@@ -126,9 +126,9 @@ git push -u origin feature/nama-fitur-kamu
 ---
 
 ## 📖 Dokumentasi Lengkap
-Seluruh rincian kebutuhan sistem ada di folder `docs/product/`:
-* `01_PRD.md` : Scope MVP Lomba vs Fitur Lanjutan.
-* `02_ARCHITECTURE.md` : Arsitektur teknis, resolusi subdomain, & alur keamanan pembayaran.
-* `03_DATABASE_SCHEMA.md` : Skema tabel Postgres & pola Row Level Security (RLS).
-* `04_USER_FLOWS.md` : Alur langkah demi langkah tiap peran & checklist UAT.
-* `05_FEATURE_SPEC.md` : Kriteria penerimaan (*acceptance criteria*) tiap modul.
+* `docs/MILESTONES.md` : **Roadmap & Checklist Milestone Tim (M0–M9)**.
+* `docs/product/01_PRD.md` : Scope MVP Lomba vs Fitur Lanjutan.
+* `docs/product/02_ARCHITECTURE.md` : Arsitektur teknis, resolusi subdomain, & alur keamanan pembayaran.
+* `docs/product/03_DATABASE_SCHEMA.md` : Skema tabel Postgres & pola Row Level Security (RLS).
+* `docs/product/04_USER_FLOWS.md` : Alur langkah demi langkah tiap peran & checklist UAT.
+* `docs/product/05_FEATURE_SPEC.md` : Kriteria penerimaan (*acceptance criteria*) tiap modul.
