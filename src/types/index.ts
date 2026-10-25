@@ -27,6 +27,19 @@ export type Profile = {
   created_at: string;
 };
 
+export type Package = {
+  id: string;
+  name: string;
+  tier: PackageTier;
+  price_monthly: number;
+  price_6_months: number;
+  price_yearly: number;
+  trial_days: number;
+  feature_flags: Record<string, boolean>;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type Tenant = {
   id: string;
   owner_id: string;
@@ -37,12 +50,13 @@ export type Tenant = {
   contact_phone: string | null;
   contact_whatsapp: string | null;
   address: string | null;
+  primary_color: string;
   status: TenantStatus;
   current_package_id: string | null;
-  primary_color: string;
   trial_ends_at: string | null;
   subscription_ends_at: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type PublicTenant = Pick<
@@ -58,6 +72,20 @@ export type PublicTenant = Pick<
   | 'primary_color'
   | 'status'
 >;
+
+export type Transaction = {
+  id: string;
+  tenant_id: string;
+  package_id: string;
+  billing_cycle: BillingCycle;
+  amount: number;
+  midtrans_order_id: string;
+  midtrans_transaction_id: string | null;
+  status: TransactionStatus;
+  raw_notification: Record<string, any> | null;
+  settled_at: string | null;
+  created_at: string;
+};
 
 export type Category = {
   id: string;
@@ -102,4 +130,46 @@ export type OrderItem = {
   price_snapshot: number;
   quantity: number;
   subtotal: number;
+};
+
+export type GuestOrderItemPayload = {
+  menu_item_id: string;
+  quantity: number;
+};
+
+export type CreateGuestOrderPayload = {
+  p_tenant_id: string;
+  p_buyer_name: string;
+  p_buyer_contact?: string | null;
+  p_note?: string | null;
+  p_items: GuestOrderItemPayload[];
+};
+
+export type CreateGuestOrderResult = {
+  success: boolean;
+  order_id: string;
+  order_code: string;
+  total_amount: number;
+  status: OrderStatus;
+};
+
+export type GuestOrderStatusItem = {
+  name: string;
+  price: number;
+  quantity: number;
+  subtotal: number;
+};
+
+export type GetGuestOrderStatusResult = {
+  success: boolean;
+  order_id?: string;
+  order_code?: string;
+  buyer_name?: string;
+  buyer_contact_masked?: string | null;
+  status?: OrderStatus;
+  total_amount?: number;
+  note?: string | null;
+  created_at?: string;
+  items?: GuestOrderStatusItem[];
+  message?: string;
 };
