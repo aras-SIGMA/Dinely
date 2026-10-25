@@ -15,19 +15,21 @@ ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
 -- ------------------------------------------------------------------------------
 -- 2. HELPER FUNCTIONS UNTUK EVALUASI RLS
+-- Atribut: STABLE SECURITY DEFINER SET search_path = public, pg_temp
+-- Menggunakan (SELECT auth.uid()) untuk evaluasi initPlan 1x per query
 -- ------------------------------------------------------------------------------
 
 -- Memeriksa apakah user saat ini memiliki role 'platform_admin'
 CREATE OR REPLACE FUNCTION public.is_platform_admin()
 RETURNS boolean
 LANGUAGE sql
-SECURITY DEFINER
 STABLE
-SET search_path = public
+SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'platform_admin'
+    WHERE id = (SELECT auth.uid()) AND role = 'platform_admin'
   );
 $$;
 
@@ -35,15 +37,18 @@ $$;
 CREATE OR REPLACE FUNCTION public.is_tenant_owner(p_tenant_id uuid)
 RETURNS boolean
 LANGUAGE sql
-SECURITY DEFINER
 STABLE
-SET search_path = public
+SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.tenants
-    WHERE id = p_tenant_id AND owner_id = auth.uid()
+    WHERE id = p_tenant_id AND owner_id = (SELECT auth.uid())
   );
 $$;
+
+GRANT EXECUTE ON FUNCTION public.is_platform_admin() TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_tenant_owner(uuid) TO anon, authenticated, service_role;
 
 -- ------------------------------------------------------------------------------
 -- 3. POLICIES: profiles
@@ -53,13 +58,22 @@ $$;
 CREATE POLICY "profiles_select_own_or_admin"
   ON public.profiles
   FOR SELECT
-  USING (id = auth.uid() OR public.is_platform_admin());
+  USING (
+    id = (SELECT auth.uid()) OR
+    public.is_platform_admin()
+  );
 
 CREATE POLICY "profiles_update_own_or_admin"
   ON public.profiles
   FOR UPDATE
-  USING (id = auth.uid() OR public.is_platform_admin())
-  WITH CHECK (id = auth.uid() OR public.is_platform_admin());
+  USING (
+    id = (SELECT auth.uid()) OR
+    public.is_platform_admin()
+  )
+  WITH CHECK (
+    id = (SELECT auth.uid()) OR
+    public.is_platform_admin()
+  );
 
 -- ------------------------------------------------------------------------------
 -- 4. POLICIES: packages
@@ -69,7 +83,10 @@ CREATE POLICY "profiles_update_own_or_admin"
 CREATE POLICY "packages_select_public"
   ON public.packages
   FOR SELECT
-  USING (is_active = true OR public.is_platform_admin());
+  USING (
+    is_active = true OR
+    public.is_platform_admin()
+  );
 
 CREATE POLICY "packages_modify_admin"
   ON public.packages
@@ -79,16 +96,15 @@ CREATE POLICY "packages_modify_admin"
 
 -- ------------------------------------------------------------------------------
 -- 5. POLICIES: tenants
--- Publik hanya bisa melihat tenant berstatus 'active' atau 'trial'
--- Pemilik bisa melihat & mengedit data usahanya sendiri
--- Admin platform bisa melihat semua dan mengubah status
+-- PENTING: Role anon TIDAK memiliki akses langsung ke tabel tenants!
+-- Publik WAJIB mengakses profil tenant melalui view `public_tenants`.
+-- Tabel tenants hanya bisa diakses oleh pemiliknya (owner) dan platform_admin.
 -- ------------------------------------------------------------------------------
-CREATE POLICY "tenants_select_active_or_owner"
+CREATE POLICY "tenants_select_owner_or_admin"
   ON public.tenants
   FOR SELECT
   USING (
-    status IN ('active', 'trial') OR
-    owner_id = auth.uid() OR
+    owner_id = (SELECT auth.uid()) OR
     public.is_platform_admin()
   );
 
@@ -96,19 +112,19 @@ CREATE POLICY "tenants_insert_owner"
   ON public.tenants
   FOR INSERT
   WITH CHECK (
-    auth.uid() IS NOT NULL AND
-    owner_id = auth.uid()
+    (SELECT auth.uid()) IS NOT NULL AND
+    owner_id = (SELECT auth.uid())
   );
 
 CREATE POLICY "tenants_update_owner_or_admin"
   ON public.tenants
   FOR UPDATE
   USING (
-    owner_id = auth.uid() OR
+    owner_id = (SELECT auth.uid()) OR
     public.is_platform_admin()
   )
   WITH CHECK (
-    owner_id = auth.uid() OR
+    owner_id = (SELECT auth.uid()) OR
     public.is_platform_admin()
   );
 
@@ -192,8 +208,8 @@ CREATE POLICY "menu_items_owner_full_access"
 
 -- ------------------------------------------------------------------------------
 -- 9. POLICIES: orders & order_items
--- Direct INSERT dari anon diblokir demi keamanan penghitungan harga (wajib via RPC)
--- Pemilik tenant dan admin platform dapat melihat & memperbarui status pesanan
+-- Direct INSERT dari anon diblokir demi keamanan (pembuatan order wajib via RPC).
+-- Pemilik tenant dan admin platform dapat melihat & memperbarui status pesanan.
 -- ------------------------------------------------------------------------------
 CREATE POLICY "orders_select_owner_or_admin"
   ON public.orders

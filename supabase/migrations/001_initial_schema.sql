@@ -105,6 +105,14 @@ CREATE TABLE public.tenants (
     length(subdomain) <= 63 AND
     subdomain NOT LIKE '-%' AND
     subdomain NOT LIKE '%-'
+  ),
+
+  -- Blacklist subdomain terlarang (reserved subdomains)
+  CONSTRAINT check_subdomain_reserved CHECK (
+    subdomain NOT IN (
+      'www', 'app', 'api', 'admin', 'auth', 'dashboard', 'cdn',
+      'mail', 'support', 'billing', 'static', 'status', 'assets', 'docs'
+    )
   )
 );
 
@@ -135,7 +143,10 @@ CREATE TABLE public.categories (
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   name text NOT NULL,
   sort_order integer NOT NULL DEFAULT 0,
-  created_at timestamptz NOT NULL DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+
+  -- Composite unique agar bisa dijadikan referensi composite foreign key
+  CONSTRAINT uq_categories_id_tenant UNIQUE (id, tenant_id)
 );
 
 -- ------------------------------------------------------------------------------
@@ -153,7 +164,11 @@ CREATE TABLE public.menu_items (
   is_available boolean NOT NULL DEFAULT true,
   sort_order integer NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+  updated_at timestamptz NOT NULL DEFAULT now(),
+
+  -- Kunci category_id dan tenant_id sekaligus agar menu tidak bisa salah tenant
+  CONSTRAINT fk_menu_items_category FOREIGN KEY (category_id, tenant_id)
+    REFERENCES public.categories(id, tenant_id) ON DELETE RESTRICT
 );
 
 -- ------------------------------------------------------------------------------
@@ -178,7 +193,8 @@ CREATE TABLE public.orders (
 
 -- ------------------------------------------------------------------------------
 -- 9. TABEL: order_items
--- Rincian item pesanan dengan snapshot harga & nama menu saat dipesan
+-- Rincian item pesanan dengan snapshot harga & nama menu saat dipesan.
+-- subtotal adalah GENERATED ALWAYS AS (price_snapshot * quantity) STORED
 -- ------------------------------------------------------------------------------
 CREATE TABLE public.order_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -186,13 +202,13 @@ CREATE TABLE public.order_items (
   menu_item_id uuid REFERENCES public.menu_items(id) ON DELETE SET NULL,
   menu_item_name_snapshot text NOT NULL,
   price_snapshot numeric NOT NULL CHECK (price_snapshot >= 0),
-  quantity integer NOT NULL CHECK (quantity > 0),
-  subtotal numeric NOT NULL CHECK (subtotal >= 0)
+  quantity integer NOT NULL CHECK (quantity > 0 AND quantity <= 1000),
+  subtotal numeric GENERATED ALWAYS AS (price_snapshot * quantity) STORED
 );
 
 -- ------------------------------------------------------------------------------
 -- 10. DATABASE VIEW: public_tenants
--- Hanya menampilkan kolom publik untuk tenant berstatus aktif atau trial
+-- Hanya menampilkan kolom publik untuk tenant berstatus aktif/trial dan belum expired
 -- ------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW public.public_tenants AS
 SELECT 
@@ -207,17 +223,21 @@ SELECT
   primary_color,
   status
 FROM public.tenants
-WHERE status IN ('active', 'trial');
+WHERE (status = 'active' AND (subscription_ends_at IS NULL OR subscription_ends_at > now()))
+   OR (status = 'trial' AND (trial_ends_at IS NULL OR trial_ends_at > now()));
+
+-- Berikan hak baca view ke role publik (anon) dan authenticated
+GRANT SELECT ON public.public_tenants TO anon, authenticated;
 
 -- ------------------------------------------------------------------------------
 -- 11. INDEXES UNTUK PERFORMA
 -- ------------------------------------------------------------------------------
 CREATE INDEX idx_tenants_subdomain ON public.tenants (subdomain);
-CREATE INDEX idx_tenants_owner ON public.tenants (owner_id);
+CREATE INDEX idx_tenants_owner_id ON public.tenants (owner_id);
 CREATE INDEX idx_transactions_tenant ON public.transactions (tenant_id);
 CREATE INDEX idx_transactions_midtrans_order ON public.transactions (midtrans_order_id);
 CREATE INDEX idx_categories_tenant_sort ON public.categories (tenant_id, sort_order);
 CREATE INDEX idx_menu_items_tenant_cat ON public.menu_items (tenant_id, category_id, sort_order);
-CREATE INDEX idx_menu_items_availability ON public.menu_items (tenant_id, is_available);
-CREATE INDEX idx_orders_tenant_status ON public.orders (tenant_id, status, created_at DESC);
-CREATE INDEX idx_order_items_order ON public.order_items (order_id);
+CREATE INDEX idx_menu_items_tenant_avail ON public.menu_items (tenant_id, is_available, sort_order);
+CREATE INDEX idx_orders_tenant_status_created ON public.orders (tenant_id, status, created_at DESC);
+CREATE INDEX idx_order_items_order_id ON public.order_items (order_id);
