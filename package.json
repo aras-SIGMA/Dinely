@@ -21,8 +21,6 @@
     "vite": "^7.3.7"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1156.0",
-    "@aws-sdk/s3-request-presigner": "^3.1156.0",
     "@supabase/supabase-js": "^2.118.0",
     "sv-router": "^0.19.0"
   }

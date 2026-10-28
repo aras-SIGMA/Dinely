@@ -13,7 +13,7 @@ Dokumen ini adalah panduan kerja teknis seluruh tim RestoLink untuk menyelesaika
 | **M2** | Subdomain Resolver Engine | H3–H4 | `feature/subdomain-resolver` | ⏹️ Antrean |
 | **M3** | Autentikasi & Registrasi Pemilik | H4–H5 | `feature/auth-and-registration` | ⏹️ Antrean |
 | **M4** | Pembayaran Midtrans (Serverless Webhook) | H6–H7 | `feature/midtrans-payment` | ⏹️ Antrean |
-| **M5** | Menu Management & Cloudflare R2 Upload | H8–H9 | `feature/menu-and-r2-upload` | ⏹️ Antrean |
+| **M5** | Menu Management & Cloudinary Image Upload | H8–H9 | `feature/menu-and-cloudinary-upload` | ⏹️ Antrean |
 | **M6** | Website Publik Tenant & Guest Checkout | H9–H10 | `feature/tenant-site-and-order` | ⏹️ Antrean |
 | **M7** | Dashboard Pesanan (Owner Order Tracking) | H11 | `feature/order-management` | ⏹️ Antrean |
 | **M8** | Dashboard Admin Platform & Landing Page | H12–H13 | `feature/admin-and-landing` | ⏹️ Antrean |
@@ -100,18 +100,18 @@ Dokumen ini adalah panduan kerja teknis seluruh tim RestoLink untuk menyelesaika
 
 ---
 
-### Milestone 5: Menu Management & Cloudflare R2 Upload
-* **Branch**: `feature/menu-and-r2-upload`
+### Milestone 5: Menu Management & Cloudinary Image Upload
+* **Branch**: `feature/menu-and-cloudinary-upload`
 * **Dependensi**: M3, M4
-* **Tujuan**: Pemilik dapat mengatur identitas usaha dan katalog produk makanan/minuman.
+* **Tujuan**: Pemilik dapat mengatur identitas usaha dan katalog produk makanan/minuman dengan penyimpanan gambar Cloudinary.
 * **Langkah Konkret**:
   1. Client WebP Compressor (`src/lib/image-compressor.ts`): Kompresi gambar via canvas browser (max 800px, max 300KB).
-  2. Endpoint `api/r2/sign-upload.ts`: Pembuatan presigned PUT URL ke bucket Cloudflare R2.
+  2. Endpoint `api/cloudinary/sign-upload.ts`: Pembuatan signature terotentikasi (SHA-1) untuk direct upload ke Cloudinary API.
   3. Dashboard Profil Usaha: Update nama usaha, deskripsi, alamat, kontak WhatsApp, dan logo.
   4. Dashboard Kategori: CRUD kategori + input urutan tampil (`sort_order`).
-  5. Dashboard Menu: CRUD item menu (nama, kategori, deskripsi, harga, upload foto WebP, toggle ketersediaan `is_available`).
+  5. Dashboard Menu: CRUD item menu (nama, kategori, deskripsi, harga, upload foto WebP ke Cloudinary, toggle ketersediaan `is_available`).
 * **Kriteria Selesai (AC)**:
-  * Foto menu terunggah dalam format WebP ke storage dan URL tersimpan di database.
+  * Foto menu terunggah ke Cloudinary dan URL tersimpan di database.
   * Toggle ketersediaan menu langsung tersimpan dan aman di bawah RLS owner.
 
 ---

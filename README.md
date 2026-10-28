@@ -31,7 +31,7 @@ Salin file template `.env.example` menjadi `.env`:
   cp .env.example .env
   ```
 
-Buka file `.env` dan isi kredensial proyek (tanyakan nilai kredensial Supabase/Midtrans/R2 ke lead/koordinator tim).
+Buka file `.env` dan isi kredensial proyek (tanyakan nilai kredensial Supabase/Midtrans/Cloudinary ke lead/koordinator tim).
 
 ### 4. Menjalankan Aplikasi (Development)
 ```bash
@@ -71,7 +71,7 @@ restolink/
 │
 ├── api/                       # BACKEND (Vercel Serverless Functions / Node.js)
 │   ├── midtrans/              # Endpoint create transaction & webhook validator
-│   ├── r2/                    # Presigned PUT URL generator Cloudflare R2
+│   ├── cloudinary/            # Endpoint signature generator upload gambar Cloudinary
 │   └── gemini/                # Proxy AI chatbot landing page
 │
 ├── supabase/                  # DATABASE POSTGRES & KEAMANAN
@@ -99,7 +99,7 @@ Agar kolaborasi tim rapi dan tidak terjadi konflik kode (*merge conflict*), patu
      * `feature/subdomain-resolver`
      * `feature/auth-and-registration`
      * `feature/midtrans-payment`
-     * `feature/menu-and-r2-upload`
+     * `feature/menu-and-cloudinary-upload`
      * `feature/tenant-site-and-order`
      * `feature/order-management`
      * `feature/admin-and-landing`
