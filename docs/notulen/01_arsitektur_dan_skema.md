@@ -12,7 +12,7 @@ Status: Disetujui
 * **Warna Tema Utama**: Oranye Kuliner (`#ea580c`) + Slate Netral. Warna aksen per tenant dikontrol dinamis via CSS variable.
 * **Backend Serverless**: Vercel Serverless Functions (`api/` berbasis Node.js/TypeScript).
 * **Database & Autentikasi**: Supabase Postgres + Supabase Auth (Anon key di browser, Service Role key di endpoint serverless).
-* **Storage Gambar**: Cloudflare R2 via Presigned PUT URL (dengan fallback sementara Supabase Storage bila diperlukan).
+* **Storage Gambar**: Cloudinary via signature-based direct upload (kuota gratis 25 GB tanpa perlu verifikasi kartu kredit).
 * **Payment Gateway**: Midtrans (Snap API + webhook verification server-side).
 
 ---
@@ -29,8 +29,8 @@ restolink/
 │   ├── midtrans/
 │   │   ├── create.ts                   # Endpoint buat token Snap
 │   │   └── webhook.ts                  # Verifikasi SHA-512 & aktivasi tenant
-│   ├── r2/
-│   │   └── sign-upload.ts              # Presigned PUT URL Cloudflare R2
+│   ├── cloudinary/
+│   │   └── sign-upload.ts              # Endpoint signature upload Cloudinary
 │   └── gemini/
 │       └── chat.ts                     # Proxy Gemini API
 ├── supabase/                           # Database & SQL Engine
