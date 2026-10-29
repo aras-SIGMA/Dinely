@@ -19,8 +19,8 @@
 
   const pageTitle = $derived(
     tenantStore.businessName
-      ? `${tenantStore.businessName} - Menu Digital | RestoLink`
-      : 'RestoLink'
+      ? `${tenantStore.businessName} - Menu Digital`
+      : 'Menu Digital'
   );
 </script>
 
@@ -66,6 +66,31 @@
         <Skeleton class="h-32 rounded-xl" />
       </div>
     </div>
+  {:else if tenantStore.error}
+    <!-- Gangguan Jaringan / Server Toko -->
+    <div class="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-4 text-center">
+      <div class="flex size-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 shadow-xs">
+        <svg class="size-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+      <h1 class="mt-4 text-xl font-bold text-slate-900">Koneksi Sedang Terkendala</h1>
+      <p class="mt-2 text-sm text-slate-600">
+        Kami mengalami kendala saat menghubungkan ke database toko. Silakan coba muat ulang halaman.
+      </p>
+      <button
+        type="button"
+        onclick={() => tenantStore.fetchTenant(host.slug, true)}
+        class="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800"
+      >
+        Muat Ulang Halaman
+      </button>
+    </div>
   {:else if tenantStore.notFound}
     <!-- Tenant Tidak Ditemukan atau Non-Aktif -->
     <NotFound />
@@ -73,10 +98,10 @@
     <!-- Content Route Tenant -->
     {@render children()}
 
-    <!-- Simple Footer Platform -->
-    <footer class="mt-16 border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
+    <!-- Simple Minimalist Footer -->
+    <footer class="mt-16 border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">
       <p>
-        Ditenagai oleh <a href="https://restolink.site" class="font-semibold text-brand-600 hover:underline">RestoLink</a> — Solusi Menu Digital UMKM Kuliner
+        Ditenagai oleh <span class="font-medium text-slate-600">RestoLink</span>
       </p>
     </footer>
   {/if}
