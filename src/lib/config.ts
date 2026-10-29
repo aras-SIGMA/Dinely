@@ -10,21 +10,24 @@ export const APP_DOMAIN = 'restolink.site';
 /**
  * Daftar Subdomain yang Dipesan (Reserved Subdomains)
  *
+ * Sinkron 100% dengan constraint database check_subdomain_reserved pada 001_initial_schema.sql.
  * Subdomain-subdomain di bawah ini dilarang didaftarkan oleh tenant UMKM
  * untuk mencegah bentrok dengan rute sistem platform, DNS, atau modul internal.
  */
 export const RESERVED_SUBDOMAINS = new Set([
   'www',
-  'admin',
-  'api',
   'app',
+  'api',
+  'admin',
   'auth',
-  'mail',
   'dashboard',
-  'static',
-  'assets',
   'cdn',
+  'mail',
+  'support',
+  'billing',
+  'static',
   'status',
+  'assets',
   'docs'
 ]);
 
@@ -32,5 +35,21 @@ export const RESERVED_SUBDOMAINS = new Set([
  * Memeriksa apakah suatu slug termasuk subdomain yang dilarang/dipesan.
  */
 export function isReservedSubdomain(slug: string): boolean {
-  return RESERVED_SUBDOMAINS.has(slug.toLowerCase());
+  return RESERVED_SUBDOMAINS.has(slug.toLowerCase().trim());
+}
+
+/**
+ * Memeriksa apakah format dan nilai subdomain valid sesuai aturan platform & database.
+ * Aturan:
+ * - Panjang 3 - 63 karakter
+ * - Hanya karakter a-z, 0-9, dan dash (-)
+ * - Tidak diawali atau diakhiri tanda dash (-)
+ * - Bukan anggota RESERVED_SUBDOMAINS
+ */
+export function isValidSubdomain(slug: string): boolean {
+  const normalized = slug.trim().toLowerCase();
+  if (normalized.length < 3 || normalized.length > 63) return false;
+  if (!/^[a-z0-9-]+$/.test(normalized)) return false;
+  if (normalized.startsWith('-') || normalized.endsWith('-')) return false;
+  return !isReservedSubdomain(normalized);
 }
