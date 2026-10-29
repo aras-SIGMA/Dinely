@@ -7,6 +7,8 @@ class TenantStore {
   slug = $state<string | null>(null);
   error = $state<string | null>(null);
 
+  #inFlight: Promise<PublicTenant | null> | null = null;
+
   get notFound(): boolean {
     return !this.loading && this.slug !== null && this.tenant === null;
   }
@@ -36,41 +38,46 @@ class TenantStore {
 
     const normalizedSlug = slug.trim().toLowerCase();
 
-    // Hindari request duplikat jika tenant dengan slug yang sama sudah berhasil dimuat
-    if (!force && this.slug === normalizedSlug && this.tenant !== null) {
-      return this.tenant;
+    // Hindari request duplikat jika tenant sudah dimuat atau request sedang berjalan (in-flight)
+    if (!force && this.slug === normalizedSlug) {
+      if (this.tenant !== null) return this.tenant;
+      if (this.#inFlight) return this.#inFlight;
     }
 
     this.loading = true;
     this.error = null;
     this.slug = normalizedSlug;
 
-    try {
-      const { data, error } = await supabase
-        .from('public_tenants')
-        .select(
-          'id, business_name, subdomain, logo_url, description, contact_phone, contact_whatsapp, address, primary_color, status'
-        )
-        .eq('subdomain', normalizedSlug)
-        .maybeSingle();
+    this.#inFlight = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('public_tenants')
+          .select(
+            'id, business_name, subdomain, logo_url, description, contact_phone, contact_whatsapp, address, primary_color, status'
+          )
+          .eq('subdomain', normalizedSlug)
+          .maybeSingle();
 
-      if (error) {
-        console.error('[RestoLink] Gagal memuat data tenant:', error.message);
-        this.error = error.message;
+        if (error) {
+          console.error('[RestoLink] Gagal memuat data tenant:', error.message);
+          this.error = error.message;
+          this.tenant = null;
+        } else {
+          this.tenant = data as PublicTenant | null;
+        }
+      } catch (err: any) {
+        const message = err?.message ?? 'Terjadi kesalahan jaringan saat memuat tenant';
+        console.error('[RestoLink] Exception saat memuat tenant:', err);
+        this.error = message;
         this.tenant = null;
-      } else {
-        this.tenant = data as PublicTenant | null;
+      } finally {
+        this.loading = false;
+        this.#inFlight = null;
       }
-    } catch (err: any) {
-      const message = err?.message ?? 'Terjadi kesalahan jaringan saat memuat tenant';
-      console.error('[RestoLink] Exception saat memuat tenant:', err);
-      this.error = message;
-      this.tenant = null;
-    } finally {
-      this.loading = false;
-    }
+      return this.tenant;
+    })();
 
-    return this.tenant;
+    return this.#inFlight;
   }
 
   reset(): void {
@@ -78,6 +85,7 @@ class TenantStore {
     this.tenant = null;
     this.slug = null;
     this.error = null;
+    this.#inFlight = null;
   }
 }
 

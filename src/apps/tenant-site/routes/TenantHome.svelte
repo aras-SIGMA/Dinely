@@ -4,10 +4,13 @@
 
   const tenant = $derived(tenantStore.tenant);
 
-  // Normalisasi nomor WhatsApp ke standar internasional Indonesia (awalan 62)
+  // Gunakan contact_whatsapp, fallback ke contact_phone jika ada
+  const targetPhone = $derived(tenant?.contact_whatsapp || tenant?.contact_phone || null);
+
+  // Normalisasi nomor ke standar internasional Indonesia (awalan 62)
   const cleanWaNumber = $derived.by(() => {
-    if (!tenant?.contact_whatsapp) return null;
-    let num = tenant.contact_whatsapp.replace(/[^0-9]/g, '');
+    if (!targetPhone) return null;
+    let num = targetPhone.replace(/[^0-9]/g, '');
     if (num.startsWith('0')) {
       num = '62' + num.slice(1);
     }
@@ -17,7 +20,7 @@
   const waInquiryLink = $derived.by(() => {
     if (!cleanWaNumber || !tenant) return null;
     const greeting = encodeURIComponent(
-      `Halo ${tenant.business_name}, saya melihat menu di website Anda dan ingin bertanya mengenai layanan/menu:`
+      `Halo ${tenant.business_name}, saya melihat menu digital Anda di website dan ingin bertanya mengenai pemesanan/layanan.`
     );
     return `https://wa.me/${cleanWaNumber}?text=${greeting}`;
   });
@@ -183,6 +186,27 @@
           Snapshot Harga Aman & Akurat
         </span>
       </div>
+
+      {#if waInquiryLink}
+        <div class="mt-8 flex flex-col items-center justify-center gap-2 border-t border-slate-200/80 pt-6">
+          <p class="text-xs text-slate-500">
+            Ingin memesan menu khusus atau berkonsultasi langsung dengan toko sekarang?
+          </p>
+          <a
+            href={waInquiryLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-emerald-700"
+          >
+            <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.074-1.807-.412-.969-.401-1.631-1.341-1.68-1.405-.049-.064-.383-.51-.383-.972 0-.462.242-.689.328-.784.086-.095.188-.119.251-.119.063 0 .126.002.181.004.058.003.136-.022.213.163.078.188.267.653.29.701.023.048.039.105.008.167-.031.062-.047.1-.094.155-.047.056-.099.124-.141.167-.047.047-.096.098-.041.193.055.094.244.404.524.654.361.321.666.421.76.468.095.048.151.04.207-.024.056-.064.24-.28.304-.376.064-.096.127-.08.214-.048.087.032.553.261.648.308.095.048.158.072.182.112.024.041.024.238-.12.643z"
+              />
+            </svg>
+            Hubungi WhatsApp Penjual / Toko
+          </a>
+        </div>
+      {/if}
     </section>
   </main>
 {/if}
