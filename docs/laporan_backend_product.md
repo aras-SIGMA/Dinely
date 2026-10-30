@@ -13,7 +13,7 @@ RestoLink adalah platform web multi-tenant yang berfungsi sebagai pusat kendali 
 Berdasarkan `02_ARCHITECTURE.md` (Bagian 1, 2, 4, 5, 7):
 * **Frontend & Client Routing**: Vite + Svelte + TypeScript, Svelte-based routing (Multi-page untuk Landing Page SEO, SPA untuk Dashboard Pemilik & Admin Platform, serta Runtime Subdomain Resolver untuk Website Tenant). Frontend murni client-side rendering (tanpa SSR).
 * **Backend & Database**: Supabase (PostgreSQL), Supabase Auth, Row Level Security (RLS), serta RPC / Edge Functions / Serverless API routes untuk logika bisnis server.
-* **Asset Storage**: Cloudflare R2 untuk penyimpanan logo usaha dan foto menu dalam format WebP yang dikompresi sebelum upload.
+* **Asset Storage**: Cloudinary untuk penyimpanan logo usaha dan foto menu dalam format WebP yang dikompresi sebelum upload.
 * **Payment Gateway**: Midtrans (Snap / Sandbox) khusus untuk pembayaran paket langganan (bukan untuk pesanan pembeli).
 * **Hosting & Subdomain**: Vercel dengan konfigurasi wildcard subdomain (`*.restolink.site`).
 * **Chatbot AI**: Google Gemini API, hanya aktif di Landing Page utama platform.
@@ -78,9 +78,9 @@ Berdasarkan `02_ARCHITECTURE.md`, `03_DATABASE_SCHEMA.md`, `05_FEATURE_SPEC.md`,
      * Jika `deny`, `cancel`, `expire`, atau `failure`: update `transactions.status` sesuai notifikasi; `tenants.status` tetap `pending` (`04_USER_FLOWS.md` Bagian 1 & 4).
 
 3. **Asset Upload Signer / Direct Storage Endpoint**
-   * *Method & Path*: TIDAK JELAS (Di `02_ARCHITECTURE.md` Bagian 1 & 7 hanya disebut upload gambar WebP ke Cloudflare R2; endpoint signer / presigned URL belum dispesifikasikan).
-   * *Tujuan*: Menyediakan kredensial sementara / presigned PUT URL ke Cloudflare R2 agar client dapat mengunggah logo dan gambar menu secara aman tanpa membocorkan kredensial R2 ke frontend.
-   * *Validasi*: Sesi autentikasi owner, batasan ukuran file, tipe file gambar.
+   * *Method & Path*: `POST api/cloudinary/sign-upload.ts` (Sesuai `TIM_TASKS.md` BE-03).
+   * *Tujuan*: Menyediakan signature berbatas waktu (timestamp) terotentikasi ke Cloudinary menggunakan `CLOUDINARY_API_SECRET` agar client dapat mengunggah logo dan gambar menu secara aman tanpa membocorkan secret key ke frontend.
+   * *Validasi*: Sesi autentikasi owner (Bearer token), batasan ukuran file, tipe file gambar.
 
 4. **Guest Order Creation Handler / Database RPC**
    * *Method & Path*: RPC Database Supabase (misal `create_guest_order`) atau `POST /rest/v1/rpc/...` (`03_DATABASE_SCHEMA.md` Bagian 9 & 10).
@@ -132,9 +132,8 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
 
 ## 6. Kontradiksi atau Ketidaksesuaian Antar Dokumen
 
-1. **Penyedia Storage Gambar (Cloudflare R2 vs Implementasi Lain)**:
-   * *Sumber*: Seluruh dokumen `docs/product/` (`00_README.md` baris 33, `02_ARCHITECTURE.md` Bagian 1, `03_DATABASE_SCHEMA.md` baris 49 & 153, `05_FEATURE_SPEC.md` Bagian D2, `04_USER_FLOWS.md` Bagian 1) secara konsisten menyebut **Cloudflare R2** sebagai tempat penyimpanan gambar WebP.
-   * *Catatan*: Tidak ada penyebutan penyedia storage lain di folder `docs/product/`.
+1. **Penyedia Storage Gambar (Penyelarasan ke Cloudinary)**:
+   * *Status*: Telah diselaraskan dari Cloudflare R2 ke **Cloudinary** di seluruh dokumen produk agar sesuai dengan `TIM_TASKS.md` (BE-03: Cloudinary Upload Signer) dan implementasi `api/cloudinary/sign-upload.ts`.
 
 2. **Skema Trial 30 Hari: Berbayar via Midtrans vs Gratis Tanpa Transaksi**:
    * *01_PRD.md* FR-12: Menyebutkan *"Sistem menyediakan uji coba gratis 30 hari pada paket yang dipilih..."*.
@@ -160,9 +159,8 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
    * *Status*: TIDAK JELAS.
    * *Detail*: `02_ARCHITECTURE.md` menyatakan frontend di-hosting di Vercel dan database di Supabase. Namun dokumen tidak merinci apakah endpoint backend (Midtrans webhook, Snap creator, Gemini proxy) harus diimplementasikan sebagai **Vercel Serverless Functions** (folder `api/`) atau **Supabase Edge Functions** (Deno di folder `supabase/functions/`).
 
-2. **Spesifikasi Teknis Upload ke Cloudflare R2**:
-   * *Status*: TIDAK JELAS.
-   * *Detail*: Dokumen hanya menyebut gambar menu dikompresi ke WebP dan disimpan ke Cloudflare R2. Tidak ada endpoint, SDK, maupun skema presigned URL yang dijelaskan untuk mengizinkan upload dari browser secara aman ke bucket R2.
+2. **Spesifikasi Teknis Upload ke Cloudinary**:
+   * *Status*: Sudah jelas via endpoint signer `api/cloudinary/sign-upload.ts` (generate signature SHA-1 dengan timestamp dan `CLOUDINARY_API_SECRET`), lalu client melakukan direct POST multipart ke API Cloudinary.
 
 3. **Nominal Pasti Pembayaran Paket Mikro**:
    * *Status*: TIDAK JELAS.
@@ -182,7 +180,7 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
 
 1. **Runtime Serverless Backend**: Apakah backend dibangun menggunakan Vercel Serverless Functions (`api/*.ts`) atau Supabase Edge Functions (`supabase/functions/*.ts`)?
 2. **Skema Pembayaran Trial**: Apakah pengguna yang baru mendaftar paket Mikro harus melalui checkout Midtrans dengan nominal tertentu (misal Rp 29.000), atau langsung mendapatkan status `'trial'` selama 30 hari secara otomatis tanpa Midtrans?
-3. **Mekanisme Upload R2**: Bagaimana alur upload ke Cloudflare R2 yang disepakati? Apakah backend perlu membuat endpoint presigned PUT URL S3-compatible, atau ada mekanisme lain?
+3. **Mekanisme Upload Cloudinary**: Konfirmasi alur upload Cloudinary melalui backend signer (SHA-1 signature generator dengan timestamp) yang dipanggil oleh client sebelum POST multipart ke API Cloudinary.
 4. **Implementasi Pemesanan Guest**: Apakah pembuatan pesanan pembeli wajib dibungkus dalam PostgreSQL Function (RPC) di Supabase untuk menjamin atomisitas validasi menu dan snapshot harga, atau cukup transaksi client via Supabase SDK?
 5. **Format `order_code`**: Bagaimana aturan pembentukan `order_code` (misal 5 karakter alfanumerik acak, atau urutan harian per tenant)?
 6. **Harga Paket Mikro**: Berapa nominal pasti `amount` yang harus dikirim ke Midtrans saat pembuatan transaksi paket Mikro?
@@ -206,8 +204,8 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
    * Membuat RPC `create_guest_order` untuk validasi realtime menu (`is_available`), kalkulasi total, pembuatan snapshot harga & nama menu, serta generate `order_code`.
    * Membuat RPC/query proteksi pelacakan status pesanan guest berdasarkan `order_code`.
 
-4. **Tahap 4: Endpoint Media Storage Signer**
-   * Membangun endpoint signer / presigned URL generator untuk upload gambar menu dan logo ke Cloudflare R2 secara aman.
+4. **Tahap 4: Endpoint Media Storage Signer (Cloudinary)**
+   * Membangun endpoint signer (`api/cloudinary/sign-upload.ts`) untuk upload gambar menu dan logo ke Cloudinary secara aman.
 
 5. **Tahap 5: Chatbot AI Proxy (Gemini API)**
    * Membangun endpoint proxy untuk request chat landing page menggunakan Gemini API dengan system prompt RestoLink dan proteksi API key.

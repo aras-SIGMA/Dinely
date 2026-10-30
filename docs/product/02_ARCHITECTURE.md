@@ -12,7 +12,7 @@
 | Database & Backend | **Supabase** (Postgres) | Data relasional, business logic via RPC/Edge Functions bila perlu |
 | Autentikasi | **Supabase Auth** | Registrasi & login Pemilik Usaha dan Admin Platform |
 | Isolasi Data | **Supabase Row Level Security (RLS)** | Memastikan satu tenant tidak bisa akses data tenant lain |
-| Penyimpanan Gambar | **Cloudflare R2** (format WebP) | Logo usaha, foto menu — dikompresi sebelum upload untuk hemat storage |
+| Penyimpanan Gambar | **Cloudinary** (format WebP) | Logo usaha, foto menu — dikompresi sebelum upload untuk hemat storage |
 | Payment Gateway | **Midtrans** | Pembayaran paket langganan (bukan pembayaran pesanan pembeli) |
 | Hosting & Domain | **Vercel** (dengan wildcard subdomain) | Deployment aplikasi + routing `*.restolink.site` |
 | Chatbot AI | **Google Gemini API** | Hanya di landing page utama platform |
@@ -140,7 +140,7 @@ Prinsip yang **wajib** dipegang: **aktivasi tenant/paket hanya boleh terjadi dar
                      ┌────────────┴────────────┐             │
                      │                         │             ▼
              ┌───────▼───────┐        ┌────────▼───────┐  ┌──────────────────┐
-             │  Cloudflare R2  │        │    Midtrans     │  │ Website Publik    │
+             │   Cloudinary    │        │    Midtrans     │  │ Website Publik    │
              │ (gambar menu,  │        │ (pembayaran     │  │ Tenant (subdomain)│
              │  logo — WebP)  │        │  paket, webhook)│  │ ← Pembeli         │
              └────────────────┘        └─────────────────┘  └──────────────────┘
@@ -156,7 +156,7 @@ Semua di-deploy & di-route lewat Vercel (termasuk wildcard subdomain).
 - [ ] Query dari website publik tenant (anon/public role) hanya boleh `SELECT` data tenant **aktif**, dan hanya kolom yang memang untuk publik (jangan expose data internal seperti kontak admin, catatan biaya, dsb.).
 - [ ] Webhook Midtrans divalidasi signature-nya di server sebelum dipercaya.
 - [ ] Role Admin Platform punya policy RLS terpisah yang eksplisit mengizinkan akses lintas-tenant — jangan pakai service role key di client manapun.
-- [ ] Upload gambar ke Cloudflare R2 dibatasi ukuran & tipe file, dan dikompresi ke WebP sebelum/pada saat upload.
+- [ ] Upload gambar ke Cloudinary dibatasi ukuran & tipe file, dan dikompresi ke WebP sebelum/pada saat upload.
 
 ---
 
