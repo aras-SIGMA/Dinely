@@ -64,7 +64,7 @@
 ### D2. CRUD Menu
 - **AC**:
   - [ ] Field: nama, deskripsi, harga, foto, kategori, status ketersediaan.
-  - [ ] Upload foto dikompresi ke WebP sebelum disimpan ke Cloudflare R2.
+  - [ ] Upload foto dikompresi ke WebP sebelum disimpan ke Cloudinary.
   - [ ] Toggle ketersediaan (`is_available`) langsung memengaruhi tampilan di website publik.
   - [ ] Hanya pemilik tenant terkait yang bisa CRUD menu tenant tersebut (verifikasi RLS, bukan hanya UI guard).
 

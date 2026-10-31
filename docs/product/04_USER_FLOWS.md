@@ -15,7 +15,7 @@
    - Buat baris `transactions` dengan `status = 'pending'`.
 5. **(Server-side, async)** Midtrans mengirim notifikasi → server validasi → update `transactions.status` dan `tenants.status` menjadi `active`/`trial` (lihat `02_ARCHITECTURE.md` bag. 5 untuk detail keamanan).
 6. Setelah pembayaran terverifikasi, website & fitur paket diaktifkan — subdomain tenant mulai bisa diakses publik.
-7. Pemilik menambahkan kategori & menu beserta harga dan foto (diupload ke Cloudflare R2, dikompresi WebP).
+7. Pemilik menambahkan kategori & menu beserta harga dan foto (diupload ke Cloudinary, dikompresi WebP).
 8. Pemilik membagikan alamat website (`{subdomain}.restolink.site`) ke pelanggan.
 9. Pemilik melihat pesanan masuk & memperbarui statusnya.
 10. Pemilik memperbarui menu, harga, dan ketersediaan saat diperlukan — perubahan harus langsung tercermin di website publik (NFR-07).
@@ -81,7 +81,7 @@ Status yang wajib ditangani di UI pemilik: **sukses**, **pending/menunggu**, **g
 
 1. Pemilik buka Dashboard → menu "Kategori & Menu".
 2. Tambah kategori baru (nama, urutan tampil).
-3. Dalam kategori, tambah menu: nama, deskripsi, harga, foto (upload → kompres WebP → simpan ke Cloudflare R2 → simpan URL di `menu_items.image_url`).
+3. Dalam kategori, tambah menu: nama, deskripsi, harga, foto (upload → kompres WebP → simpan ke Cloudinary → simpan URL di `menu_items.image_url`).
 4. Toggle ketersediaan menu (`is_available`) — perubahan ini harus **langsung** terlihat di website publik tanpa perlu refresh manual yang rumit (pertimbangkan Supabase Realtime subscription atau polling ringan di tenant-site untuk FR-07/NFR-07).
 5. Edit/hapus kategori atau menu — hapus kategori yang masih punya menu di dalamnya perlu konfirmasi/aturan cascade yang jelas (mis. tidak boleh hapus kategori berisi menu tanpa memindah/menghapus menunya dulu).
 
