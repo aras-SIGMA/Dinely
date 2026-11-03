@@ -7,7 +7,7 @@ Status: Disetujui
 
 ## 1. Keputusan Arsitektur & Stack Teknis
 * **Frontend Framework**: Svelte 5 (menggunakan Runes: `$state`, `$derived`).
-* **Router**: `svelte-spa-router`.
+* **Router**: `sv-router` (history mode).
 * **Styling**: Hybrid Tailwind CSS v4 + Scoped CSS Svelte (`<style>`) + CSS Variables untuk dynamic theming website tenant.
 * **Warna Tema Utama**: Oranye Kuliner (`#ea580c`) + Slate Netral. Warna aksen per tenant dikontrol dinamis via CSS variable.
 * **Backend Serverless**: Vercel Serverless Functions (`api/` berbasis Node.js/TypeScript).

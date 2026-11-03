@@ -130,3 +130,14 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Berhasil dibundel tanpa kendala.
   - Audit keamanan URL: Percobaan mengakses `/dashboard` di subdomain tenant otomatis diblokir ke halaman 404.
+
+---
+
+### [PM-DECISION-01] Penyelarasan Harga Paket Mikro & Transisi Status Tenant
+* **Tanggal**: 02 November 2026
+* **Konteks**: Sinkronisasi dokumen produk, `TIM_TASKS.md`, `seed.sql`, dan implementasi BE-01 Midtrans.
+* **Keputusan Resmi PM**:
+  1. **Nominal Paket Mikro**: Ditetapkan final **Rp 49.000 / bulan** (menghapus referensi lama Rp 29.000 di `TIM_TASKS.md`).
+  2. **Transisi Status Tenant (Opsi A)**: Setelah pembayaran awal Rp 49.000 tervalidasi webhook Midtrans, `tenants.status` langsung `'active'` dengan `subscription_ends_at = now() + interval '30 days'`. Enum `'trial'` disimpan untuk kemungkinan roadmap free trial di masa depan.
+  3. **Router Library**: Mengonfirmasi penggunaan `sv-router` (history mode), mengoreksi catatan lama `svelte-spa-router` di `docs/notulen/01_arsitektur_dan_skema.md`.
+  4. **Runtime Backend**: Vercel Serverless Functions (`api/` Node.js/TS).

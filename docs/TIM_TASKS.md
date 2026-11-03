@@ -55,7 +55,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 * **Milestone 4: Midtrans Payment Engine**
   - [ ] **BE-01**: Endpoint `api/midtrans/create.ts`
     - Validasi sesi user / tenant ID.
-    - Hitung tagihan paket Mikro (Rp 29.000).
+    - Hitung tagihan paket Mikro (Rp 49.000).
     - Request Snap Token ke Midtrans API Sandbox menggunakan `MIDTRANS_SERVER_KEY`.
     - Insert transaksi ke tabel `transactions` status `pending`.
   - [ ] **BE-02**: Endpoint `api/midtrans/webhook.ts` *(Titik Paling Kritis Sistem)*
@@ -82,7 +82,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [ ] **FE-01**: Komponen navigasi umum: `src/apps/landing/components/Navbar.svelte` & `Footer.svelte`.
   - [ ] **FE-02**: Slicing halaman `Home.svelte` (Hero section, 3 langkah mudah UMKM, value proposition, CTA).
   - [ ] **FE-03**: Slicing halaman `Features.svelte` (Menu digital, QR Code, Manajemen pesanan).
-  - [ ] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 29.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
+  - [ ] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 49.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
   - [ ] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.restolink.site`, email, password).
   - [ ] **FE-06**: Slicing halaman `Login.svelte` (Input email, password, error display, forgot password stub).
 * **Milestone 4, 5, 7: Dashboard Pemilik Usaha UI**

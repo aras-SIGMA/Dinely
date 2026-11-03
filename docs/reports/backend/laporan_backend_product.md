@@ -65,7 +65,7 @@ Berdasarkan `02_ARCHITECTURE.md`, `03_DATABASE_SCHEMA.md`, `05_FEATURE_SPEC.md`,
    * *Method & Path*: `POST` (Path: TIDAK JELAS di dokumen produk; disarankan `api/midtrans/create` atau Supabase Edge Function).
    * *Tujuan*: Meminta Snap Token / redirect URL dari Midtrans Sandbox dan membuat record transaksi awal.
    * *Validasi*: Sesi authenticated owner (`auth.uid()`), `tenant_id` valid milik user, `package_id` valid dan aktif.
-   * *Aturan Bisnis*: Hitung amount paket Mikro (Rp 29.000 / skema trial), generate `midtrans_order_id` unik, insert ke `transactions` dengan `status = 'pending'`, kembalikan Snap token ke client (`02_ARCHITECTURE.md` Bagian 5, `04_USER_FLOWS.md` Bagian 4).
+    * *Aturan Bisnis*: Hitung amount paket Mikro (Rp 49.000 / skema trial), generate `midtrans_order_id` unik, insert ke `transactions` dengan `status = 'pending'`, kembalikan Snap token ke client (`02_ARCHITECTURE.md` Bagian 5, `04_USER_FLOWS.md` Bagian 4).
 
 2. **Midtrans Webhook Receiver Endpoint**
    * *Method & Path*: `POST` (Path: TIDAK JELAS di dokumen produk; disarankan `api/midtrans/webhook` atau Supabase Edge Function).
@@ -135,16 +135,11 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
 1. **Penyedia Storage Gambar (Penyelarasan ke Cloudinary)**:
    * *Status*: Telah diselaraskan dari Cloudflare R2 ke **Cloudinary** di seluruh dokumen produk agar sesuai dengan `TIM_TASKS.md` (BE-03: Cloudinary Upload Signer) dan implementasi `api/cloudinary/sign-upload.ts`.
 
-2. **Skema Trial 30 Hari: Berbayar via Midtrans vs Gratis Tanpa Transaksi**:
-   * *01_PRD.md* FR-12: Menyebutkan *"Sistem menyediakan uji coba gratis 30 hari pada paket yang dipilih..."*.
-   * *04_USER_FLOWS.md* Bagian 1 langkah 4 & Bagian 7: Menyebutkan *"Pemilik menyelesaikan pembayaran trial/paket melalui Midtrans"* dan *"bayar trial"*.
-   * *03_DATABASE_SCHEMA.md* Bagian 6: Tabel `transactions` memiliki enum `billing_cycle ('trial','monthly','6_months','yearly')`.
-   * *Pertentangan*: Apakah trial 30 hari memerlukan transaksi Midtrans (misal Rp 0 atau nominal komitmen) atau tenant langsung aktif tanpa melalui Midtrans?
+2. **Skema Pembayaran Trial & Nominal Paket Mikro**:
+   * *Keputusan PM (Final)*: Paket Mikro ditetapkan sebesar **Rp 49.000 / bulan** (sesuai `seed.sql` dan `api/midtrans/create.ts`). Pemilik usaha menyelesaikan pembayaran awal Rp 49.000 melalui Midtrans Snap.
 
-3. **Status Tenant Pasca Pembayaran Pertama**:
-   * *04_USER_FLOWS.md* Bagian 4 langkah 6: Menyebutkan update status menjadi `'active'` *(atau `'trial'` bila trial)*.
-   * *03_DATABASE_SCHEMA.md* Bagian 3: Tabel `tenants.status` memiliki pilihan enum `'pending','active','trial','suspended','expired'`.
-   * *Pertentangan*: Apakah setelah registrasi dan aktivasi paket Mikro statusnya adalah `'trial'` (karena ada 30 hari uji coba gratis) atau langsung `'active'` dengan `trial_ends_at` terisi?
+3. **Status Tenant Pasca Pembayaran Pertama (Opsi A Dipilih)**:
+   * *Keputusan PM (Final)*: Menggunakan **Opsi A**. Setelah notifikasi webhook Midtrans (`settlement` / `capture`) tervalidasi, backend langsung mengubah `tenants.status = 'active'`, mengisi `tenants.current_package_id`, dan menyetel `tenants.subscription_ends_at = now() + interval '30 days'`. Kolom `trial_ends_at` dan enum status `'trial'` disimpan untuk keperluan roadmap lanjutan bila ada skema free trial tanpa kartu/pembayaran di masa mendatang.
 
 4. **Kapan `current_package_id` Disimpan**:
    * *04_USER_FLOWS.md* Bagian 1 langkah 2-3: Pemilik memilih paket **sebelum** mendaftar dan mengisi formulir.
@@ -163,28 +158,28 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
    * *Status*: Sudah jelas via endpoint signer `api/cloudinary/sign-upload.ts` (generate signature SHA-1 dengan timestamp dan `CLOUDINARY_API_SECRET`), lalu client melakukan direct POST multipart ke API Cloudinary.
 
 3. **Nominal Pasti Pembayaran Paket Mikro**:
-   * *Status*: TIDAK JELAS.
-   * *Detail*: `01_PRD.md` Bagian 8 dan `03_DATABASE_SCHEMA.md` Bagian 4 menyatakan detail harga belum final (menunggu validasi pasar). Di dokumen produk tidak disebutkan nominal angka rupiah untuk paket Mikro (apakah Rp 29.000 atau nominal lain).
+   * *Status*: SUDAH FINAL (Rp 49.000 / bulan).
+   * *Detail*: Ditetapkan Rp 49.000 / bulan sesuai `seed.sql`, `api/midtrans/create.ts`, dan arahan PM.
 
 4. **Generator Format `order_code`**:
-   * *Status*: TIDAK JELAS.
-   * *Detail*: `03_DATABASE_SCHEMA.md` Bagian 9 memberikan contoh `#A123`, tetapi algoritma pembuatan kode (panjang karakter, prefix alfabet, urutan per hari, atau penanganan collision jika ada pesanan bersamaan) tidak dijelaskan.
+   * *Status*: SUDAH DISELESAIKAN DI M1.
+   * *Detail*: Telah diimplementasikan pada RPC `create_guest_order` dengan format alfanumerik acak anti-collision (misal `#A123`).
 
 5. **Spesifikasi Interface Database Function (RPC) Pesanan Guest**:
-   * *Status*: TIDAK JELAS.
-   * *Detail*: `03_DATABASE_SCHEMA.md` menyarankan pemesanan guest menggunakan RPC function agar validasi ketersediaan menu terjadi di server secara atomik, namun nama function, tipe parameter (JSON array item), dan struktur respon belum didefinisikan secara konkrit.
+   * *Status*: SUDAH DISELESAIKAN DI M1.
+   * *Detail*: Telah diimplementasikan via RPC `create_guest_order` (atomik validasi menu dan snapshot harga) dan `get_guest_order_status` (masking nomor kontak).
 
 ---
 
-## 8. Pertanyaan yang Perlu Dikonfirmasi ke Tim Sebelum Mulai Koding
+## 8. Jawaban & Konfirmasi PM untuk Backend
 
-1. **Runtime Serverless Backend**: Apakah backend dibangun menggunakan Vercel Serverless Functions (`api/*.ts`) atau Supabase Edge Functions (`supabase/functions/*.ts`)?
-2. **Skema Pembayaran Trial**: Apakah pengguna yang baru mendaftar paket Mikro harus melalui checkout Midtrans dengan nominal tertentu (misal Rp 29.000), atau langsung mendapatkan status `'trial'` selama 30 hari secara otomatis tanpa Midtrans?
-3. **Mekanisme Upload Cloudinary**: Konfirmasi alur upload Cloudinary melalui backend signer (SHA-1 signature generator dengan timestamp) yang dipanggil oleh client sebelum POST multipart ke API Cloudinary.
-4. **Implementasi Pemesanan Guest**: Apakah pembuatan pesanan pembeli wajib dibungkus dalam PostgreSQL Function (RPC) di Supabase untuk menjamin atomisitas validasi menu dan snapshot harga, atau cukup transaksi client via Supabase SDK?
-5. **Format `order_code`**: Bagaimana aturan pembentukan `order_code` (misal 5 karakter alfanumerik acak, atau urutan harian per tenant)?
-6. **Harga Paket Mikro**: Berapa nominal pasti `amount` yang harus dikirim ke Midtrans saat pembuatan transaksi paket Mikro?
-7. **Arsitektur Chatbot Gemini**: Apakah Chatbot Gemini dipanggil via endpoint proxy backend (untuk menyembunyikan API key) dan apa system prompt persisnya?
+1. **Runtime Serverless Backend**: Menggunakan **Vercel Serverless Functions** (`api/*.ts`) berbasis Node.js/TypeScript.
+2. **Skema Pembayaran Trial**: Menggunakan **Opsi A**. Pemilik baru menyelesaikan pembayaran Rp 49.000 melalui Midtrans untuk 30 hari pertama, dan langsung berstatus `active`.
+3. **Mekanisme Upload Cloudinary**: Sesuai kesepakatan: endpoint signer `api/cloudinary/sign-upload.ts` (SHA-1 signature + timestamp) dipanggil oleh browser sebelum direct upload ke Cloudinary API.
+4. **Implementasi Pemesanan Guest**: Sudah tuntas via RPC PostgreSQL `create_guest_order` (M1) untuk menjamin atomisitas validasi ketersediaan menu dan snapshot harga.
+5. **Format `order_code`**: Sudah tuntas via generator di dalam RPC `create_guest_order` (M1).
+6. **Harga Paket Mikro**: **Rp 49.000** (final).
+7. **Arsitektur Chatbot Gemini**: Dipanggil via proxy backend `api/gemini/chat.ts` untuk menjaga kerahasiaan `GEMINI_API_KEY` dan membatasi respon hanya seputar produk RestoLink.
 
 ---
 
