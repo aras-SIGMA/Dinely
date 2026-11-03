@@ -14,9 +14,9 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-03** | M2 | TenantShell Layout, Skeleton Loader, & Theming | ✅ Selesai | 02 Nov 2026 | `feature/subdomain-resolver` |
 | **FS-04** | M2 | Polish Tenant Home, WhatsApp CS Card, & 404 Route | ✅ Selesai | 02 Nov 2026 | `feature/subdomain-resolver` |
 | **FS-05** | M2 | Eager Prefetch & In-Flight Request Deduplication | ✅ Selesai | 02 Nov 2026 | `feature/subdomain-resolver` |
-| **FS-06** | M3 | Subdomain Availability RPC & Validation Service | ⏳ Antrean | - | `feature/auth-and-registration` |
-| **FS-07** | M3 | Owner Auth Store & Tenant Provisioning Engine | ⏳ Antrean | - | `feature/auth-and-registration` |
-| **FS-08** | M3 | Route Guard Engine & Access Control Hooks | ⏳ Antrean | - | `feature/auth-and-registration` |
+| **FS-06** | M3 | Subdomain Availability RPC & Validation Service | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
+| **FS-07** | M3 | Owner Auth Store & Tenant Provisioning Engine | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
+| **FS-08** | M3 | Route Guard Engine & Access Control Hooks | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-09** | M4 | Integrasi Client Midtrans Snap Popup | ⏹️ Antrean | - | `feature/midtrans-payment` |
 | **FS-10** | M5 | Client Canvas Image Compressor (WebP) | ⏹️ Antrean | - | `feature/menu-and-cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & Guest Order RPC Integration | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
@@ -141,3 +141,60 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   2. **Transisi Status Tenant (Opsi A)**: Setelah pembayaran awal Rp 49.000 tervalidasi webhook Midtrans, `tenants.status` langsung `'active'` dengan `subscription_ends_at = now() + interval '30 days'`. Enum `'trial'` disimpan untuk kemungkinan roadmap free trial di masa depan.
   3. **Router Library**: Mengonfirmasi penggunaan `sv-router` (history mode), mengoreksi catatan lama `svelte-spa-router` di `docs/notulen/01_arsitektur_dan_skema.md`.
   4. **Runtime Backend**: Vercel Serverless Functions (`api/` Node.js/TS).
+
+---
+
+### [FS-06] Subdomain Availability RPC & Validation Service
+* **Tanggal Selesai**: 03 November 2026
+* **Milestone**: M3 (Autentikasi & Registrasi Pemilik Usaha)
+* **Branch**: `feature/auth-and-registration`
+* **File Terkait**:
+  - `supabase/migrations/005_subdomain_rpc.sql`
+  - `src/lib/subdomain-validator.ts`
+* **Keputusan Teknis**:
+  1. Fungsi RPC Postgres `is_subdomain_available(subdomain_input text)` beratribut `SECURITY DEFINER` dan `SET search_path = public, pg_temp` agar role `anon` dan `authenticated` dapat mengecek keunikan subdomain tanpa membuka akses SELECT langsung ke tabel `tenants`.
+  2. Sinkronisasi penuh 14 daftar reserved subdomains dan regex `^[a-z0-9-]+$` (panjang 3-63 karakter, tanpa tanda hubung di awal/akhir).
+  3. Service client `src/lib/subdomain-validator.ts` menyertakan `slugify` (pembersihan otomatis nama toko menjadi format URL) dan validasi sintaks lokal sebelum memicu network call RPC.
+  4. Instruksi delegasi FE-05: Frontend Developer wajib memasang debounce 300–400ms saat menghubungkan input subdomain ke `checkSubdomainAvailability` agar tidak memicu query RPC per ketukan tombol.
+* **Hasil Verifikasi**:
+  - Unit test lokal (slugify, format length, dash check, reserved subdomains) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+
+---
+
+### [FS-07] Owner Auth Store & Tenant Provisioning Engine
+* **Tanggal Selesai**: 03 November 2026
+* **Milestone**: M3 (Autentikasi & Registrasi Pemilik Usaha)
+* **Branch**: `feature/auth-and-registration`
+* **File Terkait**:
+  - `src/stores/auth.svelte.ts`
+  - `src/App.svelte`
+* **Keputusan Teknis**:
+  1. State reaktif Svelte 5 (`loading`, `profile`, `tenant`) dengan helper derived getters (`role`, `isAuthenticated`, `isOwner`, `isPlatformAdmin`, `hasActiveTenant`).
+  2. Metode `signUp`: Verifikasi ketersediaan subdomain -> pendaftaran Supabase Auth -> sinkronisasi profil -> otomatis membuat baris tenant status `pending` jika sesi aktif.
+  3. Metode `signIn`: Validasi password -> eager load paralel profil dan data tenant (`loadProfile` & `loadTenant`).
+  4. Jeda retry resilient (250ms) pada `loadProfile` untuk menangani asinkronisitas eksekusi trigger `on_auth_user_created`.
+* **Hasil Verifikasi**:
+  - `npm run check`: 0 error, 0 warning.
+
+---
+
+### [FS-08] Route Guard Engine & Access Control Hooks
+* **Tanggal Selesai**: 03 November 2026
+* **Milestone**: M3 (Autentikasi & Registrasi Pemilik Usaha)
+* **Branch**: `feature/auth-and-registration`
+* **File Terkait**:
+  - `src/lib/guards.ts`
+  - `src/routes/platform.ts`
+  - `src/App.svelte`
+* **Keputusan Teknis**:
+  1. Engine otorisasi RBAC murni (`evaluateAccess`):
+     - Rute `/dashboard/*` terproteksi khusus role `owner`. Guest dilempar ke `/masuk`, admin dialihkan ke `/admin`.
+     - Rute `/admin/*` terproteksi khusus role `platform_admin`. Guest dilempar ke `/masuk`, owner dialihkan ke `/dashboard`.
+     - Rute guest-only (`/masuk`, `/daftar`) otomatis mengalihkan user yang sudah login ke dashboard masing-masing.
+  2. Pemasangan lifecycle hooks `beforeLoad` pada konfigurasi rute `sv-router`. Menunggu `authStore.waitUntilReady()` untuk mencegah false redirect saat inisialisasi awal.
+  3. Integrasi fungsi `navigate` router klien via `setPlatformNavigate` di `App.svelte` dengan fallback `window.location.replace`.
+* **Hasil Verifikasi**:
+  - Unit test RBAC (seluruh permutasi login/unauth/role mismatch/role match) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala.
