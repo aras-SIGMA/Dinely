@@ -28,14 +28,14 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 
 ### 1. PM & Fullstack
 * **Milestone 2: Subdomain Resolver Engine**
-  - [ ] **FS-01**: Parser hostname runtime (`src/lib/tenant-resolver.ts`, `src/lib/host.ts`) untuk domain produksi `*.restolink.site`, lokal `*.localhost:5173`, dan dev query `?tenant=slug`.
-  - [ ] **FS-02**: Store reaktif `src/stores/tenant.svelte.ts` untuk query view Supabase `public_tenants`.
-  - [ ] **FS-03**: Shell layout `src/apps/tenant-site/TenantShell.svelte` dengan dynamic theming CSS variable (`--brand-primary`) dan skeleton loader.
-  - [ ] **FS-04**: Root dispatcher di `src/App.svelte` penentu perutean Platform vs Tenant Site.
+  - [x] **FS-01**: Parser hostname runtime (`src/lib/tenant-resolver.ts`, `src/lib/host.ts`) untuk domain produksi `*.restolink.site`, lokal `*.localhost:5173`, dan dev query `?tenant=slug`.
+  - [x] **FS-02**: Store reaktif `src/stores/tenant.svelte.ts` untuk query view Supabase `public_tenants`.
+  - [x] **FS-03**: Shell layout `src/apps/tenant-site/TenantShell.svelte` dengan dynamic theming CSS variable (`--brand-primary`) dan skeleton loader.
+  - [x] **FS-04**: Root dispatcher di `src/App.svelte` penentu perutean Platform vs Tenant Site.
 * **Milestone 3: Autentikasi & Guard**
-  - [ ] **FS-05**: Implementasi logika registrasi pemilik (`supabase.auth.signUp`) + create tenant status `pending` di `src/stores/auth.svelte.ts`.
-  - [ ] **FS-06**: Implementasi login & auto-redirect berdasarkan role (`owner` → `/dashboard`, `platform_admin` → `/admin`).
-  - [ ] **FS-07**: Route guard hooks (`src/lib/guards.ts`) proteksi akses rute `/dashboard/*` dan `/admin/*`.
+  - [x] **FS-05**: Implementasi logika registrasi pemilik (`supabase.auth.signUp`) + create tenant status `pending` di `src/stores/auth.svelte.ts`.
+  - [x] **FS-06**: Implementasi login & auto-redirect berdasarkan role (`owner` → `/dashboard`, `platform_admin` → `/admin`).
+  - [x] **FS-07**: Route guard hooks (`src/lib/guards.ts`) proteksi akses rute `/dashboard/*` dan `/admin/*`.
 * **Milestone 4 & 5: Integrasi Pembayaran & Upload Client**
   - [ ] **FS-08**: Integrasi Snap Popup Midtrans di sisi browser saat pemilik checkout paket langganan.
   - [ ] **FS-09**: Client image compressor `src/lib/image-compressor.ts` (canvas kompresi WebP max 800px / 300KB).
@@ -84,6 +84,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [ ] **FE-03**: Slicing halaman `Features.svelte` (Menu digital, QR Code, Manajemen pesanan).
   - [ ] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 49.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
   - [ ] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.restolink.site`, email, password).
+    - *Catatan Integrasi:* Gunakan debounce 300–400ms saat memanggil `checkSubdomainAvailability` (`src/lib/subdomain-validator.ts`) pada input form agar tidak membebani query RPC Supabase per keystroke. Gunakan `authStore.signUp` (`src/stores/auth.svelte.ts`) untuk submit registrasi.
   - [ ] **FE-06**: Slicing halaman `Login.svelte` (Input email, password, error display, forgot password stub).
 * **Milestone 4, 5, 7: Dashboard Pemilik Usaha UI**
   - [ ] **FE-07**: Halaman `Subscription.svelte`: Tampilan status paket aktif, sisa hari trial, tombol perpanjang langganan.
