@@ -17,7 +17,7 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-06** | M3 | Subdomain Availability RPC & Validation Service | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-07** | M3 | Owner Auth Store & Tenant Provisioning Engine | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-08** | M3 | Route Guard Engine & Access Control Hooks | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
-| **FS-09** | M4 | Integrasi Client Midtrans Snap Popup | ⏹️ Antrean | - | `feature/midtrans-payment` |
+| **FS-09** | M4 | Integrasi Client Midtrans Snap Popup | ✅ Selesai | 03 Nov 2026 | `feature/midtrans-payment` |
 | **FS-10** | M5 | Client Canvas Image Compressor (WebP) | ⏹️ Antrean | - | `feature/menu-and-cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & Guest Order RPC Integration | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
 | **FS-12** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
@@ -198,3 +198,26 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test RBAC (seluruh permutasi login/unauth/role mismatch/role match) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala.
+
+---
+
+### [FS-09] Integrasi Client Midtrans Snap Popup
+* **Tanggal Selesai**: 03 November 2026
+* **Milestone**: M4 (Midtrans Payment Client)
+* **Branch**: `feature/midtrans-payment`
+* **File Terkait**:
+  - `src/types/index.ts`
+  - `src/lib/midtrans.ts`
+  - `src/stores/subscription.svelte.ts`
+  - `src/apps/dashboard/routes/Subscription.svelte`
+* **Keputusan Teknis**:
+  1. Loader script dinamis `loadSnapScript` dengan caching promise untuk mengunduh library Midtrans Snap JS sekali saja, mendukung mode sandbox dan produksi.
+  2. Implementasi `createSubscriptionTransaction`: meminta snap token ke endpoint serverless `POST /api/midtrans/create` menggunakan Bearer token JWT Supabase.
+  3. Integrasi Svelte 5 reactive store `subscriptionStore`:
+     - Memuat daftar paket aktif via `fetchPackages()`.
+     - Orkestrasi `checkout`: request token -> buka popup `window.snap.pay` -> polling status tenant aktivasi via `pollTenantActivation`.
+  4. Penyediaan dummy test harness pada `Subscription.svelte` sebagai sarana pengujian langsung sebelum slicing final Frontend Dev (`FE-07`) siap.
+  5. Instruksi delegasi FE-07: Sediakan tombol manual "Cek Status Ulang" yang memanggil `authStore.refreshTenant()` jika polling otomatis 30 detik selesai sebelum webhook Midtrans selesai memproses update database.
+* **Hasil Verifikasi**:
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (3.77s).
