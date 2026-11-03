@@ -91,7 +91,7 @@
           </li>
           <li class="flex items-center gap-2">
             <span class="size-1.5 rounded-full bg-brand-500" aria-hidden="true"></span>
-            Katalog Foto WebP Cepat
+            Katalog Foto Web Cepat
           </li>
           <li class="flex items-center gap-2">
             <span class="size-1.5 rounded-full bg-brand-500" aria-hidden="true"></span>
