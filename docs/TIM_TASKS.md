@@ -39,7 +39,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 * **Milestone 4 & 5: Integrasi Pembayaran & Upload Client**
   - [x] **FS-08**: Integrasi Snap Popup Midtrans di sisi browser saat pemilik checkout paket langganan.
   - [x] **FS-09**: Client image compressor `src/lib/image-compressor.ts` (canvas kompresi WebP max 800px / 300KB).
-  - [ ] **FS-10**: Client uploader `src/lib/cloudinary-upload.ts` (request signature ke backend → POST multipart ke Cloudinary API).
+  - [x] **FS-10**: Client uploader `src/lib/cloudinary-upload.ts` (request signature ke backend → POST multipart ke Cloudinary API).
     - *Catatan Integrasi:* Integrasikan dengan `compressImage` (`src/lib/image-compressor.ts`) sebelum file dikirim ke Cloudinary. Sediakan metadata ringkasan kompresi (misal: ukuran awal, ukuran terkompresi, dan persentase penghematan ukuran) agar komponen UI dapat menampilkan feedback visual hasil optimasi gambar kepada pengguna.
 * **Milestone 6 & 7: Integrasi Pemesanan & Dashboard Realtime**
   - [ ] **FS-11**: Keranjang belanja reaktif `src/stores/cart.svelte.ts` (hitung subtotal, simpan LocalStorage).
@@ -91,7 +91,9 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [ ] **FE-07**: Halaman `Subscription.svelte`: Tampilan status paket aktif, sisa hari trial, tombol perpanjang langganan.
     - *Catatan Integrasi:* Gunakan `subscriptionStore` (`src/stores/subscription.svelte.ts`) untuk memicu checkout `subscriptionStore.checkout(pkg.id)`. Jika polling 30 detik selesai mendahului konfirmasi webhook, sediakan tombol interaktif "Cek Status Ulang" yang memanggil `authStore.refreshTenant()`.
   - [ ] **FE-08**: Halaman `Profile.svelte`: Form info resto (logo upload preview, nama usaha, deskripsi, alamat, kontak WhatsApp, color picker brand).
+    - *Catatan Integrasi:* Gunakan `uploadImage(file, { type: 'logo', onProgress })` (`src/lib/cloudinary-upload.ts`) untuk unggah logo resto. Manfaatkan callback `onProgress` untuk indikator progress bar dan tampilkan ringkasan hasil kompresi (ukuran awal vs terkompresi).
   - [ ] **FE-09**: Halaman `MenuManagement.svelte`: Modal tambah/edit kategori, modal tambah/edit menu (dropzone foto, input harga, toggle ketersediaan `is_available`).
+    - *Catatan Integrasi:* Gunakan `uploadImage(file, { type: 'menu', onProgress })` (`src/lib/cloudinary-upload.ts`) pada dropzone foto menu. Hubungkan `onProgress` ke progress bar upload dan tampilkan badge penghematan kompresi WebP (misal: "2.4 MB -> 180 KB (-92%)").
   - [ ] **FE-10**: Halaman `Orders.svelte`: Kolom/tab pesanan per status (`baru`, `diproses`, `selesai`, `dibatalkan`), kartu pesanan dengan snapshot menu & info pemesan.
 * **Milestone 6: Website Publik Tenant UI**
   - [ ] **FE-11**: Layout resto publik `TenantHome.svelte`: Header resto, logo, alamat, badge buka, link WhatsApp.
