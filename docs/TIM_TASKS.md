@@ -42,7 +42,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FS-10**: Client uploader `src/lib/cloudinary-upload.ts` (request signature ke backend → POST multipart ke Cloudinary API).
     - *Catatan Integrasi:* Integrasikan dengan `compressImage` (`src/lib/image-compressor.ts`) sebelum file dikirim ke Cloudinary. Sediakan metadata ringkasan kompresi (misal: ukuran awal, ukuran terkompresi, dan persentase penghematan ukuran) agar komponen UI dapat menampilkan feedback visual hasil optimasi gambar kepada pengguna.
 * **Milestone 6 & 7: Integrasi Pemesanan & Dashboard Realtime**
-  - [ ] **FS-11**: Keranjang belanja reaktif `src/stores/cart.svelte.ts` (hitung subtotal, simpan LocalStorage).
+  - [x] **FS-11**: Keranjang belanja reaktif `src/stores/cart.svelte.ts` (hitung subtotal, simpan LocalStorage).
   - [ ] **FS-12**: Integrasi submit pesanan guest ke RPC Postgres `create_guest_order` dan pelacakan via `get_guest_order_status`.
   - [ ] **FS-13**: Store pesanan pemilik `src/stores/orders.svelte.ts` dengan update status (`baru → diproses → selesai`) dan polling interval 15 detik.
 * **Milestone 8 & 9: Admin Platform & UAT**
