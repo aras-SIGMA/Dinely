@@ -17,8 +17,9 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-06** | M3 | Subdomain Availability RPC & Validation Service | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-07** | M3 | Owner Auth Store & Tenant Provisioning Engine | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-08** | M3 | Route Guard Engine & Access Control Hooks | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
-| **FS-09** | M4 | Integrasi Client Midtrans Snap Popup | ✅ Selesai | 03 Nov 2026 | `feature/midtrans-payment` |
-| **FS-10** | M5 | Client Canvas Image Compressor (WebP) (FS-09 Master) | ✅ Selesai | 04 Nov 2026 | `feature/menu-and-cloudinary-upload` |
+| **FS-08** | M4 | Integrasi Client Midtrans Snap Popup | ✅ Selesai | 03 Nov 2026 | `feature/midtrans-payment` |
+| **FS-09** | M5 | Client Canvas Image Compressor (WebP) | ✅ Selesai | 04 Nov 2026 | `feature/menu-and-cloudinary-upload` |
+| **FS-10** | M5 | Client Cloudinary Direct Uploader | ✅ Selesai | 04 Nov 2026 | `feature/cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & Guest Order RPC Integration | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
 | **FS-12** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
 | **FS-13** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
@@ -244,3 +245,26 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test lokal (dimensi, ukuran byte, penamaan ekstensi, validasi berkas) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (5.59s).
+
+---
+
+### [FS-10] Client Cloudinary Direct Uploader
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M5 (Menu Management & Cloudinary Image Upload)
+* **Branch**: `feature/cloudinary-upload`
+* **File Terkait**:
+  - `src/lib/cloudinary-upload.ts`
+* **Keputusan Teknis**:
+  1. Integrasi otomatis `compressImage` (`src/lib/image-compressor.ts`) sebelum pengiriman data, memastikan semua foto menu dan logo yang diunggah ke Cloudinary bertipe WebP dan berukuran <= 300KB.
+  2. Alur otentikasi signature backend:
+     - Mengirim request `POST /api/cloudinary/sign-upload` berotentikasi Bearer token JWT Supabase dengan payload kategori (`menu` atau `logo`).
+     - Mendukung parsing fleksibel payload langsung `{ signature, timestamp, apiKey, cloudName, folder }` maupun nested `{ data: { ... } }`.
+  3. Direct multipart upload ke Cloudinary API (`https://api.cloudinary.com/v1_1/<cloudName>/image/upload`):
+     - Memanfaatkan `XMLHttpRequest` untuk real-time upload progress tracking (`onProgress: (percent: number) => void`) dengan fallback ke `fetch`.
+     - Validasi status response dan `secure_url`.
+  4. Penyediaan metadata penghematan kompresi (`originalSize`, `compressedSize`, `compressionRatio`, `savedBytes`, `savedPercent`) pada hasil upload untuk memudahkan integrasi UI feedback visual.
+  5. Instruksi delegasi FE-08 & FE-09: Frontend Developer wajib menghubungkan callback `onProgress: (percent) => void` pada `uploadImage` ke komponen progress bar UI, serta menampilkan badge informasi efisiensi kompresi gambar (contoh: "2.4 MB -> 180 KB (-92%)") saat pemilik mengunggah logo usaha dan foto menu.
+* **Hasil Verifikasi**:
+  - Unit test lokal (perhitungan penghematan byte/persentase, parsing signature, pemetaan data response) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (3.60s).
