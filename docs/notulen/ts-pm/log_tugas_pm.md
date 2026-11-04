@@ -21,8 +21,8 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-09** | M5 | Client Canvas Image Compressor (WebP) | ✅ Selesai | 04 Nov 2026 | `feature/menu-and-cloudinary-upload` |
 | **FS-10** | M5 | Client Cloudinary Direct Uploader | ✅ Selesai | 04 Nov 2026 | `feature/cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & LocalStorage Sync | ✅ Selesai | 04 Nov 2026 | `feature/tenant-site-and-order` |
-| **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
-| **FS-12** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
+| **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ✅ Selesai | 04 Nov 2026 | `feature/guest-order-integration` |
+| **FS-13** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
 | **FS-13** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
 | **FS-14** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
 
@@ -290,3 +290,29 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test lokal (tambah item, akumulasi qty, penolakan stok habis, decrement/auto-remove, isolasi multi-tenant, persistensi storage, format Rupiah) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (3.74s).
+
+---
+
+### [FS-12] Integrasi Submit Guest Order RPC & Status Tracking
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M6 (Website Publik Tenant & Guest Checkout)
+* **Branch**: `feature/guest-order-integration`
+* **File Terkait**:
+  - `src/lib/guest-order.ts`
+  - `src/stores/guest-order.svelte.ts`
+* **Keputusan Teknis**:
+  1. Service `src/lib/guest-order.ts`:
+     - Validasi data input di client (`validateGuestOrderInput`): panjang nama pemesan (2-100 char), batas jenis menu (1-50 item), kuantitas menu (1-99), dan panjang catatan (max 500 char).
+     - Pemanggilan RPC Postgres `create_guest_order` dengan proteksi error handling transaksional.
+     - Pemanggilan RPC Postgres `get_guest_order_status` dengan proteksi masking nomor kontak pemesan (PII protection).
+     - Helper LocalStorage persistensi kode pesanan terakhir (`saveLastOrderCode`, `getLastOrderCode`, `clearLastOrderCode`) berbasis tenant.
+  2. Reactive store Svelte 5 `guestOrderStore` (`src/stores/guest-order.svelte.ts`):
+     - State reaktif proses pemesanan (`submitting`, `trackingLoading`, `lastOrder`, `orderDetail`, `errorMessage`).
+     - Derived helpers: `statusLabel` ramah pengguna berbahasa Indonesia, `statusTone` badge warna UI (`info`, `warning`, `success`, `error`), `isTerminal` indikator selesai/batal.
+     - Polling interval dinamis (12 detik) yang otomatis berhenti jika pesanan mencapai status terminal (`selesai` / `dibatalkan`).
+     - Mekanisme pemulihan pesanan `recoverLastOrder` untuk mengantisipasi ketidaksengajaan reload browser pada smartphone pembeli.
+  3. Instruksi delegasi FE-13 & FE-14: Frontend Developer diarahkan untuk mengintegrasikan `guestOrderStore.submit` pada form checkout modal serta `guestOrderStore.orderDetail` / `recoverLastOrder` pada modal bukti pesanan, lengkap dengan tombol salin (copy-to-clipboard) kode pesanan `order_code`.
+* **Hasil Verifikasi**:
+  - Unit test lokal (validasi input nama/item/qty/note, persistensi kode pesanan, pemetaan status & tone, state reactivity) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (3.61s).
