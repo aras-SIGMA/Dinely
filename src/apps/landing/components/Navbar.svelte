@@ -54,7 +54,7 @@
 <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md transition-shadow">
   <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
     <!-- Brand Logo -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center">
       <a
         href="/"
         class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded-lg p-0.5"
@@ -63,9 +63,6 @@
       >
         <Logo size="md" />
       </a>
-      <span class="hidden rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 sm:inline-block border border-brand-200/60">
-        GTNIC 2026
-      </span>
     </div>
 
     <!-- Desktop Navigation Links -->
