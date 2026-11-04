@@ -132,6 +132,8 @@ async function runTests() {
   };
 
   let failNextPendingUpdate = false;
+  let failNextTenantUpdate = false;
+  let failNextTenantSelect = false;
 
   const adminClient = getSupabaseAdmin();
   adminClient.from = ((tableName: string) => {
@@ -165,6 +167,9 @@ async function runTests() {
         select: () => ({
           eq: (col: string, val: string) => ({
             maybeSingle: async () => {
+              if (failNextTenantSelect) {
+                return { data: null, error: { message: 'Database read error' } };
+              }
               const tenant = mockTenants[val];
               return { data: tenant ? { ...tenant } : null, error: null };
             },
@@ -172,6 +177,9 @@ async function runTests() {
         }),
         update: (fields: any) => ({
           eq: async (col: string, val: string) => {
+            if (failNextTenantUpdate) {
+              return { error: { message: 'Simulated tenant update failure' } };
+            }
             const tenant = mockTenants[val];
             if (tenant) {
               Object.assign(tenant, fields);
@@ -210,7 +218,7 @@ async function runTests() {
     assert(statusCode === 404 && jsonBody?.error?.includes('tidak ditemukan'), 'TC-04: Transaksi tidak ditemukan mengembalikan 404', { statusCode, jsonBody });
   }
 
-  // TC-05: Ketat - Valid settlement: delta 30 hari (+/- 60 detik), settled_at, midtrans_transaction_id, trial_ends_at=null
+  // TC-05: Ketat - Valid settlement: delta 30 hari (+/- 60 detik), settled_at, midtrans_tx_id, trial_ends_at=null
   {
     const orderId = 'RL-TEST-001';
     const statusCodeStr = '200';
@@ -350,14 +358,14 @@ async function runTests() {
       id: 'tx-uuid-3',
       tenant_id: 'tenant-uuid-3',
       package_id: 'pkg-uuid-1',
-      status: 'settlement', // Transaksi sudah settlement
+      status: 'settlement',
       billing_cycle: 'monthly',
       amount: 49000,
       midtrans_order_id: 'RL-TEST-003',
     };
     mockTenants['tenant-uuid-3'] = {
       id: 'tenant-uuid-3',
-      status: 'pending', // Tenant belum aktif karena partial failure
+      status: 'pending',
       current_package_id: null,
       subscription_ends_at: null,
     };
@@ -512,7 +520,7 @@ async function runTests() {
 
     const orderId = 'RL-TEST-006';
     const statusCodeStr = '200';
-    const grossAmount = '10000.00'; // Selisih nominal (Rp 10.000 vs Rp 49.000)
+    const grossAmount = '10000.00';
     const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
 
     const req = {
@@ -576,6 +584,471 @@ async function runTests() {
       statusCode === 500 && jsonBody?.error?.includes('Gagal menyimpan notifikasi transaksi'),
       'TC-12: Error DB pada cabang pending ditangani dengan 500',
       { statusCode, jsonBody }
+    );
+  }
+
+  // TC-13 (H1 Regression): Anti-Double Extension saat attempt 1 gagal update tenant
+  {
+    mockTransactions['RL-TEST-008'] = {
+      id: 'tx-uuid-8',
+      tenant_id: 'tenant-uuid-8',
+      package_id: 'pkg-uuid-1',
+      status: 'pending',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-008',
+    };
+    mockTenants['tenant-uuid-8'] = {
+      id: 'tenant-uuid-8',
+      status: 'pending',
+      current_package_id: null,
+      subscription_ends_at: null,
+    };
+
+    const orderId = 'RL-TEST-008';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    // Attempt 1: Tx sukses jadi settlement, tapi tenant update gagal -> return 500
+    failNextTenantUpdate = true;
+    const req1 = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const res1 = createMockRes();
+    await handler(req1, res1.res);
+    const result1 = res1.getData();
+    failNextTenantUpdate = false;
+
+    // Attempt 2: Midtrans retry -> masuk recovery -> tenant diaktifkan + 30 hari -> return 200
+    const res2 = createMockRes();
+    await handler(req1, res2.res);
+    const result2 = res2.getData();
+
+    // Attempt 3: Midtrans retry duplikat lagi -> idempotent -> return 200
+    const res3 = createMockRes();
+    await handler(req1, res3.res);
+    const result3 = res3.getData();
+
+    const tenant8 = mockTenants['tenant-uuid-8'];
+    const nowTime = Date.now();
+    const endsTime = new Date(tenant8.subscription_ends_at).getTime();
+    const totalDaysAdded = (endsTime - nowTime) / (1000 * 60 * 60 * 24);
+
+    assert(
+      result1.statusCode === 500 &&
+      result2.statusCode === 200 &&
+      result3.statusCode === 200 &&
+      tenant8.status === 'active' &&
+      Math.abs(totalDaysAdded - 30) < 0.1, // Strictly 30 hari, BUKAN 60 hari!
+      'TC-13: Anti-Double Extension terbukti (Attempt 1 gagal 500, retry 200, total durasi tepat 30 hari)',
+      { result1Code: result1.statusCode, totalDaysAdded }
+    );
+  }
+
+  // TC-14 (H2 Regression): Error di blok recovery dilempar sebagai HTTP 500 (bukan ditelan 200)
+  {
+    mockTransactions['RL-TEST-009'] = {
+      id: 'tx-uuid-9',
+      tenant_id: 'tenant-uuid-9',
+      package_id: 'pkg-uuid-1',
+      status: 'settlement', // Transaksi sudah settlement
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-009',
+    };
+    mockTenants['tenant-uuid-9'] = {
+      id: 'tenant-uuid-9',
+      status: 'pending', // Butuh recovery
+      current_package_id: null,
+      subscription_ends_at: null,
+    };
+
+    const orderId = 'RL-TEST-009';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    failNextTenantUpdate = true; // Simulasikan database error saat recovery update
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+    failNextTenantUpdate = false;
+
+    assert(
+      statusCode === 500 && jsonBody?.error?.includes('Gagal memulihkan aktivasi tenant'),
+      'TC-14: Kegagalan DB pada recovery guard menghasilkan 500 (memicu retry Midtrans)',
+      { statusCode, jsonBody }
+    );
+  }
+
+  // TC-15 (H3 Regression): Suspended tenant tidak boleh teraktivasi kembali
+  {
+    mockTransactions['RL-TEST-010'] = {
+      id: 'tx-uuid-10',
+      tenant_id: 'tenant-uuid-10',
+      package_id: 'pkg-uuid-1',
+      status: 'pending',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-010',
+    };
+    mockTenants['tenant-uuid-10'] = {
+      id: 'tenant-uuid-10',
+      status: 'suspended', // Suspended oleh admin
+      current_package_id: null,
+      subscription_ends_at: null,
+    };
+
+    const orderId = 'RL-TEST-010';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode } = getData();
+
+    const tenant10 = mockTenants['tenant-uuid-10'];
+    const tx10 = mockTransactions['RL-TEST-010'];
+
+    assert(
+      statusCode === 200 &&
+      tx10.status === 'settlement' &&
+      tenant10.status === 'suspended',
+      'TC-15: Suspended tenant tetap suspended saat pembayaran settlement masuk',
+      { statusCode, tenantStatus: tenant10.status, txStatus: tx10.status }
+    );
+  }
+
+  // TC-16 (R1 Regression): Perpanjangan tenant aktif saat update tenant gagal di percobaan 1
+  {
+    const futureDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+    mockTransactions['RL-TEST-011'] = {
+      id: 'tx-uuid-11',
+      tenant_id: 'tenant-uuid-11',
+      package_id: 'pkg-uuid-1',
+      status: 'pending',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-011',
+    };
+    mockTenants['tenant-uuid-11'] = {
+      id: 'tenant-uuid-11',
+      status: 'active', // Tenant sudah aktif (punya sisa 10 hari)
+      current_package_id: 'pkg-uuid-1',
+      subscription_ends_at: futureDate,
+    };
+
+    const orderId = 'RL-TEST-011';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    // Attempt 1: Tx berhasil jadi settlement, tapi tenant update gagal -> return 500
+    failNextTenantUpdate = true;
+    const req1 = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const res1 = createMockRes();
+    await handler(req1, res1.res);
+    const result1 = res1.getData();
+    failNextTenantUpdate = false;
+
+    // Tenant belum ter-update di attempt 1 (masih futureDate / +10 hari)
+    assert(
+      result1.statusCode === 500 &&
+      mockTenants['tenant-uuid-11'].subscription_ends_at === futureDate,
+      'TC-16a: Attempt 1 gagal update tenant menghasilkan HTTP 500'
+    );
+
+    // Attempt 2: Midtrans retry -> masuk recovery blok -> deteksi _extension_applied false / behind target -> terapkan target (+40 hari)
+    const res2 = createMockRes();
+    await handler(req1, res2.res);
+    const result2 = res2.getData();
+
+    const tenant11 = mockTenants['tenant-uuid-11'];
+    const expectedTime = new Date(futureDate).getTime() + 30 * 24 * 60 * 60 * 1000;
+    const actualTime = new Date(tenant11.subscription_ends_at).getTime();
+    const diffSec = Math.abs(actualTime - expectedTime) / 1000;
+
+    assert(
+      result2.statusCode === 200 && diffSec < 60,
+      'TC-16b: Retry memulihkan perpanjangan secara presisi (+10 hari sisa + 30 hari = 40 hari, bukan 10 hari)',
+      { diffSec, actual: tenant11.subscription_ends_at }
+    );
+
+    // Attempt 3: Retry duplikat lanjutan -> idempotent -> sisa masa aktif tetap tepat 40 hari (tidak jadi 70 hari)
+    const res3 = createMockRes();
+    await handler(req1, res3.res);
+    const result3 = res3.getData();
+
+    const actualTime3 = new Date(tenant11.subscription_ends_at).getTime();
+    const diffSec3 = Math.abs(actualTime3 - expectedTime) / 1000;
+
+    assert(
+      result3.statusCode === 200 && diffSec3 < 60,
+      'TC-16c: Retry duplikat lanjutan tidak menambah durasi ganda (tetap tepat 40 hari)',
+      { diffSec3 }
+    );
+  }
+
+  // TC-17: Error database saat pembacaan tenant di blok recovery menghasilkan 500
+  {
+    mockTransactions['RL-TEST-012'] = {
+      id: 'tx-uuid-12',
+      tenant_id: 'tenant-uuid-12',
+      package_id: 'pkg-uuid-1',
+      status: 'settlement',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-012',
+    };
+    mockTenants['tenant-uuid-12'] = {
+      id: 'tenant-uuid-12',
+      status: 'pending',
+      current_package_id: null,
+      subscription_ends_at: null,
+    };
+
+    const orderId = 'RL-TEST-012';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    failNextTenantSelect = true; // Simulasikan database select error pada tenant
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+    failNextTenantSelect = false;
+
+    assert(
+      statusCode === 500 && jsonBody?.error?.includes('Gagal memverifikasi status tenant saat recovery'),
+      'TC-17: Error select tenant di blok recovery menghasilkan HTTP 500',
+      { statusCode, jsonBody }
+    );
+  }
+
+  // TC-18: Suspended tenant pada jalur recovery tetap suspended
+  {
+    mockTransactions['RL-TEST-013'] = {
+      id: 'tx-uuid-13',
+      tenant_id: 'tenant-uuid-13',
+      package_id: 'pkg-uuid-1',
+      status: 'settlement',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-013',
+      raw_notification: {
+        _extension_applied: false,
+      },
+    };
+    mockTenants['tenant-uuid-13'] = {
+      id: 'tenant-uuid-13',
+      status: 'suspended', // Sengaja di-suspend admin
+      current_package_id: null,
+      subscription_ends_at: null,
+    };
+
+    const orderId = 'RL-TEST-013';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode } = getData();
+
+    const tenant13 = mockTenants['tenant-uuid-13'];
+
+    assert(
+      statusCode === 200 &&
+      tenant13.status === 'suspended' &&
+      tenant13.subscription_ends_at === null,
+      'TC-18: Suspended tenant pada jalur recovery tetap berstatus suspended',
+      { statusCode, tenantStatus: tenant13.status }
+    );
+  }
+
+  // TC-19 (E1 Regression): Transaksi legacy tanpa metadata tidak menambah durasi tenant aktif
+  {
+    const initialEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    mockTransactions['RL-TEST-014'] = {
+      id: 'tx-uuid-14',
+      tenant_id: 'tenant-uuid-14',
+      package_id: 'pkg-uuid-1',
+      status: 'settlement',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-014',
+      raw_notification: {
+        order_id: 'RL-TEST-014',
+        transaction_status: 'settlement',
+        // Tidak ada _target_subscription_ends_at maupun _extension_applied (legacy row)
+      },
+    };
+    mockTenants['tenant-uuid-14'] = {
+      id: 'tenant-uuid-14',
+      status: 'active',
+      current_package_id: 'pkg-uuid-1',
+      subscription_ends_at: initialEndsAt,
+    };
+
+    const orderId = 'RL-TEST-014';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+
+    const tenant14 = mockTenants['tenant-uuid-14'];
+    const tx14 = mockTransactions['RL-TEST-014'];
+
+    assert(
+      statusCode === 200 &&
+      tenant14.subscription_ends_at === initialEndsAt &&
+      tx14.raw_notification?._extension_applied === true,
+      'TC-19: Transaksi legacy tanpa metadata tidak menggandakan masa aktif tenant aktif (E1 fix)',
+      { statusCode, endsAt: tenant14.subscription_ends_at, initialEndsAt }
+    );
+  }
+
+  // TC-20 (E2 Regression): Retry transaksi tertunda tidak memendekkan masa aktif tenant yang sudah lebih maju
+  {
+    const targetOldDate = new Date(Date.now() + 40 * 24 * 60 * 60 * 1000).toISOString();
+    const moreAdvancedDate = new Date(Date.now() + 70 * 24 * 60 * 60 * 1000).toISOString();
+
+    mockTransactions['RL-TEST-015'] = {
+      id: 'tx-uuid-15',
+      tenant_id: 'tenant-uuid-15',
+      package_id: 'pkg-uuid-1',
+      status: 'settlement',
+      billing_cycle: 'monthly',
+      amount: 49000,
+      midtrans_order_id: 'RL-TEST-015',
+      raw_notification: {
+        order_id: 'RL-TEST-015',
+        _extension_applied: false, // Sempat gagal menandai diterapkan
+        _target_subscription_ends_at: targetOldDate, // Target transaksi ini: 40 hari
+      },
+    };
+    mockTenants['tenant-uuid-15'] = {
+      id: 'tenant-uuid-15',
+      status: 'active',
+      current_package_id: 'pkg-uuid-1',
+      subscription_ends_at: moreAdvancedDate, // Tenant sudah diperpanjang transaksi lain sampai 70 hari
+    };
+
+    const orderId = 'RL-TEST-015';
+    const statusCodeStr = '200';
+    const grossAmount = '49000.00';
+    const signature = computeSignature(orderId, statusCodeStr, grossAmount, serverKey);
+
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        order_id: orderId,
+        status_code: statusCodeStr,
+        gross_amount: grossAmount,
+        signature_key: signature,
+        transaction_status: 'settlement',
+      },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode } = getData();
+
+    const tenant15 = mockTenants['tenant-uuid-15'];
+    const tx15 = mockTransactions['RL-TEST-015'];
+
+    assert(
+      statusCode === 200 &&
+      tenant15.subscription_ends_at === moreAdvancedDate &&
+      tx15.raw_notification?._extension_applied === true,
+      'TC-20: Retry transaksi tertunda tidak memendekkan masa aktif yang sudah lebih maju (E2 fix)',
+      { statusCode, tenantEndsAt: tenant15.subscription_ends_at, expected: moreAdvancedDate }
     );
   }
 

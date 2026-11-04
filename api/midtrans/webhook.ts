@@ -115,7 +115,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     // 2. Cari transaksi terkait berdasarkan midtrans_order_id
     const { data: tx, error: txError } = await supabaseAdmin
       .from('transactions')
-      .select('id, tenant_id, package_id, status, billing_cycle, amount')
+      .select('id, tenant_id, package_id, status, billing_cycle, amount, raw_notification')
       .eq('midtrans_order_id', order_id)
       .maybeSingle();
 
@@ -142,7 +142,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       }
     }
 
-    // 3. Idempotency Check & Partial Failure Recovery
+    // 3. Idempotency Check & Partial Failure Recovery (H1, H2, H3, R1, E1, E2)
     if (tx.status === 'settlement' || tx.status === 'capture') {
       const { data: currentTenant, error: tenantCheckErr } = await supabaseAdmin
         .from('tenants')
@@ -150,18 +150,60 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('id', tx.tenant_id)
         .maybeSingle();
 
-      // Jika sebelumnya tenant gagal diaktifkan (partial failure), pulihkan di sini
-      if (
-        !tenantCheckErr &&
-        currentTenant &&
-        (currentTenant.status !== 'active' || !currentTenant.subscription_ends_at)
-      ) {
-        const recoveredEndsAt = calculateSubscriptionExtension(
-          currentTenant.subscription_ends_at,
-          tx.billing_cycle
-        );
+      if (tenantCheckErr) {
+        return sendJson(res, 500, {
+          error: `Gagal memverifikasi status tenant saat recovery: ${tenantCheckErr.message}`,
+        });
+      }
 
-        await supabaseAdmin
+      if (!currentTenant) {
+        return sendJson(res, 404, {
+          error: 'Tenant yang terkait dengan transaksi ini tidak ditemukan.',
+        });
+      }
+
+      // H3: Jangan aktifkan kembali tenant yang sengaja di-suspend oleh admin
+      if (currentTenant.status === 'suspended') {
+        return sendJson(res, 200, {
+          status: 'ok',
+          message: 'Transaksi sudah settlement, namun tenant berstatus suspended oleh admin.',
+          order_id,
+        });
+      }
+
+      const rawNotif = (tx.raw_notification && typeof tx.raw_notification === 'object')
+        ? (tx.raw_notification as Record<string, any>)
+        : {};
+      const isExtensionApplied = rawNotif._extension_applied === true;
+      const targetEndsAt = typeof rawNotif._target_subscription_ends_at === 'string'
+        ? rawNotif._target_subscription_ends_at
+        : null;
+
+      const isTenantInactive = currentTenant.status !== 'active' || !currentTenant.subscription_ends_at;
+
+      // E2: Hanya boleh memperpanjang jika masa aktif saat ini tertinggal dari target (anti-pemendekan)
+      const isEndsAtBehindTarget = Boolean(
+        targetEndsAt &&
+        (!currentTenant.subscription_ends_at ||
+          new Date(currentTenant.subscription_ends_at).getTime() < new Date(targetEndsAt).getTime())
+      );
+
+      // E1 & E2:
+      // - Jika ada targetEndsAt: perbarui tenant HANYA jika inaktif atau tertinggal dari target.
+      // - Jika transaksi legacy tanpa metadata (targetEndsAt null): HANYA pulihkan jika tenant inaktif (anti-ekstensi ganda).
+      const needsTenantUpdate = targetEndsAt
+        ? (isTenantInactive || isEndsAtBehindTarget)
+        : isTenantInactive;
+
+      if (needsTenantUpdate) {
+        const recoveredEndsAt =
+          targetEndsAt ||
+          calculateSubscriptionExtension(
+            currentTenant.subscription_ends_at,
+            tx.billing_cycle
+          );
+
+        const { error: recoveryErr } = await supabaseAdmin
           .from('tenants')
           .update({
             status: 'active',
@@ -171,6 +213,49 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
             updated_at: new Date().toISOString(),
           })
           .eq('id', tx.tenant_id);
+
+        if (recoveryErr) {
+          return sendJson(res, 500, {
+            error: `Gagal memulihkan aktivasi tenant pada retry: ${recoveryErr.message}`,
+          });
+        }
+
+        // Tandai bahwa ekstensi untuk transaksi ini sudah diterapkan
+        const { error: markErr } = await supabaseAdmin
+          .from('transactions')
+          .update({
+            raw_notification: {
+              ...rawNotif,
+              _extension_applied: true,
+              _target_subscription_ends_at: recoveredEndsAt,
+            },
+          })
+          .eq('id', tx.id);
+
+        if (markErr) {
+          return sendJson(res, 500, {
+            error: `Gagal menandai finalisasi transaksi pada recovery: ${markErr.message}`,
+          });
+        }
+      } else if (!isExtensionApplied) {
+        // E1 & E2: Tenant sudah aktif dan sudah mencapai/melampaui target masa aktif.
+        // Cukup tandai _extension_applied: true tanpa mengubah masa aktif tenant.
+        const { error: markErr } = await supabaseAdmin
+          .from('transactions')
+          .update({
+            raw_notification: {
+              ...rawNotif,
+              _extension_applied: true,
+              ...(targetEndsAt ? { _target_subscription_ends_at: targetEndsAt } : {}),
+            },
+          })
+          .eq('id', tx.id);
+
+        if (markErr) {
+          return sendJson(res, 500, {
+            error: `Gagal menandai finalisasi transaksi: ${markErr.message}`,
+          });
+        }
       }
 
       return sendJson(res, 200, {
@@ -195,7 +280,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     if (isSuccess) {
       const now = new Date();
 
-      // Ambil tenant untuk kalkulasi sisa durasi langganan (akumulatif)
+      // Ambil tenant untuk kalkulasi target masa aktif (akumulatif)
       const { data: targetTenant, error: getTenantErr } = await supabaseAdmin
         .from('tenants')
         .select('id, status, subscription_ends_at')
@@ -208,43 +293,77 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         });
       }
 
-      const subscriptionEndsAt = calculateSubscriptionExtension(
+      const targetSubscriptionEndsAt = calculateSubscriptionExtension(
         targetTenant.subscription_ends_at,
         tx.billing_cycle
       );
 
-      // LANGKAH 1: Update status tenant terlebih dahulu (mencegah kondisi paid but inactive)
-      const { error: updateTenantError } = await supabaseAdmin
-        .from('tenants')
-        .update({
-          status: 'active',
-          current_package_id: tx.package_id,
-          subscription_ends_at: subscriptionEndsAt,
-          trial_ends_at: null,
-          updated_at: now.toISOString(),
-        })
-        .eq('id', tx.tenant_id);
-
-      if (updateTenantError) {
-        return sendJson(res, 500, {
-          error: `Gagal mengaktifkan tenant: ${updateTenantError.message}`,
-        });
-      }
-
-      // LANGKAH 2: Tandai status transaksi sebagai settlement
+      // LANGKAH 1 (H1 & R1): Kunci status transaksi sebagai 'settlement' dan catat target ends at.
+      // _extension_applied disetel false sampai update tenant tuntas berhasil.
       const { error: updateTxError } = await supabaseAdmin
         .from('transactions')
         .update({
           status: 'settlement',
           settled_at: now.toISOString(),
           midtrans_transaction_id: transaction_id || null,
-          raw_notification: body,
+          raw_notification: {
+            ...body,
+            _extension_applied: false,
+            _target_subscription_ends_at: targetSubscriptionEndsAt,
+          },
         })
         .eq('id', tx.id);
 
       if (updateTxError) {
         return sendJson(res, 500, {
           error: `Gagal memperbarui status transaksi: ${updateTxError.message}`,
+        });
+      }
+
+      // H3: Jika tenant berstatus suspended, jangan ubah status menjadi active
+      if (targetTenant.status === 'suspended') {
+        return sendJson(res, 200, {
+          status: 'ok',
+          message: 'Pembayaran settlement dicatat, namun status tenant tetap suspended.',
+          order_id,
+        });
+      }
+
+      // LANGKAH 2: Terapkan aktivasi / perpanjangan pada tenant
+      const { error: updateTenantError } = await supabaseAdmin
+        .from('tenants')
+        .update({
+          status: 'active',
+          current_package_id: tx.package_id,
+          subscription_ends_at: targetSubscriptionEndsAt,
+          trial_ends_at: null,
+          updated_at: now.toISOString(),
+        })
+        .eq('id', tx.tenant_id);
+
+      // Jika update tenant gagal di sini, respon 500 memicu retry Midtrans,
+      // dan retry otomatis masuk ke blok idempotency recovery (R1) dengan target yang sudah tercatat!
+      if (updateTenantError) {
+        return sendJson(res, 500, {
+          error: `Gagal mengaktifkan tenant: ${updateTenantError.message}`,
+        });
+      }
+
+      // LANGKAH 3 (R1 & E2): Tandai _extension_applied: true
+      const { error: markSuccessError } = await supabaseAdmin
+        .from('transactions')
+        .update({
+          raw_notification: {
+            ...body,
+            _extension_applied: true,
+            _target_subscription_ends_at: targetSubscriptionEndsAt,
+          },
+        })
+        .eq('id', tx.id);
+
+      if (markSuccessError) {
+        return sendJson(res, 500, {
+          error: `Gagal menandai status transaksi: ${markSuccessError.message}`,
         });
       }
 

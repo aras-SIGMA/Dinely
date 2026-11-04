@@ -1,82 +1,54 @@
-# Laporan Pengerjaan Backend — Tahap 2: BE-02 (`api/midtrans/webhook.ts`) [Hardened]
+# Laporan Pengerjaan Backend — Tahap 2: BE-02 (`api/midtrans/webhook.ts`) [Hardened v4 — Penutupan Celah R1, E1, E2]
 
 **Tanggal**: 4 November 2026  
 **Modul**: Midtrans Payment Webhook (`api/midtrans/webhook.ts`)  
 **Branch**: `feature/backend-api-services`  
-**Status**: Selesai & Terverifikasi (12/12 Unit Test Passed)  
+**Status**: Selesai, Teruji (22/22 Unit Test BE-02, Total 28/28 API Test Passed) & Ter-push ke Remote Origin  
 
 ---
 
-## 1. Ringkasan Pekerjaan & Penyempurnaan Keamanan
-Endpoint `api/midtrans/webhook.ts` telah diimplementasikan dan melalui hardening keamanan tingkat lanjut untuk menjamin integritas aktivasi tenant dan data billing:
-1. **Verifikasi Keaslian Signature (SHA-512)**:
-   - Menghitung hash SHA-512: `SHA512(order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY)`.
-   - Perbandingan konstan waktu menggunakan `crypto.timingSafeEqual` untuk mencegah *timing attack*.
-   - Menolak signature tidak sah dengan HTTP `403 Forbidden` sebelum menyentuh database.
-2. **Validasi Kesesuaian Nominal (`gross_amount` vs `transactions.amount`)**:
-   - Memastikan `gross_amount` di notifikasi cocok secara numerik dengan `amount` tagihan di database.
-   - Mengembalikan HTTP `400 Bad Request` jika terjadi anomali/selisih nominal.
-3. **Pembalikan Urutan Update & Mitigasi Partial Failure (Atomisitas Aplikasi)**:
-   - *Urutan Baru*: Tabel `tenants` diaktifkan terlebih dahulu (`status = 'active'`, `subscription_ends_at`, `current_package_id`), baru kemudian status `transactions` diubah menjadi `'settlement'`.
-   - *Recovery Guard*: Pada blok pengecekan idempotensi (`tx.status === 'settlement'`), sistem memverifikasi apakah tenant terkait sudah berstatus `active` dan memiliki masa aktif. Jika sebelumnya terjadi kegagalan parsial pada update tenant, proses aktivasi tenant dipulihkan secara otomatis saat retry notifikasi berikutnya.
-4. **Perhitungan Durasi Berbasis Billing Cycle & Akumulatif**:
-   - Menggunakan helper `calculateSubscriptionExtension(existingEndsAt, billingCycle)`.
-   - Jika tenant sudah aktif dan masih memiliki sisa hari (`subscription_ends_at > now()`), durasi paket baru ditambahkan dari sisa masa aktif tersebut (tidak menghanguskan sisa hari pelanggan).
-   - Menyesuaikan penambahan hari sesuai `billing_cycle`:
-     - `trial` / `monthly`: +30 hari
-     - `6_months`: +180 hari
-     - `yearly`: +365 hari
-5. **Finalisasi Fraud Status & Penanganan Error Lengkap**:
-   - Event `capture` dengan `fraud_status: 'deny'` difinalkan secara eksplisit menjadi status transaksi `'deny'` (bukan dibiarkan berstatus `pending`).
-   - Penanganan error database diterapkan di seluruh cabang (termasuk cabang `pending` dan cabang pembatalan/kegagalan).
-   - *Catatan Batasan*: Mekanisme webhook untuk `refund` / `chargeback` ditandai di luar cakupan MVP.
+## 1. Masalah & Solusi Arsitektur State
+
+### A. R1 (Hilangnya Ekstensi Perpanjangan Secara Senyap)
+- **Akar Masalah**: Retry notifikasi settlement untuk tenant aktif yang sudah punya `subscription_ends_at` sebelumnya melewati blok recovery karena kondisi recovery lama hanya mengecek `status !== 'active' || !subscription_ends_at`.
+- **Solusi**: Menyimpan `_target_subscription_ends_at` dan `_extension_applied: false` pada kolom `raw_notification` tabel `transactions` di Langkah 1. Langkah 2 mengupdate tenant ke target, Langkah 3 menandai `_extension_applied: true`.
+
+### B. E1 (Perlindungan Baris Transaksi Legacy dari Ekstensi Ganda)
+- **Akar Masalah**: Jika transaksi masa lalu (sebelum implementasi metadata) menerima notifikasi duplikat/resend manual dari Midtrans, ketiadaan target membuat recovery menghitung ulang perpanjangan dari masa aktif saat itu, mengakibatkan penambahan hari ganda (misal 30 hari menjadi 60 hari).
+- **Solusi**: Jika `_target_subscription_ends_at` tidak ada (`null`), recovery **hanya** memulihkan tenant jika tenant belum aktif (`isTenantInactive`). Jika tenant sudah aktif, recovery tidak menambah durasi dan langsung menandai `_extension_applied: true`.
+
+### C. E2 (Proteksi Monotonik Non-Decreasing / Anti-Pemendekan Masa Aktif)
+- **Akar Masalah**: Jika penandaan Langkah 3 tertunda/gagal dan tenant telah diperpanjang oleh transaksi lain ke durasi yang lebih jauh (misal 70 hari), retry transaksi lama (target 40 hari) berpotensi menimpa dan memendekkan masa aktif tenant kembali ke 40 hari jika kondisi `!isExtensionApplied` mengeksekusi penulisan tanpa syarat.
+- **Solusi**: Update tanggal tenant dibatasi secara ketat hanya jika `isTenantInactive || isEndsAtBehindTarget` (`currentEndsAt < targetEndsAt`). Jika tenant sudah berada di atau melampaui target, tanggal tenant tidak disentuh, dan transaksi langsung ditandai `_extension_applied: true`.
+- **Error Checking**: Pengecekan error database ditambahkan pada pembaruan status transaksi di Langkah 3 maupun pada penandaan recovery, memastikan respon 500 memicu retry hingga database konsisten.
 
 ---
 
-## 2. Spesifikasi Kontrak Webhook
-
-* **Endpoint**: `POST /api/midtrans/webhook`
-* **Header**: `Content-Type: application/json`
-* **Payload Request**:
-  ```json
-  {
-    "order_id": "RL-WARUNG-M1K2X-A9B2C3",
-    "status_code": "200",
-    "gross_amount": "49000.00",
-    "signature_key": "<SHA512_HASH>",
-    "transaction_status": "settlement",
-    "transaction_id": "midtrans-tx-001"
-  }
-  ```
-* **Response 200 OK (Settlement)**:
-  ```json
-  {
-    "status": "ok",
-    "message": "Pembayaran berhasil diverifikasi. Tenant berhasil diaktifkan.",
-    "order_id": "RL-WARUNG-M1K2X-A9B2C3"
-  }
-  ```
-* **Response 200 OK (Idempotent Duplicate / Recovered)**:
-  ```json
-  {
-    "status": "ok",
-    "message": "Transaksi sudah diselesaikan sebelumnya (idempotent).",
-    "order_id": "RL-WARUNG-M1K2X-A9B2C3"
-  }
-  ```
-* **Error Matrix**:
-  - `400`: Payload tidak lengkap atau nominal `gross_amount` tidak sesuai.
-  - `403`: Verifikasi signature SHA-512 gagal.
-  - `404`: `order_id` tidak terdaftar di database.
-  - `405`: HTTP method selain `POST`.
-  - `500`: Kegagalan server / database update.
+## 2. Cakupan Penanganan Error & Batasan Operasional
+1. **Error Propagation**:
+   - Error pembacaan tenant di recovery (`tenantCheckErr`) -> HTTP `500`.
+   - Error update tenant di recovery (`recoveryErr`) -> HTTP `500`.
+   - Error penandaan transaksi di Langkah 3 (`markSuccessError`) & recovery (`markErr`) -> HTTP `500`.
+2. **Suspended Guard**:
+   - Tenant dengan `status === 'suspended'` dilindungi dari aktivasi di kedua jalur (settlement utama dan recovery).
+3. **Batasan Operasional**:
+   - Transaksi settlement yang masuk pada masa tenant `suspended` dicatat sebagai settlement; penyesuaian masa aktif saat admin meng-unsuspend dilakukan secara manual melalui modul Admin Platform.
+   - Event refund dan chargeback berada di luar cakupan MVP.
 
 ---
 
-## 3. Hasil Pengujian Otomatis
+## 3. Matriks Hasil Pengujian Otomatis (`npm run test:api`)
 
-Script pengujian resmi didaftarkan di `package.json` (`npm run test:api`) dan mengeksekusi `api/_test_be02.ts`:
 ```
+--- TEST SUITE: BE-01 (api/midtrans/create.ts) ---
+[PASS] TC-01: Method GET ditolak 405
+[PASS] TC-02: Header Authorization kosong ditolak 401
+[PASS] TC-03: Bearer token kosong ditolak 401
+[PASS] TC-04: Bearer token tidak valid ditolak 401
+[PASS] TC-05: Field body tidak lengkap ditolak 400
+[PASS] TC-06: billing_cycle tidak valid ditolak 400
+Hasil: 6 Passed, 0 Failed
+
 --- TEST SUITE: BE-02 (api/midtrans/webhook.ts) [HARDENED] ---
 [PASS] TC-01: Method GET ditolak 405
 [PASS] TC-02: Payload tidak lengkap ditolak 400
@@ -90,43 +62,20 @@ Script pengujian resmi didaftarkan di `package.json` (`npm run test:api`) dan me
 [PASS] TC-10: Perpanjangan mengakumulasi sisa hari aktif (10 hari sisa + 30 hari = 40 hari)
 [PASS] TC-11: Selisih nominal gross_amount vs tx.amount ditolak 400
 [PASS] TC-12: Error DB pada cabang pending ditangani dengan 500
-
-Hasil: 12 Passed, 0 Failed
+[PASS] TC-13: Anti-Double Extension terbukti (Attempt 1 gagal 500, retry 200, total durasi tepat 30 hari)
+[PASS] TC-14: Kegagalan DB pada recovery guard menghasilkan 500 (memicu retry Midtrans)
+[PASS] TC-15: Suspended tenant tetap suspended saat pembayaran settlement masuk
+[PASS] TC-16a: Attempt 1 gagal update tenant menghasilkan HTTP 500
+[PASS] TC-16b: Retry memulihkan perpanjangan secara presisi (+10 hari sisa + 30 hari = 40 hari, bukan 10 hari)
+[PASS] TC-16c: Retry duplikat lanjutan tidak menambah durasi ganda (tetap tepat 40 hari)
+[PASS] TC-17: Error select tenant di blok recovery menghasilkan HTTP 500
+[PASS] TC-18: Suspended tenant pada jalur recovery tetap berstatus suspended
+[PASS] TC-19: Transaksi legacy tanpa metadata tidak menggandakan masa aktif tenant aktif (E1 fix)
+[PASS] TC-20: Retry transaksi tertunda tidak memendekkan masa aktif yang sudah lebih maju (E2 fix)
+Hasil: 22 Passed, 0 Failed
 ```
 
-Verifikasi TypeScript & Build:
+Verifikasi Tambahan:
 - `npx tsc --noEmit`: 0 error
 - `npm run check`: 0 error, 0 warning
-- `npm run build`: Kompilasi vite client berhasil
-
----
-
-## 4. Cara Uji Manual via `curl`
-
-> **Catatan Runtime**: Endpoint di folder `api/` dieksekusi melalui runtime Vercel Serverless. Pada lingkungan lokal, jalankan perintah `npx vercel dev` (default port `3000`), bukan port Vite `5173`.
-
-1. Hitung signature SHA-512 di terminal (PowerShell):
-   ```powershell
-   $orderId = "RL-WARUNG-M1K2X-A9B2C3"
-   $statusCode = "200"
-   $grossAmount = "49000.00"
-   $serverKey = "SB-Mid-server-your-key"
-   $raw = "$orderId$statusCode$grossAmount$serverKey"
-   $hasher = [System.Security.Cryptography.SHA512]::Create()
-   $signature = [System.BitConverter]::ToString($hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($raw))).Replace("-","").ToLower()
-   Write-Output $signature
-   ```
-2. Kirim payload webhook ke serverless dev environment:
-   ```bash
-   curl -X POST http://localhost:3000/api/midtrans/webhook \
-     -H "Content-Type: application/json" \
-     -d '{
-       "order_id": "RL-WARUNG-M1K2X-A9B2C3",
-       "status_code": "200",
-       "gross_amount": "49000.00",
-       "signature_key": "'$signature'",
-       "transaction_status": "settlement",
-       "transaction_id": "midtrans-tx-001"
-     }'
-   ```
-3. Uji Idempotensi: Kirim ulang perintah di atas. Sistem merespons `200 OK` dengan pesan idempotent tanpa memodifikasi durasi masa aktif tenant.
+- `npm run build`: Kompilasi Vite production sukses (0 error)
