@@ -20,7 +20,8 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-08** | M4 | Integrasi Client Midtrans Snap Popup | ✅ Selesai | 03 Nov 2026 | `feature/midtrans-payment` |
 | **FS-09** | M5 | Client Canvas Image Compressor (WebP) | ✅ Selesai | 04 Nov 2026 | `feature/menu-and-cloudinary-upload` |
 | **FS-10** | M5 | Client Cloudinary Direct Uploader | ✅ Selesai | 04 Nov 2026 | `feature/cloudinary-upload` |
-| **FS-11** | M6 | Reactive Cart Store & Guest Order RPC Integration | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
+| **FS-11** | M6 | Reactive Cart Store & LocalStorage Sync | ✅ Selesai | 04 Nov 2026 | `feature/tenant-site-and-order` |
+| **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
 | **FS-12** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
 | **FS-13** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
 | **FS-14** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
@@ -268,3 +269,24 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test lokal (perhitungan penghematan byte/persentase, parsing signature, pemetaan data response) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (3.60s).
+
+---
+
+### [FS-11] Reactive Cart Store & LocalStorage Sync
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M6 (Website Publik Tenant & Guest Checkout)
+* **Branch**: `feature/tenant-site-and-order`
+* **File Terkait**:
+  - `src/stores/cart.svelte.ts`
+* **Keputusan Teknis**:
+  1. Pengelolaan state berbasis Svelte 5 Runes (`items = $state([])`, `tenantId = $state(null)`), dengan getters reaktif (`totalItems`, `subtotal`, `formattedSubtotal`, `isEmpty`, `itemCount`, `rpcPayloadItems`).
+  2. Isolasi multi-tenant pada browser storage: Kunci LocalStorage dibedakan per resto (`restolink_cart_${tenantId}`) agar keranjang tidak saling menimpa saat pelanggan membuka beberapa toko kuliner berbeda.
+  3. Validasi & batas integritas keranjang:
+     - Menolak penambahan menu habis (`is_available === false`).
+     - Membatasi kuantitas maksimum per menu hingga 99 item (`MAX_QUANTITY_PER_ITEM = 99`).
+     - Membatasi variasi menu dalam satu keranjang hingga 50 jenis (`MAX_ITEMS_IN_CART = 50`) selaras dengan batas validasi anti-DoS RPC Postgres `create_guest_order`.
+  4. Penyusunan payload RPC otomatis via getter `rpcPayloadItems`: memetakan item langsung menjadi format `{ menu_item_id, quantity }` untuk konsumsi Task FS-12 berikutnya.
+* **Hasil Verifikasi**:
+  - Unit test lokal (tambah item, akumulasi qty, penolakan stok habis, decrement/auto-remove, isolasi multi-tenant, persistensi storage, format Rupiah) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (3.74s).
