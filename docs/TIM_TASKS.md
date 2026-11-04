@@ -54,12 +54,12 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 
 ### 2. Backend Developer
 * **Milestone 4: Midtrans Payment Engine**
-  - [ ] **BE-01**: Endpoint `api/midtrans/create.ts`
+  - [x] **BE-01**: Endpoint `api/midtrans/create.ts`
     - Validasi sesi user / tenant ID.
     - Hitung tagihan paket Mikro (Rp 49.000).
     - Request Snap Token ke Midtrans API Sandbox menggunakan `MIDTRANS_SERVER_KEY`.
     - Insert transaksi ke tabel `transactions` status `pending`.
-  - [ ] **BE-02**: Endpoint `api/midtrans/webhook.ts` *(Titik Paling Kritis Sistem)*
+  - [x] **BE-02**: Endpoint `api/midtrans/webhook.ts` *(Titik Paling Kritis Sistem)*
     - Validasi signature hash SHA-512: `SHA512(order_id + status_code + gross_amount + ServerKey)`.
     - Idempotency protection (cegah pemrosesan ulang webhook duplikat).
     - Jika `settlement` / `capture`: update `transactions.status = 'settlement'`, update `tenants.status = 'active'`, pasang `subscription_ends_at` (+30 hari) via Supabase `service_role`.

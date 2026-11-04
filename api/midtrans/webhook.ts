@@ -38,6 +38,33 @@ function verifySignature(
   );
 }
 
+export function calculateSubscriptionExtension(
+  existingEndsAt: string | null | undefined,
+  billingCycle: string
+): string {
+  const now = new Date();
+  let baseDate = now;
+
+  if (existingEndsAt) {
+    const parsed = new Date(existingEndsAt);
+    if (!isNaN(parsed.getTime()) && parsed.getTime() > now.getTime()) {
+      baseDate = parsed;
+    }
+  }
+
+  let daysToAdd = 30;
+  if (billingCycle === '6_months') {
+    daysToAdd = 180;
+  } else if (billingCycle === 'yearly') {
+    daysToAdd = 365;
+  } else {
+    daysToAdd = 30; // 'trial' or 'monthly' or default
+  }
+
+  const newEndsAt = new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  return newEndsAt.toISOString();
+}
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') {
     return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
@@ -88,7 +115,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     // 2. Cari transaksi terkait berdasarkan midtrans_order_id
     const { data: tx, error: txError } = await supabaseAdmin
       .from('transactions')
-      .select('id, tenant_id, package_id, status')
+      .select('id, tenant_id, package_id, status, billing_cycle, amount')
       .eq('midtrans_order_id', order_id)
       .maybeSingle();
 
@@ -104,8 +131,48 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       });
     }
 
-    // 3. Idempotency Check: jika transaksi sudah berstatus final settlement/capture, abaikan
+    // Validasi kesesuaian gross_amount terhadap database tagihan
+    if (tx.amount != null) {
+      const payloadAmount = Math.round(Number(gross_amount));
+      const txAmount = Math.round(Number(tx.amount));
+      if (!isNaN(payloadAmount) && !isNaN(txAmount) && payloadAmount !== txAmount) {
+        return sendJson(res, 400, {
+          error: `Nominal pembayaran tidak sesuai. Payload: ${payloadAmount}, Tagihan: ${txAmount}.`,
+        });
+      }
+    }
+
+    // 3. Idempotency Check & Partial Failure Recovery
     if (tx.status === 'settlement' || tx.status === 'capture') {
+      const { data: currentTenant, error: tenantCheckErr } = await supabaseAdmin
+        .from('tenants')
+        .select('id, status, subscription_ends_at')
+        .eq('id', tx.tenant_id)
+        .maybeSingle();
+
+      // Jika sebelumnya tenant gagal diaktifkan (partial failure), pulihkan di sini
+      if (
+        !tenantCheckErr &&
+        currentTenant &&
+        (currentTenant.status !== 'active' || !currentTenant.subscription_ends_at)
+      ) {
+        const recoveredEndsAt = calculateSubscriptionExtension(
+          currentTenant.subscription_ends_at,
+          tx.billing_cycle
+        );
+
+        await supabaseAdmin
+          .from('tenants')
+          .update({
+            status: 'active',
+            current_package_id: tx.package_id,
+            subscription_ends_at: recoveredEndsAt,
+            trial_ends_at: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', tx.tenant_id);
+      }
+
       return sendJson(res, 200, {
         status: 'ok',
         message: 'Transaksi sudah diselesaikan sebelumnya (idempotent).',
@@ -117,31 +184,36 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       transaction_status === 'settlement' ||
       (transaction_status === 'capture' && fraud_status === 'accept');
 
-    const isFailure = ['deny', 'cancel', 'expire', 'failure'].includes(transaction_status);
+    const isDenied =
+      transaction_status === 'deny' ||
+      (transaction_status === 'capture' && fraud_status === 'deny');
+
+    const isFailure =
+      isDenied || ['cancel', 'expire', 'failure'].includes(transaction_status);
 
     // 4. Update transaksi & tenant sesuai status
     if (isSuccess) {
       const now = new Date();
-      const subscriptionEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      // Update transaksi menjadi settlement
-      const { error: updateTxError } = await supabaseAdmin
-        .from('transactions')
-        .update({
-          status: 'settlement',
-          settled_at: now.toISOString(),
-          midtrans_transaction_id: transaction_id || null,
-          raw_notification: body,
-        })
-        .eq('id', tx.id);
+      // Ambil tenant untuk kalkulasi sisa durasi langganan (akumulatif)
+      const { data: targetTenant, error: getTenantErr } = await supabaseAdmin
+        .from('tenants')
+        .select('id, status, subscription_ends_at')
+        .eq('id', tx.tenant_id)
+        .maybeSingle();
 
-      if (updateTxError) {
+      if (getTenantErr || !targetTenant) {
         return sendJson(res, 500, {
-          error: `Gagal memperbarui status transaksi: ${updateTxError.message}`,
+          error: `Gagal membaca data tenant: ${getTenantErr?.message || 'Tenant tidak ditemukan'}`,
         });
       }
 
-      // Update status tenant menjadi 'active' + perpanjang subscription
+      const subscriptionEndsAt = calculateSubscriptionExtension(
+        targetTenant.subscription_ends_at,
+        tx.billing_cycle
+      );
+
+      // LANGKAH 1: Update status tenant terlebih dahulu (mencegah kondisi paid but inactive)
       const { error: updateTenantError } = await supabaseAdmin
         .from('tenants')
         .update({
@@ -159,13 +231,34 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         });
       }
 
+      // LANGKAH 2: Tandai status transaksi sebagai settlement
+      const { error: updateTxError } = await supabaseAdmin
+        .from('transactions')
+        .update({
+          status: 'settlement',
+          settled_at: now.toISOString(),
+          midtrans_transaction_id: transaction_id || null,
+          raw_notification: body,
+        })
+        .eq('id', tx.id);
+
+      if (updateTxError) {
+        return sendJson(res, 500, {
+          error: `Gagal memperbarui status transaksi: ${updateTxError.message}`,
+        });
+      }
+
       return sendJson(res, 200, {
         status: 'ok',
         message: 'Pembayaran berhasil diverifikasi. Tenant berhasil diaktifkan.',
         order_id,
       });
     } else if (isFailure) {
-      const mappedStatus = transaction_status as 'deny' | 'cancel' | 'expire' | 'failure';
+      const mappedStatus = isDenied
+        ? 'deny'
+        : (['cancel', 'expire', 'failure'].includes(transaction_status)
+            ? transaction_status
+            : 'failure') as 'deny' | 'cancel' | 'expire' | 'failure';
 
       const { error: updateTxError } = await supabaseAdmin
         .from('transactions')
@@ -183,17 +276,23 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
       return sendJson(res, 200, {
         status: 'ok',
-        message: `Status transaksi diperbarui menjadi ${transaction_status}. Tenant tidak diaktifkan.`,
+        message: `Status transaksi diperbarui menjadi ${mappedStatus}. Tenant tidak diaktifkan.`,
         order_id,
       });
     } else {
       // Status pending atau event notifikasi lainnya
-      await supabaseAdmin
+      const { error: updateRawError } = await supabaseAdmin
         .from('transactions')
         .update({
           raw_notification: body,
         })
         .eq('id', tx.id);
+
+      if (updateRawError) {
+        return sendJson(res, 500, {
+          error: `Gagal menyimpan notifikasi transaksi: ${updateRawError.message}`,
+        });
+      }
 
       return sendJson(res, 200, {
         status: 'ok',
