@@ -38,8 +38,9 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FS-07**: Route guard hooks (`src/lib/guards.ts`) proteksi akses rute `/dashboard/*` dan `/admin/*`.
 * **Milestone 4 & 5: Integrasi Pembayaran & Upload Client**
   - [x] **FS-08**: Integrasi Snap Popup Midtrans di sisi browser saat pemilik checkout paket langganan.
-  - [ ] **FS-09**: Client image compressor `src/lib/image-compressor.ts` (canvas kompresi WebP max 800px / 300KB).
+  - [x] **FS-09**: Client image compressor `src/lib/image-compressor.ts` (canvas kompresi WebP max 800px / 300KB).
   - [ ] **FS-10**: Client uploader `src/lib/cloudinary-upload.ts` (request signature ke backend → POST multipart ke Cloudinary API).
+    - *Catatan Integrasi:* Integrasikan dengan `compressImage` (`src/lib/image-compressor.ts`) sebelum file dikirim ke Cloudinary. Sediakan metadata ringkasan kompresi (misal: ukuran awal, ukuran terkompresi, dan persentase penghematan ukuran) agar komponen UI dapat menampilkan feedback visual hasil optimasi gambar kepada pengguna.
 * **Milestone 6 & 7: Integrasi Pemesanan & Dashboard Realtime**
   - [ ] **FS-11**: Keranjang belanja reaktif `src/stores/cart.svelte.ts` (hitung subtotal, simpan LocalStorage).
   - [ ] **FS-12**: Integrasi submit pesanan guest ke RPC Postgres `create_guest_order` dan pelacakan via `get_guest_order_status`.

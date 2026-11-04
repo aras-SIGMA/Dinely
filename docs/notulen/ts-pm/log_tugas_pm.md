@@ -18,7 +18,7 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-07** | M3 | Owner Auth Store & Tenant Provisioning Engine | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-08** | M3 | Route Guard Engine & Access Control Hooks | ✅ Selesai | 03 Nov 2026 | `feature/auth-and-registration` |
 | **FS-09** | M4 | Integrasi Client Midtrans Snap Popup | ✅ Selesai | 03 Nov 2026 | `feature/midtrans-payment` |
-| **FS-10** | M5 | Client Canvas Image Compressor (WebP) | ⏹️ Antrean | - | `feature/menu-and-cloudinary-upload` |
+| **FS-10** | M5 | Client Canvas Image Compressor (WebP) (FS-09 Master) | ✅ Selesai | 04 Nov 2026 | `feature/menu-and-cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & Guest Order RPC Integration | ⏹️ Antrean | - | `feature/tenant-site-and-order` |
 | **FS-12** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
 | **FS-13** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
@@ -221,3 +221,26 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 * **Hasil Verifikasi**:
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (3.77s).
+
+---
+
+### [FS-09] Client Canvas Image Compressor (WebP)
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M5 (Menu Management & Cloudinary Image Upload)
+* **Branch**: `feature/menu-and-cloudinary-upload`
+* **File Terkait**:
+  - `src/lib/image-compressor.ts`
+* **Keputusan Teknis**:
+  1. Validasi awal berkas (`validateImage`): memastikan MIME type valid (`image/jpeg`, `image/png`, `image/webp`, dll) dan membatasi ukuran input mentah maksimum 10MB.
+  2. Perhitungan dimensi proporsional (`calculateDimensions`): membatasi panjang dan lebar gambar maksimum 800px sambil mempertahankan aspek rasio asli.
+  3. Konversi format & optimasi adaptif (`compressImage`):
+     - Prioritas format output WebP (`image/webp`) dengan fallback aman ke JPEG jika browser tidak mendukung WebP export.
+     - Ladder kualitas bertahap (0.85 -> 0.75 -> 0.65 -> 0.50).
+     - Downscaling dimensi dinamis (skala -20%) jika pada kualitas 0.50 ukuran masih melampaui batas 300KB (307.200 bytes).
+     - Otomatis mengganti ekstensi output menjadi `.webp` (`getWebpFilename`).
+  4. Manajemen memori aman: pembersihan object URL via `URL.revokeObjectURL(url)` segera setelah gambar selesai dimuat.
+  5. Instruksi integrasi FS-10 (`cloudinary-upload.ts`): File gambar wajib melewati `compressImage` sebelum multipart upload, dan fungsi upload wajib mengembalikan metadata ringkasan kompresi (`originalSize`, `compressedSize`, `compressionRatio`) agar UI dapat menampilkan feedback penghematan ukuran file.
+* **Hasil Verifikasi**:
+  - Unit test lokal (dimensi, ukuran byte, penamaan ekstensi, validasi berkas) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (5.59s).
