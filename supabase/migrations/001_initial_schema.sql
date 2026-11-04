@@ -179,6 +179,7 @@ CREATE TABLE public.orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   order_code text NOT NULL,
+  tracking_token uuid NOT NULL DEFAULT gen_random_uuid(),
   buyer_name text NOT NULL,
   buyer_contact text,
   note text,
@@ -240,4 +241,5 @@ CREATE INDEX idx_categories_tenant_sort ON public.categories (tenant_id, sort_or
 CREATE INDEX idx_menu_items_tenant_cat ON public.menu_items (tenant_id, category_id, sort_order);
 CREATE INDEX idx_menu_items_tenant_avail ON public.menu_items (tenant_id, is_available, sort_order);
 CREATE INDEX idx_orders_tenant_status_created ON public.orders (tenant_id, status, created_at DESC);
+CREATE INDEX idx_orders_tracking_token ON public.orders (tracking_token);
 CREATE INDEX idx_order_items_order_id ON public.order_items (order_id);

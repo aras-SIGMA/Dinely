@@ -24,6 +24,8 @@ export interface SubmitGuestOrderInput {
   items: GuestOrderItemPayload[];
 }
 
+export const MAX_TOTAL_QUANTITY_PER_ORDER = 99;
+
 export interface OrderValidationResult {
   valid: boolean;
   error?: string;
@@ -54,6 +56,7 @@ export function validateGuestOrderInput(input: SubmitGuestOrderInput): OrderVali
     return { valid: false, error: 'Jumlah jenis menu dalam keranjang maksimal 50.' };
   }
 
+  let totalQuantity = 0;
   for (const item of input.items) {
     if (!item.menu_item_id) {
       return { valid: false, error: 'ID menu tidak valid.' };
@@ -61,9 +64,27 @@ export function validateGuestOrderInput(input: SubmitGuestOrderInput): OrderVali
     if (!item.quantity || item.quantity < 1 || item.quantity > 99) {
       return { valid: false, error: 'Kuantitas per menu harus antara 1 hingga 99.' };
     }
+    totalQuantity += item.quantity;
   }
 
-  if (input.note && input.note.length > 500) {
+  if (totalQuantity > MAX_TOTAL_QUANTITY_PER_ORDER) {
+    return {
+      valid: false,
+      error: `Total kuantitas pesanan maksimal ${MAX_TOTAL_QUANTITY_PER_ORDER} item dalam sekali pemesanan.`
+    };
+  }
+
+  if (input.buyerContact) {
+    const cleanContact = input.buyerContact.trim();
+    if (cleanContact.length > 30) {
+      return { valid: false, error: 'Nomor kontak pemesan maksimal 30 karakter.' };
+    }
+    if (!/^[0-9+\-\s()]{7,30}$/.test(cleanContact)) {
+      return { valid: false, error: 'Format nomor kontak tidak valid (contoh: 08123456789).' };
+    }
+  }
+
+  if (input.note && input.note.trim().length > 500) {
     return { valid: false, error: 'Catatan pesanan maksimal 500 karakter.' };
   }
 
@@ -104,18 +125,21 @@ export async function submitGuestOrder(
     throw new Error('Pesanan gagal diproses oleh server database.');
   }
 
-  // Simpan kode pesanan terakhir ke LocalStorage agar pembeli tidak kehilangan bukti
-  saveLastOrderCode(input.tenantId, result.order_code);
+  // Simpan kode pesanan dan tracking token terakhir ke LocalStorage agar pembeli tidak kehilangan bukti
+  saveLastOrderCode(input.tenantId, result.order_code, result.tracking_token);
 
   return result;
 }
 
 /**
  * Mengambil detail & status pesanan guest via RPC Postgres `get_guest_order_status`.
+ * Jika trackingToken valid disertakan, server menyajikan rincian lengkap.
+ * Jika tanpa trackingToken, server menyajikan masked view tanpa PII.
  */
 export async function fetchGuestOrderStatus(
   tenantId: string,
-  orderCode: string
+  orderCode: string,
+  trackingToken?: string | null
 ): Promise<GetGuestOrderStatusResult> {
   if (!tenantId || !orderCode) {
     return { success: false, message: 'ID resto dan kode pesanan wajib disertakan.' };
@@ -125,7 +149,8 @@ export async function fetchGuestOrderStatus(
 
   const { data, error } = await supabase.rpc('get_guest_order_status', {
     p_tenant_id: tenantId,
-    p_order_code: cleanCode
+    p_order_code: cleanCode,
+    p_tracking_token: trackingToken ?? null
   });
 
   if (error) {
@@ -141,14 +166,17 @@ export async function fetchGuestOrderStatus(
 }
 
 /**
- * Menyimpan kode pesanan terakhir pelanggan di LocalStorage per tenant.
+ * Menyimpan kode pesanan dan tracking token terakhir pelanggan di LocalStorage per tenant.
  */
-export function saveLastOrderCode(tenantId: string, orderCode: string): void {
+export function saveLastOrderCode(tenantId: string, orderCode: string, trackingToken?: string | null): void {
   if (typeof window === 'undefined' || !window.localStorage || !tenantId || !orderCode) return;
   try {
     window.localStorage.setItem(`restolink_last_order_${tenantId}`, orderCode.trim().toUpperCase());
+    if (trackingToken) {
+      window.localStorage.setItem(`restolink_last_token_${tenantId}`, trackingToken);
+    }
   } catch (err) {
-    console.warn('[guest-order] Gagal menyimpan lastOrderCode:', err);
+    console.warn('[guest-order] Gagal menyimpan lastOrderCode / token:', err);
   }
 }
 
@@ -165,13 +193,26 @@ export function getLastOrderCode(tenantId: string): string | null {
 }
 
 /**
- * Menghapus catatan kode pesanan terakhir dari LocalStorage.
+ * Membaca token tracking pesanan terakhir pelanggan dari LocalStorage per tenant.
+ */
+export function getLastOrderTrackingToken(tenantId: string): string | null {
+  if (typeof window === 'undefined' || !window.localStorage || !tenantId) return null;
+  try {
+    return window.localStorage.getItem(`restolink_last_token_${tenantId}`);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Menghapus catatan kode pesanan dan tracking token terakhir dari LocalStorage.
  */
 export function clearLastOrderCode(tenantId: string): void {
   if (typeof window === 'undefined' || !window.localStorage || !tenantId) return;
   try {
     window.localStorage.removeItem(`restolink_last_order_${tenantId}`);
+    window.localStorage.removeItem(`restolink_last_token_${tenantId}`);
   } catch (err) {
-    console.warn('[guest-order] Gagal menghapus lastOrderCode:', err);
+    console.warn('[guest-order] Gagal menghapus lastOrderCode / token:', err);
   }
 }

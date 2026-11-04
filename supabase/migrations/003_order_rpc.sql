@@ -25,18 +25,57 @@ AS $$
 DECLARE
   v_tenant_record record;
   v_total_amount numeric := 0;
+  v_total_quantity integer := 0;
   v_order_id uuid;
   v_order_code text;
+  v_tracking_token uuid := gen_random_uuid();
   v_item_count integer;
   v_unique_count integer := 0;
   v_matched_count integer := 0;
   v_has_invalid_qty boolean := false;
   v_inserted boolean := false;
   v_attempts integer := 0;
+  v_recent_tenant_orders integer := 0;
+  v_recent_contact_orders integer := 0;
+  v_clean_contact text;
+  v_clean_note text;
 BEGIN
   -- 1. Validasi Input & Anti-DoS: Nama pembeli (2-100 karakter)
   IF length(trim(coalesce(p_buyer_name, ''))) < 2 OR length(trim(coalesce(p_buyer_name, ''))) > 100 THEN
     RAISE EXCEPTION 'Nama pemesan wajib diisi (antara 2 hingga 100 karakter).';
+  END IF;
+
+  v_clean_contact := nullif(trim(coalesce(p_buyer_contact, '')), '');
+  IF v_clean_contact IS NOT NULL AND length(v_clean_contact) > 30 THEN
+    RAISE EXCEPTION 'Nomor kontak pemesan maksimal 30 karakter.';
+  END IF;
+
+  v_clean_note := nullif(trim(coalesce(p_note, '')), '');
+  IF v_clean_note IS NOT NULL AND length(v_clean_note) > 500 THEN
+    RAISE EXCEPTION 'Catatan pesanan maksimal 500 karakter.';
+  END IF;
+
+  -- Anti-Spam Throttling: Maksimal 20 pesanan per menit per tenant
+  SELECT count(*) INTO v_recent_tenant_orders
+  FROM public.orders
+  WHERE tenant_id = p_tenant_id AND created_at > (now() - interval '1 minute');
+
+  IF v_recent_tenant_orders >= 20 THEN
+    RAISE EXCEPTION 'Toko sedang menerima banyak pesanan. Silakan tunggu 1 menit lalu coba kembali.';
+  END IF;
+
+  -- Anti-Spam Throttling: Maksimal 3 pesanan baru per kontak dalam 10 menit
+  IF v_clean_contact IS NOT NULL THEN
+    SELECT count(*) INTO v_recent_contact_orders
+    FROM public.orders
+    WHERE tenant_id = p_tenant_id 
+      AND buyer_contact = v_clean_contact 
+      AND status = 'baru'
+      AND created_at > (now() - interval '10 minutes');
+
+    IF v_recent_contact_orders >= 3 THEN
+      RAISE EXCEPTION 'Maksimal 3 pesanan aktif menunggu konfirmasi untuk nomor kontak ini.';
+    END IF;
   END IF;
 
   -- 2. Validasi format p_items (harus array, 1-50 item)
@@ -86,15 +125,16 @@ BEGIN
       count(pi.menu_item_id) AS unique_count,
       count(m.id) AS matched_count,
       coalesce(sum(m.price * pi.quantity), 0) AS calculated_total,
-      bool_or(pi.quantity < 1 OR pi.quantity > 1000) AS has_invalid_qty
+      coalesce(sum(pi.quantity), 0)::int AS total_quantity,
+      bool_or(pi.quantity < 1 OR pi.quantity > 99) AS has_invalid_qty
     FROM parsed_items pi
     LEFT JOIN public.menu_items m 
       ON m.id = pi.menu_item_id 
      AND m.tenant_id = p_tenant_id 
      AND m.is_available = true
   )
-  SELECT unique_count, matched_count, calculated_total, coalesce(has_invalid_qty, false)
-  INTO v_unique_count, v_matched_count, v_total_amount, v_has_invalid_qty
+  SELECT unique_count, matched_count, calculated_total, total_quantity, coalesce(has_invalid_qty, false)
+  INTO v_unique_count, v_matched_count, v_total_amount, v_total_quantity, v_has_invalid_qty
   FROM aggregated_check;
 
   IF v_unique_count = 0 THEN
@@ -102,7 +142,11 @@ BEGIN
   END IF;
 
   IF v_has_invalid_qty THEN
-    RAISE EXCEPTION 'Jumlah pesanan per menu harus antara 1 hingga 1000.';
+    RAISE EXCEPTION 'Jumlah pesanan per menu harus antara 1 hingga 99.';
+  END IF;
+
+  IF v_total_quantity > 99 THEN
+    RAISE EXCEPTION 'Total kuantitas pesanan maksimal 99 item dalam sekali pemesanan.';
   END IF;
 
   IF v_matched_count < v_unique_count THEN
@@ -120,6 +164,7 @@ BEGIN
       INSERT INTO public.orders (
         tenant_id,
         order_code,
+        tracking_token,
         buyer_name,
         buyer_contact,
         note,
@@ -128,9 +173,10 @@ BEGIN
       ) VALUES (
         p_tenant_id,
         v_order_code,
+        v_tracking_token,
         trim(p_buyer_name),
-        nullif(trim(coalesce(p_buyer_contact, '')), ''),
-        nullif(trim(coalesce(p_note, '')), ''),
+        v_clean_contact,
+        v_clean_note,
         'baru',
         v_total_amount
       ) RETURNING id INTO v_order_id;
@@ -149,6 +195,7 @@ BEGIN
     INSERT INTO public.orders (
       tenant_id,
       order_code,
+      tracking_token,
       buyer_name,
       buyer_contact,
       note,
@@ -157,9 +204,10 @@ BEGIN
     ) VALUES (
       p_tenant_id,
       v_order_code,
+      v_tracking_token,
       trim(p_buyer_name),
-      nullif(trim(coalesce(p_buyer_contact, '')), ''),
-      nullif(trim(coalesce(p_note, '')), ''),
+      v_clean_contact,
+      v_clean_note,
       'baru',
       v_total_amount
     ) RETURNING id INTO v_order_id;
@@ -196,6 +244,7 @@ BEGIN
     'success', true,
     'order_id', v_order_id,
     'order_code', v_order_code,
+    'tracking_token', v_tracking_token,
     'total_amount', v_total_amount,
     'status', 'baru'
   );
@@ -209,11 +258,14 @@ GRANT EXECUTE ON FUNCTION public.create_guest_order(uuid, text, text, text, json
 -- ------------------------------------------------------------------------------
 -- 2. FUNGSI: get_guest_order_status
 -- Memungkinkan pembeli melihat status pesanannya menggunakan order_code
--- Dilengkapi perlindungan PII (masking nomor kontak pembeli)
+-- Dilengkapi verifikasi tracking_token untuk mencegah enumeration / data scraping
 -- ------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.get_guest_order_status(uuid, text);
+
 CREATE OR REPLACE FUNCTION public.get_guest_order_status(
   p_tenant_id uuid,
-  p_order_code text
+  p_order_code text,
+  p_tracking_token uuid DEFAULT NULL
 )
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -222,16 +274,36 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_order record;
-  v_items jsonb;
+  v_items jsonb := '[]'::jsonb;
   v_masked_contact text := NULL;
+  v_is_authorized boolean := false;
 BEGIN
-  SELECT id, order_code, buyer_name, buyer_contact, status, total_amount, note, created_at
+  SELECT id, order_code, tracking_token, buyer_name, buyer_contact, status, total_amount, note, created_at
   INTO v_order
   FROM public.orders
   WHERE tenant_id = p_tenant_id AND upper(order_code) = upper(trim(p_order_code));
 
   IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'message', 'Pesanan tidak ditemukan.');
+  END IF;
+
+  -- Verifikasi token pembeli atau role pemilik/admin
+  IF (p_tracking_token IS NOT NULL AND p_tracking_token = v_order.tracking_token)
+     OR public.is_tenant_owner(p_tenant_id)
+     OR public.is_platform_admin() THEN
+    v_is_authorized := true;
+  END IF;
+
+  -- Jika token salah/tanpa token: sembunyikan semua PII (nama, telepon, catatan, rincian menu)
+  IF NOT v_is_authorized THEN
+    RETURN jsonb_build_object(
+      'success', true,
+      'order_code', v_order.order_code,
+      'status', v_order.status,
+      'total_amount', v_order.total_amount,
+      'created_at', v_order.created_at,
+      'is_masked_view', true
+    );
   END IF;
 
   -- Masking nomor telepon pembeli jika ada (contoh: 0812****789)
@@ -265,11 +337,12 @@ BEGIN
     'total_amount', v_order.total_amount,
     'note', v_order.note,
     'created_at', v_order.created_at,
-    'items', v_items
+    'items', v_items,
+    'is_masked_view', false
   );
 END;
 $$;
 
 -- Hak akses eksplisit get_guest_order_status
-REVOKE ALL ON FUNCTION public.get_guest_order_status(uuid, text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.get_guest_order_status(uuid, text) TO anon, authenticated, service_role;
+REVOKE ALL ON FUNCTION public.get_guest_order_status(uuid, text, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_guest_order_status(uuid, text, uuid) TO anon, authenticated, service_role;

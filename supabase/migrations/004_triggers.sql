@@ -150,6 +150,20 @@ BEGIN
     RAISE EXCEPTION 'Rincian pesanan bersifat permanen. Hanya status pesanan yang dapat diperbarui.';
   END IF;
 
+  -- Kunci status terminal: pesanan selesai atau dibatalkan dilarang diubah kembali
+  IF OLD.status IN ('selesai', 'dibatalkan') AND NEW.status IS DISTINCT FROM OLD.status THEN
+    RAISE EXCEPTION 'Pesanan berstatus "%" bersifat final dan tidak dapat diubah kembali.', OLD.status;
+  END IF;
+
+  -- Validasi alur transisi sah
+  IF OLD.status = 'baru' AND NEW.status NOT IN ('baru', 'diproses', 'dibatalkan') THEN
+    RAISE EXCEPTION 'Transisi status dari "%" ke "%" tidak diizinkan.', OLD.status, NEW.status;
+  END IF;
+
+  IF OLD.status = 'diproses' AND NEW.status NOT IN ('diproses', 'selesai', 'dibatalkan') THEN
+    RAISE EXCEPTION 'Transisi status dari "%" ke "%" tidak diizinkan.', OLD.status, NEW.status;
+  END IF;
+
   RETURN NEW;
 END;
 $$;

@@ -34,6 +34,7 @@ export interface AddItemInput {
 }
 
 export const MAX_QUANTITY_PER_ITEM = 99;
+export const MAX_TOTAL_QUANTITY_PER_ORDER = 99;
 export const MAX_ITEMS_IN_CART = 50; // Sesuai constraint RPC create_guest_order (1-50 item)
 
 export function formatRupiah(amount: number): string {
@@ -120,12 +121,20 @@ class CartStore {
 
     if (existingIndex >= 0) {
       const currentQty = this.items[existingIndex].quantity;
-      const nextQty = Math.min(MAX_QUANTITY_PER_ITEM, currentQty + quantity);
-
       if (currentQty >= MAX_QUANTITY_PER_ITEM) {
         return {
           success: false,
           message: `Maksimal pemesanan per menu adalah ${MAX_QUANTITY_PER_ITEM}.`
+        };
+      }
+
+      const nextQty = Math.min(MAX_QUANTITY_PER_ITEM, currentQty + quantity);
+      const addedQty = nextQty - currentQty;
+
+      if (this.totalItems + addedQty > MAX_TOTAL_QUANTITY_PER_ORDER) {
+        return {
+          success: false,
+          message: `Total kuantitas pesanan maksimal ${MAX_TOTAL_QUANTITY_PER_ORDER} item dalam sekali pemesanan.`
         };
       }
 
@@ -138,11 +147,19 @@ class CartStore {
         };
       }
 
+      const nextQty = Math.min(MAX_QUANTITY_PER_ITEM, quantity);
+      if (this.totalItems + nextQty > MAX_TOTAL_QUANTITY_PER_ORDER) {
+        return {
+          success: false,
+          message: `Total kuantitas pesanan maksimal ${MAX_TOTAL_QUANTITY_PER_ORDER} item dalam sekali pemesanan.`
+        };
+      }
+
       this.items.push({
         menuItemId: item.id,
         name: item.name,
         price: Math.max(0, item.price),
-        quantity: Math.min(MAX_QUANTITY_PER_ITEM, quantity),
+        quantity: nextQty,
         imageUrl: item.imageUrl ?? null,
         categoryName: item.categoryName ?? null
       });
@@ -155,6 +172,7 @@ class CartStore {
   /**
    * Memperbarui kuantitas suatu item dalam keranjang.
    * Jika kuantitas <= 0, item otomatis dihapus.
+   * Dibatasi agar total kuantitas seluruh keranjang tidak melebihi MAX_TOTAL_QUANTITY_PER_ORDER.
    */
   updateQuantity(menuItemId: string, newQuantity: number): void {
     const index = this.items.findIndex((item) => item.menuItemId === menuItemId);
@@ -163,7 +181,13 @@ class CartStore {
     if (newQuantity <= 0) {
       this.items.splice(index, 1);
     } else {
-      this.items[index].quantity = Math.min(MAX_QUANTITY_PER_ITEM, newQuantity);
+      const otherItemsTotal = this.items.reduce(
+        (total, it, idx) => (idx === index ? total : total + it.quantity),
+        0
+      );
+      const maxAllowed = Math.max(0, MAX_TOTAL_QUANTITY_PER_ORDER - otherItemsTotal);
+      const targetQty = Math.min(MAX_QUANTITY_PER_ITEM, newQuantity);
+      this.items[index].quantity = Math.min(targetQty, maxAllowed);
     }
 
     this.saveToStorage();
@@ -173,6 +197,7 @@ class CartStore {
    * Menambah kuantitas item sebanyak 1.
    */
   increment(menuItemId: string): void {
+    if (this.totalItems >= MAX_TOTAL_QUANTITY_PER_ORDER) return;
     const current = this.getItemQuantity(menuItemId);
     this.updateQuantity(menuItemId, current + 1);
   }
@@ -247,21 +272,32 @@ class CartStore {
 
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Validasi dan sanitasi item hasil muatan storage
-        this.items = parsed
-          .filter(
-            (item): item is CartItem =>
-              item &&
-              typeof item.menuItemId === 'string' &&
-              typeof item.name === 'string' &&
-              typeof item.price === 'number' &&
-              typeof item.quantity === 'number' &&
-              item.quantity > 0
-          )
-          .map((item) => ({
-            ...item,
-            quantity: Math.min(MAX_QUANTITY_PER_ITEM, item.quantity)
-          }));
+        let accumulatedTotal = 0;
+        this.items = [];
+
+        for (const item of parsed) {
+          if (
+            item &&
+            typeof item.menuItemId === 'string' &&
+            typeof item.name === 'string' &&
+            typeof item.price === 'number' &&
+            typeof item.quantity === 'number' &&
+            item.quantity > 0
+          ) {
+            const allowed = Math.min(
+              MAX_QUANTITY_PER_ITEM,
+              item.quantity,
+              MAX_TOTAL_QUANTITY_PER_ORDER - accumulatedTotal
+            );
+            if (allowed > 0) {
+              this.items.push({
+                ...item,
+                quantity: allowed
+              });
+              accumulatedTotal += allowed;
+            }
+          }
+        }
       } else {
         this.items = [];
       }
