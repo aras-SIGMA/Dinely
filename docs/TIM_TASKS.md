@@ -44,7 +44,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 * **Milestone 6 & 7: Integrasi Pemesanan & Dashboard Realtime**
   - [x] **FS-11**: Keranjang belanja reaktif `src/stores/cart.svelte.ts` (hitung subtotal, simpan LocalStorage).
   - [x] **FS-12**: Integrasi submit pesanan guest ke RPC Postgres `create_guest_order` dan pelacakan via `get_guest_order_status`.
-  - [ ] **FS-13**: Store pesanan pemilik `src/stores/orders.svelte.ts` dengan update status (`baru → diproses → selesai`) dan polling interval 15 detik.
+  - [x] **FS-13**: Store pesanan pemilik `src/stores/orders.svelte.ts` dengan update status (`baru → diproses → selesai`) dan polling interval 15 detik.
 * **Milestone 8 & 9: Admin Platform & UAT**
   - [ ] **FS-14**: Query admin lintas-tenant & aksi manual override status tenant via Supabase client.
   - [ ] **FS-15**: Eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md`.
@@ -68,6 +68,17 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
     - Validasi bearer token sesi owner.
     - Generate signature SHA-1 berbatas waktu (timestamp) dengan `CLOUDINARY_API_SECRET`.
     - Response: `{ signature, timestamp, apiKey, cloudName, folder }`.
+* **Milestone 6: Penegakan Batas Volume Pesanan Server-Side**
+  - [x] **BE-06**: Penegakan Batas Volume Pesanan di RPC `create_guest_order` (`supabase/migrations/006_order_volume_limit.sql`)
+    - Validasi kuantitas individual per menu: `1 <= quantity <= 99`.
+    - Validasi total akumulasi kuantitas seluruh menu dalam sekali pemesanan: `SUM(quantity) <= 99`.
+    - Postgres exception: `'Total kuantitas pesanan maksimal 99 item dalam sekali pemesanan.'`.
+    - Sinkronisasi dengan client store `src/stores/cart.svelte.ts` dan service `src/lib/guest-order.ts`.
+  - [x] **BE-07**: Hardening Keamanan Sistem Order & Anti-Abuse (`supabase/migrations/007_order_security_hardening.sql`)
+    - Enforce transisi status state machine di database trigger `protect_order_immutable_fields` (kunci status terminal `selesai` & `dibatalkan`).
+    - Anti-DoS input cap: `p_buyer_contact` (max 30 char) dan `p_note` (max 500 char) pada RPC `create_guest_order`.
+    - Anti-Spam throttling di level Postgres: batas 20 pesanan per menit per tenant & max 3 pesanan aktif per kontak.
+    - Anti-Enumeration token: kolom `tracking_token uuid` pada `orders` & verifikasi otorisasi pada RPC `get_guest_order_status` untuk melindungi data privasi pembeli.
 * **Milestone 8: Chatbot AI Proxy**
   - [ ] **BE-04**: Endpoint `api/gemini/chat.ts`
     - Request proxy ke Google Gemini API menggunakan `GEMINI_API_KEY`.
@@ -95,6 +106,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [ ] **FE-09**: Halaman `MenuManagement.svelte`: Modal tambah/edit kategori, modal tambah/edit menu (dropzone foto, input harga, toggle ketersediaan `is_available`).
     - *Catatan Integrasi:* Gunakan `uploadImage(file, { type: 'menu', onProgress })` (`src/lib/cloudinary-upload.ts`) pada dropzone foto menu. Hubungkan `onProgress` ke progress bar upload dan tampilkan badge penghematan kompresi WebP (misal: "2.4 MB -> 180 KB (-92%)").
   - [ ] **FE-10**: Halaman `Orders.svelte`: Kolom/tab pesanan per status (`baru`, `diproses`, `selesai`, `dibatalkan`), kartu pesanan dengan snapshot menu & info pemesan.
+    - *Catatan Integrasi:* Gunakan `ordersStore` (`src/stores/orders.svelte.ts`) untuk memuat data via `ordersStore.fetchOrders(tenantId)`, filter tab `ordersStore.setStatusFilter(status)`, pembaruan status `ordersStore.updateStatus(orderId, nextStatus)`, serta pemanggilan otomatis `startPolling(tenantId, 15000)` dan `stopPolling()`. Sediakan modal detail dengan `ordersStore.selectOrder(order)`.
 * **Milestone 6: Website Publik Tenant UI**
   - [ ] **FE-11**: Layout resto publik `TenantHome.svelte`: Header resto, logo, alamat, badge buka, link WhatsApp.
   - [ ] **FE-12**: Komponen katalog menu: Tab filter kategori, grid kartu menu, badge "Habis" jika non-aktif, tombol tambah ke keranjang.

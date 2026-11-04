@@ -22,9 +22,9 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-10** | M5 | Client Cloudinary Direct Uploader | ✅ Selesai | 04 Nov 2026 | `feature/cloudinary-upload` |
 | **FS-11** | M6 | Reactive Cart Store & LocalStorage Sync | ✅ Selesai | 04 Nov 2026 | `feature/tenant-site-and-order` |
 | **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ✅ Selesai | 04 Nov 2026 | `feature/guest-order-integration` |
-| **FS-13** | M7 | Owner Order Realtime Sync & Status Transition | ⏹️ Antrean | - | `feature/order-management` |
-| **FS-13** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
-| **FS-14** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
+| **FS-13** | M7 | Owner Order Realtime Sync & Status Transition | ✅ Selesai | 04 Nov 2026 | `feature/order-management` |
+| **FS-14** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
+| **FS-15** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
 
 ---
 
@@ -316,3 +316,89 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test lokal (validasi input nama/item/qty/note, persistensi kode pesanan, pemetaan status & tone, state reactivity) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (3.61s).
+
+---
+
+### [FS-13] Store Pesanan Pemilik & Realtime Sync
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M7 (Dashboard Pesanan / Owner Order Tracking)
+* **Branch**: `feature/order-management`
+* **File Terkait**:
+  - `src/types/index.ts`
+  - `src/stores/orders.svelte.ts`
+  - `src/apps/dashboard/routes/Orders.svelte`
+* **Keputusan Teknis**:
+  1. Penambahan tipe relasi `OrderWithItems` di `src/types/index.ts` untuk memfasilitasi join tabel `orders` dan `order_items` (snapshot menu, harga, qty, subtotal).
+  2. Implementasi `ordersStore` (`src/stores/orders.svelte.ts`):
+     - State reaktif Svelte 5 runes (`orders`, `loading`, `updatingId`, `selectedStatus`, `selectedOrder`, `errorMessage`).
+     - Derived helpers: `filteredOrders` (filter status otomatis), `countsByStatus` (agregasi jumlah pesanan per status untuk tab badge), `newOrderCount` (indikator pesanan masuk baru).
+     - Aturan transisi status resmi (`ALLOWED_TRANSITIONS` & `isTransitionAllowed`):
+       - `baru` -> `diproses` atau `dibatalkan`
+       - `diproses` -> `selesai` atau `dibatalkan`
+       - Status `selesai` dan `dibatalkan` dikunci (terminal, tidak dapat diubah kembali).
+     - Integrasi Supabase client: query join `orders` dan `order_items` dengan sorting terbaru (`created_at DESC`), serta optimasi update status pesanan.
+     - Sinkronisasi real-time otomatis via interval polling 15 detik (`startPolling(tenantId, 15000)` dan `stopPolling()`) dengan silent background update agar posisi scroll UI tidak terganggu.
+  3. Implementasi antarmuka pengujian operasional pada `src/apps/dashboard/routes/Orders.svelte`:
+     - Tab filter status dengan counter badge.
+     - Kartu pesanan lengkap dengan kode unik, info pemesan, catatan, rincian menu snapshot, total tagihan, dan tombol aksi transisi status bertahap.
+     - Modal rincian pesanan terperinci (`selectOrder`).
+  4. Instruksi delegasi FE-10: Frontend Developer diarahkan untuk memanfaatkan `ordersStore` untuk menyambungkan layout kustom Dashboard Pesanan.
+* **Hasil Verifikasi**:
+  - Unit test lokal (aturan transisi status, label, tone, agregasi counter status, filter pesanan) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (3.82s).
+
+---
+
+### [PM-DECISION-02] Penegakan Batas Volume Pesanan Sekali Pemesanan (Max 99 Item)
+* **Tanggal Selesai**: 04 November 2026
+* **Konteks**: Anti-spam / anti-abuse perlindungan kapasitas dapur resto UMKM dari pesanan fiktif berukuran masif.
+* **File Terkait**:
+  - `supabase/migrations/006_order_volume_limit.sql`
+  - `supabase/migrations/003_order_rpc.sql`
+  - `src/stores/cart.svelte.ts`
+  - `src/lib/guest-order.ts`
+  - `docs/TIM_TASKS.md`
+* **Keputusan Teknis**:
+  1. Batasan volume pesanan guest dikunci maksimal 99 item total kuantitas per transaksi (`SUM(quantity) <= 99`), bukan batas harian toko.
+  2. Lapisan Frontend / Client:
+     - `src/stores/cart.svelte.ts`: `MAX_TOTAL_QUANTITY_PER_ORDER = 99`. Metode `addItem`, `updateQuantity`, `increment`, dan `loadFromStorage` membatasi akumulasi seluruh item agar tidak melampaui 99 item.
+     - `src/lib/guest-order.ts`: `validateGuestOrderInput` memvalidasi `totalQuantity <= 99` sebelum RPC dipanggil.
+  3. Lapisan Backend / Database RPC:
+     - `supabase/migrations/006_order_volume_limit.sql` (dan sinkronisasi `003_order_rpc.sql`): RPC `create_guest_order` menghitung `total_quantity` via CTE dan melempar `RAISE EXCEPTION 'Total kuantitas pesanan maksimal 99 item dalam sekali pemesanan.'` jika `v_total_quantity > 99`, serta membatasi kuantitas individual per menu `1 <= quantity <= 99`.
+* **Hasil Verifikasi**:
+  - Unit test lokal boundary condition (99 item lolos, 100 item ditolak, multi-item split) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala.
+
+---
+
+### [BE-07 / SEC-01] Hardening Keamanan Sistem Order & Anti-Abuse
+* **Tanggal Selesai**: 04 November 2026
+* **Milestone**: M6–M7 (Hardening & Security Governance)
+* **Branch**: `feature/order-management`
+* **File Terkait**:
+  - `supabase/migrations/007_order_security_hardening.sql`
+  - `supabase/migrations/003_order_rpc.sql`
+  - `supabase/migrations/004_triggers.sql`
+  - `src/types/index.ts`
+  - `src/lib/guest-order.ts`
+  - `src/stores/guest-order.svelte.ts`
+* **Keputusan Teknis**:
+  1. **Enforce State Machine DB**:
+     - Fungsi trigger `protect_order_immutable_fields()` memblokir perubahan jika status sudah `selesai` atau `dibatalkan` (terminal), serta hanya mengizinkan transisi `baru -> diproses/dibatalkan` dan `diproses -> selesai/dibatalkan`.
+  2. **Anti-DoS Input Cap**:
+     - Parameter `p_buyer_contact` dibatasi max 30 karakter dengan validasi format nomor kontak di client & database.
+     - Parameter `p_note` dibatasi max 500 karakter di client & database.
+  3. **PostgreSQL Anti-Spam Throttling**:
+     - Pembatasan maksimal 20 pesanan per menit per tenant untuk membendung flood bot.
+     - Pembatasan maksimal 3 pesanan aktif (`baru`) per nomor kontak dalam 10 menit.
+  4. **Anti-Enumeration Token Guard**:
+     - Kolom `tracking_token uuid` digenerate saat order dibuat dan disimpan di `localStorage` pemesan.
+     - RPC `get_guest_order_status` menyaring data berdasarkan token. Akses tanpa token hanya menerima masked view tanpa PII (nama, kontak, catatan, rincian menu disembunyikan).
+  5. **Client Cooldown**:
+     - Debounce cooldown 3 detik pada submit pesanan guest di `guestOrderStore` untuk mencegah multi-click / double order submission.
+* **Hasil Verifikasi**:
+  - Unit test (validasi format nomor, panjang teks, validasi state machine, dan proteksi tracking token) lulus 100%.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala.

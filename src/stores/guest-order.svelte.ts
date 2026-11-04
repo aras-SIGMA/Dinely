@@ -13,6 +13,7 @@ import {
   submitGuestOrder,
   fetchGuestOrderStatus,
   getLastOrderCode,
+  getLastOrderTrackingToken,
   clearLastOrderCode,
   type SubmitGuestOrderInput
 } from '@/lib/guest-order';
@@ -36,9 +37,11 @@ class GuestOrderStore {
   trackingLoading = $state(false);
   lastOrder = $state<CreateGuestOrderResult | null>(null);
   orderDetail = $state<GetGuestOrderStatusResult | null>(null);
+  trackingToken = $state<string | null>(null);
   errorMessage = $state<string | null>(null);
 
   #pollTimer: any = null;
+  #lastSubmitTime = 0;
 
   get currentStatus(): OrderStatus | null {
     return this.orderDetail?.status ?? this.lastOrder?.status ?? null;
@@ -99,6 +102,13 @@ class GuestOrderStore {
       return null;
     }
 
+    // Cooldown 3 detik anti-double click
+    const now = Date.now();
+    if (this.submitting || (now - this.#lastSubmitTime < 3000)) {
+      return null;
+    }
+    this.#lastSubmitTime = now;
+
     this.submitting = true;
     this.errorMessage = null;
 
@@ -113,14 +123,15 @@ class GuestOrderStore {
 
       const result = await submitGuestOrder(input);
       this.lastOrder = result;
+      this.trackingToken = result.tracking_token ?? null;
 
       // Kosongkan keranjang belanja setelah sukses membuat pesanan
       cartStore.clearCart();
       toastState.push(`Pesanan berhasil dibuat! Kode: ${result.order_code}`, 'success');
 
       // Ambil rincian pesanan dan mulai polling status otomatis
-      await this.track(tenantId, result.order_code);
-      this.startPolling(tenantId, result.order_code);
+      await this.track(tenantId, result.order_code, this.trackingToken);
+      this.startPolling(tenantId, result.order_code, this.trackingToken);
 
       return result;
     } catch (err: any) {
@@ -135,14 +146,19 @@ class GuestOrderStore {
   }
 
   /**
-   * Mengambil status pesanan tunggal berdasarkan order_code.
+   * Mengambil status pesanan tunggal berdasarkan order_code dan token otorisasi receipt.
    */
-  async track(tenantId: string, orderCode: string): Promise<GetGuestOrderStatusResult | null> {
+  async track(
+    tenantId: string,
+    orderCode: string,
+    token?: string | null
+  ): Promise<GetGuestOrderStatusResult | null> {
     if (!tenantId || !orderCode) return null;
 
+    const authToken = token !== undefined ? token : this.trackingToken;
     this.trackingLoading = true;
     try {
-      const res = await fetchGuestOrderStatus(tenantId, orderCode);
+      const res = await fetchGuestOrderStatus(tenantId, orderCode, authToken);
       if (res.success) {
         this.orderDetail = res;
         this.errorMessage = null;
@@ -167,7 +183,7 @@ class GuestOrderStore {
   /**
    * Menjalankan polling berkala status pesanan (interval 12 detik).
    */
-  startPolling(tenantId: string, orderCode: string, intervalMs = 12000): void {
+  startPolling(tenantId: string, orderCode: string, token?: string | null, intervalMs = 12000): void {
     this.stopPolling();
 
     this.#pollTimer = setInterval(async () => {
@@ -175,7 +191,7 @@ class GuestOrderStore {
         this.stopPolling();
         return;
       }
-      await this.track(tenantId, orderCode);
+      await this.track(tenantId, orderCode, token);
     }, intervalMs);
   }
 
@@ -196,10 +212,13 @@ class GuestOrderStore {
     const lastCode = getLastOrderCode(tenantId);
     if (!lastCode) return false;
 
-    const res = await this.track(tenantId, lastCode);
+    const lastToken = getLastOrderTrackingToken(tenantId);
+    this.trackingToken = lastToken;
+
+    const res = await this.track(tenantId, lastCode, lastToken);
     if (res && res.success) {
       if (!this.isTerminal) {
-        this.startPolling(tenantId, lastCode);
+        this.startPolling(tenantId, lastCode, lastToken);
       }
       return true;
     }
@@ -213,6 +232,7 @@ class GuestOrderStore {
     this.stopPolling();
     this.lastOrder = null;
     this.orderDetail = null;
+    this.trackingToken = null;
     this.errorMessage = null;
     this.submitting = false;
     this.trackingLoading = false;

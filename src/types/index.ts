@@ -113,6 +113,7 @@ export type Order = {
   id: string;
   tenant_id: string;
   order_code: string;
+  tracking_token?: string;
   buyer_name: string;
   buyer_contact: string | null;
   note: string | null;
@@ -132,6 +133,10 @@ export type OrderItem = {
   subtotal: number;
 };
 
+export type OrderWithItems = Order & {
+  order_items?: OrderItem[];
+};
+
 export type GuestOrderItemPayload = {
   menu_item_id: string;
   quantity: number;
@@ -149,6 +154,7 @@ export type CreateGuestOrderResult = {
   success: boolean;
   order_id: string;
   order_code: string;
+  tracking_token?: string;
   total_amount: number;
   status: OrderStatus;
 };
@@ -172,6 +178,7 @@ export type GetGuestOrderStatusResult = {
   created_at?: string;
   items?: GuestOrderStatusItem[];
   message?: string;
+  is_masked_view?: boolean;
 };
 
 export type SnapResult = {
