@@ -64,7 +64,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
     - Idempotency protection (cegah pemrosesan ulang webhook duplikat).
     - Jika `settlement` / `capture`: update `transactions.status = 'settlement'`, update `tenants.status = 'active'`, pasang `subscription_ends_at` (+30 hari) via Supabase `service_role`.
 * **Milestone 5: Cloudinary Upload Signer**
-  - [ ] **BE-03**: Endpoint `api/cloudinary/sign-upload.ts`
+  - [x] **BE-03**: Endpoint `api/cloudinary/sign-upload.ts`
     - Validasi bearer token sesi owner.
     - Generate signature SHA-1 berbatas waktu (timestamp) dengan `CLOUDINARY_API_SECRET`.
     - Response: `{ signature, timestamp, apiKey, cloudName, folder }`.
@@ -80,7 +80,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
     - Anti-Spam throttling di level Postgres: batas 20 pesanan per menit per tenant & max 3 pesanan aktif per kontak.
     - Anti-Enumeration token: kolom `tracking_token uuid` pada `orders` & verifikasi otorisasi pada RPC `get_guest_order_status` untuk melindungi data privasi pembeli.
 * **Milestone 8: Chatbot AI Proxy**
-  - [ ] **BE-04**: Endpoint `api/gemini/chat.ts`
+  - [x] **BE-04**: Endpoint `api/gemini/chat.ts`
     - Request proxy ke Google Gemini API menggunakan `GEMINI_API_KEY`.
     - System prompt restriksi: hanya menjawab seputar produk RestoLink (fitur, paket, cara daftar).
     - Error fallback jika kuota habis atau pertanyaan di luar topik.
