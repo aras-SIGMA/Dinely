@@ -138,10 +138,19 @@
           successNotice = result.error || 'Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi.';
         }
       } else {
-        formError = result.error || 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.';
+        if (result.error?.toLowerCase().includes('failed to fetch')) {
+          formError = 'Gagal terhubung ke database (Failed to fetch). Pastikan file .env sudah dibuat dan diisi VITE_SUPABASE_URL serta VITE_SUPABASE_ANON_KEY.';
+        } else {
+          formError = result.error || 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.';
+        }
       }
     } catch (err: unknown) {
-      formError = err instanceof Error ? err.message : 'Koneksi bermasalah. Silakan periksa internet Anda.';
+      const msg = err instanceof Error ? err.message : 'Koneksi bermasalah. Silakan periksa internet Anda.';
+      if (msg.toLowerCase().includes('failed to fetch')) {
+        formError = 'Gagal terhubung ke database (Failed to fetch). Pastikan file .env sudah dibuat dan diisi VITE_SUPABASE_URL serta VITE_SUPABASE_ANON_KEY.';
+      } else {
+        formError = msg;
+      }
     } finally {
       isSubmitting = false;
     }

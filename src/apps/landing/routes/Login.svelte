@@ -22,18 +22,6 @@
     email.trim().includes('@') && password.length >= 6
   );
 
-  // Quick fill helper for UAT Demo Juri
-  function fillDemoAccount(type: 'owner' | 'admin') {
-    if (type === 'owner') {
-      email = 'owner@dapur-nia.com';
-      password = 'password123';
-    } else {
-      email = 'admin@restolink.site';
-      password = 'password123';
-    }
-    errorMessage = '';
-  }
-
   // Handle Submit Login
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -57,12 +45,19 @@
         // Tampilkan pesan error ramah pengguna
         if (result.error?.toLowerCase().includes('invalid login credentials')) {
           errorMessage = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
+        } else if (result.error?.toLowerCase().includes('failed to fetch')) {
+          errorMessage = 'Gagal terhubung ke database (Failed to fetch). Pastikan file .env sudah dibuat dan diisi VITE_SUPABASE_URL serta VITE_SUPABASE_ANON_KEY dari proyek Supabase tim.';
         } else {
           errorMessage = result.error || 'Gagal masuk. Silakan periksa kredensial Anda.';
         }
       }
     } catch (err: unknown) {
-      errorMessage = err instanceof Error ? err.message : 'Terjadi kendala jaringan. Silakan coba lagi.';
+      const msg = err instanceof Error ? err.message : 'Terjadi kendala jaringan. Silakan coba lagi.';
+      if (msg.toLowerCase().includes('failed to fetch')) {
+        errorMessage = 'Gagal terhubung ke database (Failed to fetch). Pastikan file .env sudah dibuat dan diisi VITE_SUPABASE_URL serta VITE_SUPABASE_ANON_KEY dari proyek Supabase tim.';
+      } else {
+        errorMessage = msg;
+      }
     } finally {
       isSubmitting = false;
     }
@@ -209,32 +204,6 @@
           </Button>
         </div>
       </form>
-
-      <!-- Demo Accounts Shortcut (Sangat Membantu Juri & Evaluasi UAT) -->
-      <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-3.5">
-        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-          Akun Demo Siap Uji (GTNIC 2026):
-        </p>
-        <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
-          <button
-            type="button"
-            class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 hover:border-brand-500 hover:text-brand-600 transition-colors text-left"
-            onclick={() => fillDemoAccount('owner')}
-          >
-            <span class="block font-bold truncate">Resto Bu Nia</span>
-            <span class="block text-[10px] text-slate-500 font-mono">owner@dapur-nia.com</span>
-          </button>
-
-          <button
-            type="button"
-            class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 hover:border-brand-500 hover:text-brand-600 transition-colors text-left"
-            onclick={() => fillDemoAccount('admin')}
-          >
-            <span class="block font-bold truncate">Admin Platform</span>
-            <span class="block text-[10px] text-slate-500 font-mono">admin@restolink.site</span>
-          </button>
-        </div>
-      </div>
 
       <!-- Register Link -->
       <div class="mt-6 border-t border-slate-100 pt-5 text-center text-xs text-slate-600">
