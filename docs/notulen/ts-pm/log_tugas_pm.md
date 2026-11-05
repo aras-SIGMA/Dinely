@@ -24,7 +24,8 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ✅ Selesai | 04 Nov 2026 | `feature/guest-order-integration` |
 | **FS-13** | M7 | Owner Order Realtime Sync & Status Transition | ✅ Selesai | 04 Nov 2026 | `feature/order-management` |
 | **FS-14** | M8 | Admin Tenant Monitoring & Manual Override | ✅ Selesai | 05 Nov 2026 | `feature/admin-and-landing` |
-| **FS-15** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
+| **FS-15** | M9 | Eksekusi 7 Skenario UAT Lomba GTNIC 2026 | ✅ Selesai | 05 Nov 2026 | `feature/seed-and-uat` |
+| **FS-16** | M9 | Seeding Demo Data Resto Lengkap & Akun Awal | ✅ Selesai | 05 Nov 2026 | `feature/seed-and-uat` |
 
 ---
 
@@ -442,3 +443,51 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Verifikasi browser (Headless Chrome): Landing page, form login, dan redirect guard terverifikasi valid tanpa error konsol.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala (5.52s).
+
+---
+
+### [FS-16] Seeding Demo Data Resto Lengkap & Akun Awal
+* **Tanggal Selesai**: 05 November 2026
+* **Milestone**: M9 (Polish & Demo Readiness)
+* **Branch**: `feature/seed-and-uat`
+* **File Terkait**:
+  - `supabase/seed.sql`
+* **Keputusan Teknis**:
+  1. **Akun Pengguna Awal**:
+     - Super Admin Platform: `admin@restolink.site` (`password123`, role: `platform_admin`).
+     - Tenant Owner: `owner@dapur-nia.com` (`password123`, role: `owner`).
+  2. **Tenant Kuliner Resmi Demo Juri**:
+     - Usaha: *Dapur Bu Nia* (Subdomain: `dapur-nia.restolink.site`, status `active`, paket `Mikro` Rp 49.000).
+     - Profil lengkap: logo HD, deskripsi autentik, alamat Depok, kontak WhatsApp aktif, brand primary `#ea580c`.
+  3. **Katalog & Menu Lengkap**:
+     - 3 Kategori terstruktur: `Makanan Utama`, `Camilan & Gorengan`, `Minuman Segar`.
+     - 12 Menu masakan nusantara dengan harga realistis, deskripsi menggugah selera, foto makanan Unsplash CDN berkualitas tinggi, dan 1 item diset `is_available = false` untuk demonstrasi visual status stok habis.
+  4. **Transaksi & Antrean Pesanan**:
+     - 1 transaksi Midtrans status `settlement` (Rp 49.000).
+     - 4 pesanan demo dengan variasi lengkap status alur dapur (`baru`, `diproses`, `selesai`, `dibatalkan`) beserta snapshot `order_items` dan `tracking_token`.
+     - 1 baris initial audit trail di `admin_audit_logs`.
+* **Hasil Verifikasi**:
+  - Script SQL bebas syntax error, aman dijalankan berulang (`ON CONFLICT DO UPDATE / DO NOTHING`).
+
+---
+
+### [FS-15] Eksekusi 7 Skenario UAT Lomba GTNIC 2026
+* **Tanggal Selesai**: 05 November 2026
+* **Milestone**: M9 (Polish & Demo Readiness)
+* **Branch**: `feature/seed-and-uat`
+* **File Terkait**:
+  - `docs/qa/uat_execution_report.md`
+  - `docs/product/04_USER_FLOWS.md`
+* **Keputusan Teknis**:
+  1. Penyelenggaraan dan dokumentasi pengujian formal atas seluruh 7 skenario UAT dari `docs/product/04_USER_FLOWS.md`:
+     - UAT-01: Registrasi Pemilik, Pembayaran Midtrans, & Aktivasi Otomatis (PASS).
+     - UAT-02: Pengelolaan Menu & Sinkronisasi Ketersediaan Real-Time (PASS).
+     - UAT-03: Penemuan Menu & Layanan Pelanggan via Subdomain Mandiri (PASS).
+     - UAT-04: Pemesanan Guest, Pelacakan Status, & Manajemen Dapur (PASS).
+     - UAT-05: Penegakan Isolasi Multi-Tenant Lintas Akun (Cross-Tenant RLS) (PASS).
+     - UAT-06: Ketahanan Transaksi Gagal / Pending di Midtrans Sandbox (PASS).
+     - UAT-07: Penanganan Subdomain Fiktif & Tenant Kedaluwarsa (PASS).
+  2. Rekomendasi verifikasi juri: Penggunaan dataset `dapur-nia` untuk demonstrasi live tanpa hambatan teknis.
+* **Hasil Verifikasi**:
+  - 7/7 Skenario UAT diverifikasi **100% Lulus (PASS)**.
+  - Dokumentasi resmi tercatat di `docs/qa/uat_execution_report.md`.
