@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test:api": "tsx api/_test_be01.ts && tsx api/_test_be02.ts"
+    "test:api": "tsx api/_test_be01.ts && tsx api/_test_be02.ts && tsx api/_test_be03.ts && tsx api/_test_be04.ts"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
