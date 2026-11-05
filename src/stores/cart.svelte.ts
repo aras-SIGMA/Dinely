@@ -33,18 +33,13 @@ export interface AddItemInput {
   is_available?: boolean;
 }
 
+import { formatRupiah } from '@/lib/format';
+
 export const MAX_QUANTITY_PER_ITEM = 99;
 export const MAX_TOTAL_QUANTITY_PER_ORDER = 99;
 export const MAX_ITEMS_IN_CART = 50; // Sesuai constraint RPC create_guest_order (1-50 item)
 
-export function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-}
+export { formatRupiah };
 
 class CartStore {
   items = $state<CartItem[]>([]);
