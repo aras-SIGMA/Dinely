@@ -137,6 +137,42 @@ export type OrderWithItems = Order & {
   order_items?: OrderItem[];
 };
 
+export type AdminTenantItem = Tenant & {
+  owner?: {
+    id: string;
+    full_name: string;
+    phone: string | null;
+  } | null;
+  package?: {
+    id: string;
+    name: string;
+    tier: PackageTier;
+  } | null;
+};
+
+export type AdminTransactionItem = Transaction & {
+  tenant?: {
+    id: string;
+    business_name: string;
+    subdomain: string;
+  } | null;
+  package?: {
+    id: string;
+    name: string;
+    tier: PackageTier;
+  } | null;
+};
+
+export type AdminAuditLog = {
+  id: string;
+  admin_id: string;
+  action: string;
+  target_entity: string;
+  target_id: string;
+  details: Record<string, any>;
+  created_at: string;
+};
+
 export type GuestOrderItemPayload = {
   menu_item_id: string;
   quantity: number;

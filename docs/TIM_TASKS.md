@@ -46,7 +46,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FS-12**: Integrasi submit pesanan guest ke RPC Postgres `create_guest_order` dan pelacakan via `get_guest_order_status`.
   - [x] **FS-13**: Store pesanan pemilik `src/stores/orders.svelte.ts` dengan update status (`baru → diproses → selesai`) dan polling interval 15 detik.
 * **Milestone 8 & 9: Admin Platform & UAT**
-  - [ ] **FS-14**: Query admin lintas-tenant & aksi manual override status tenant via Supabase client.
+  - [x] **FS-14**: Query admin lintas-tenant & aksi manual override status tenant via Supabase client (`src/stores/admin.svelte.ts`).
   - [ ] **FS-15**: Eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md`.
   - [ ] **FS-16**: Seed demo data (1 resto kuliner contoh lengkap menu foto menarik untuk demo juri).
 
@@ -115,8 +115,8 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [ ] **FE-14**: Halaman/modal bukti pesanan (`order_code`) untuk ditunjukkan pembeli ke kasir.
     - *Catatan Integrasi:* Gunakan `guestOrderStore.orderDetail`, `guestOrderStore.statusLabel`, dan `guestOrderStore.statusTone` (`src/stores/guest-order.svelte.ts`) untuk menampilkan status live pesanan. Sediakan tombol salin (copy-to-clipboard) kode pesanan untuk memudahkan pembeli menunjukkan ke kasir. Panggil `guestOrderStore.recoverLastOrder(tenant.id)` saat inisialisasi agar bukti pesanan tidak hilang jika pembeli me-refresh browser.
 * **Milestone 8 & 9: Admin Platform UI & Polish**
-  - [ ] **FE-15**: Halaman `Tenants.svelte`: Tabel daftar seluruh tenant, badge status warna, filter paket.
-  - [ ] **FE-16**: Halaman `Transactions.svelte`: Tabel riwayat transaksi Midtrans (order ID, nominal, status).
+  - [x] **FE-15**: Halaman `Tenants.svelte`: Tabel daftar seluruh tenant, badge status warna, filter paket, dan modal manual override status.
+  - [x] **FE-16**: Halaman `Transactions.svelte`: Tabel riwayat transaksi Midtrans (order ID, nominal, status) dan manual settlement override.
   - [ ] **FE-17**: Widget Chatbot AI di pojok kanan bawah Landing Page (bubble chat popup, chat bubble user/AI, input pesan).
   - [ ] **FE-18**: Audit tampilan responsif mobile (HP Android/iPhone) di seluruh halaman publik tenant dan dashboard.
 

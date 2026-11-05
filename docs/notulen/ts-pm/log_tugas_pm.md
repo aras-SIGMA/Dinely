@@ -23,7 +23,7 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
 | **FS-11** | M6 | Reactive Cart Store & LocalStorage Sync | ✅ Selesai | 04 Nov 2026 | `feature/tenant-site-and-order` |
 | **FS-12** | M6 | Integrasi Submit Guest Order RPC & Status Tracking | ✅ Selesai | 04 Nov 2026 | `feature/guest-order-integration` |
 | **FS-13** | M7 | Owner Order Realtime Sync & Status Transition | ✅ Selesai | 04 Nov 2026 | `feature/order-management` |
-| **FS-14** | M8 | Admin Tenant Monitoring & Manual Override | ⏹️ Antrean | - | `feature/admin-and-landing` |
+| **FS-14** | M8 | Admin Tenant Monitoring & Manual Override | ✅ Selesai | 05 Nov 2026 | `feature/admin-and-landing` |
 | **FS-15** | M9 | Eksekusi 7 Skenario UAT Lomba & Demo Data Polish | ⏹️ Antrean | - | `feature/uat-and-hardening` |
 
 ---
@@ -402,3 +402,43 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - Unit test (validasi format nomor, panjang teks, validasi state machine, dan proteksi tracking token) lulus 100%.
   - `npm run check`: 0 error, 0 warning.
   - `npm run build`: Bundling sukses tanpa kendala.
+
+---
+
+### [FS-14] Query Admin Lintas-Tenant & Manual Override Status
+* **Tanggal Selesai**: 05 November 2026
+* **Milestone**: M8 (Dashboard Admin Platform)
+* **Branch**: `feature/admin-and-landing`
+* **File Terkait**:
+  - `src/types/index.ts`
+  - `src/stores/admin.svelte.ts`
+  - `src/apps/admin/AdminLayout.svelte`
+  - `src/apps/admin/routes/Tenants.svelte`
+  - `src/apps/admin/routes/Transactions.svelte`
+* **Keputusan Teknis**:
+  1. Definisi model data relasional `AdminTenantItem` (join `owner:profiles`, `package:packages`) dan `AdminTransactionItem` (join `tenant:tenants`, `package:packages`) di `src/types/index.ts`.
+  2. Implementasi store reaktif `adminStore` (`src/stores/admin.svelte.ts`):
+     - State reaktif runes: `tenants`, `transactions`, `packages`, filter status & query pencarian, indikator loading & updating ID.
+     - Derived helpers: `filteredTenants`, `tenantCounts`, `filteredTransactions`, `transactionStats` (total transaksi, jumlah settlement/pending/failed, total akumulasi omset platform).
+     - Metode `updateTenantStatus`: aksi manual override status tenant (`active`, `trial`, `pending`, `suspended`, `expired`) dengan fleksibilitas perpanjangan masa aktif langganan/trial secara kustom (`extendDays`) dan penyesuaian paket.
+     - Metode `updateTransactionStatus`: override status transaksi Midtrans (misal: menandai `settlement` manual jika webhook Midtrans mengalami kegagalan transmisi), dilengkapi auto-sync aktivasi tenant (+30 hari langganan).
+     - Polling sinkronisasi background 30 detik (`startPolling` & `stopPolling`).
+  3. Antarmuka Manajemen Tenant (`src/apps/admin/routes/Tenants.svelte`):
+     - 6 kartu metrik status (Total, Aktif, Trial, Pending, Ditangguhkan, Kedaluwarsa).
+     - Filter tab status responsif dengan counter badge dan input pencarian multi-parameter (nama resto, subdomain, pemilik, no telepon).
+     - Tabel komprehensif dengan logo/avatar warna brand, direct link tenant, profil pemilik, badge paket, status tone, dan tanggal masa aktif.
+     - Modal interaktif "Manual Override Status Tenant" lengkap dengan audit trail catatan alasan override.
+  4. Antarmuka Riwayat Transaksi (`src/apps/admin/routes/Transactions.svelte`):
+     - 4 kartu ringkasan keuangan platform.
+     - Tabel riwayat Midtrans dengan fitur copy Order ID instan, nominal Rupiah terformat, badge status, dan modal override transaksi dengan opsi aktivasi tenant otomatis.
+  5. Navigasi Admin (`src/apps/admin/AdminLayout.svelte`):
+     - Active route highlighting, profile admin badge, and responsive drawer navigation.
+* **Hasil Verifikasi**:
+  - Unit test lokal (format Rupiah, pemetaan status label & badge tone, filter & search simulator) lulus 100%.
+  - Audit kode & perbaikan temuan (Code Review):
+    1. Reaktivitas sidebar admin (`AdminLayout.svelte` & `src/lib/router.ts`): Memanfaatkan `router.route.pathname` dalam `$derived` rune untuk sinkronisasi seketika status link aktif saat navigasi SPA.
+    2. Audit trail persisten (`supabase/migrations/008_admin_audit_logs.sql`): Pembuatan tabel `admin_audit_logs` dengan RLS `is_platform_admin()` untuk mencatat jejak setiap aksi override status tenant dan transaksi beserta alasannya.
+    3. Eliminasi duplikasi kode (`src/lib/format.ts`): Sentralisasi helper `formatRupiah` dan `formatDate` sebagai single source of truth.
+  - Verifikasi browser (Headless Chrome): Landing page, form login, dan redirect guard terverifikasi valid tanpa error konsol.
+  - `npm run check`: 0 error, 0 warning.
+  - `npm run build`: Bundling sukses tanpa kendala (5.52s).
