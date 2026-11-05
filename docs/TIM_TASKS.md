@@ -47,8 +47,8 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FS-13**: Store pesanan pemilik `src/stores/orders.svelte.ts` dengan update status (`baru → diproses → selesai`) dan polling interval 15 detik.
 * **Milestone 8 & 9: Admin Platform & UAT**
   - [x] **FS-14**: Query admin lintas-tenant & aksi manual override status tenant via Supabase client (`src/stores/admin.svelte.ts`).
-  - [ ] **FS-15**: Eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md`.
-  - [ ] **FS-16**: Seed demo data (1 resto kuliner contoh lengkap menu foto menarik untuk demo juri).
+  - [x] **FS-15**: Eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md` (`docs/qa/uat_execution_report.md`).
+  - [x] **FS-16**: Seed demo data (1 resto kuliner contoh lengkap menu foto menarik untuk demo juri di `supabase/seed.sql`).
 
 ---
 
