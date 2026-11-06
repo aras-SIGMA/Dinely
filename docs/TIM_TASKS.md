@@ -91,13 +91,13 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 
 ### 3. Frontend Developer
 * **Milestone 0 & 3: Landing Page & Auth UI**
-  - [ ] **FE-01**: Komponen navigasi umum: `src/apps/landing/components/Navbar.svelte` & `Footer.svelte`.
-  - [ ] **FE-02**: Slicing halaman `Home.svelte` (Hero section, 3 langkah mudah UMKM, value proposition, CTA).
-  - [ ] **FE-03**: Slicing halaman `Features.svelte` (Menu digital, QR Code, Manajemen pesanan).
-  - [ ] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 49.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
-  - [ ] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.restolink.site`, email, password).
+  - [x] **FE-01**: Komponen navigasi umum: `src/apps/landing/components/Navbar.svelte` & `Footer.svelte`.
+  - [x] **FE-02**: Slicing halaman `Home.svelte` (Hero section, 3 langkah mudah UMKM, value proposition, CTA).
+  - [x] **FE-03**: Slicing halaman `Features.svelte` (Menu digital, QR Code, Manajemen pesanan).
+  - [x] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 49.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
+  - [x] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.restolink.site`, email, password).
     - *Catatan Integrasi:* Gunakan debounce 300–400ms saat memanggil `checkSubdomainAvailability` (`src/lib/subdomain-validator.ts`) pada input form agar tidak membebani query RPC Supabase per keystroke. Gunakan `authStore.signUp` (`src/stores/auth.svelte.ts`) untuk submit registrasi.
-  - [ ] **FE-06**: Slicing halaman `Login.svelte` (Input email, password, error display, forgot password stub).
+  - [x] **FE-06**: Slicing halaman `Login.svelte` (Input email, password, error display, forgot password stub).
 * **Milestone 4, 5, 7: Dashboard Pemilik Usaha UI**
   - [ ] **FE-07**: Halaman `Subscription.svelte`: Tampilan status paket aktif, sisa hari trial, tombol perpanjang langganan.
     - *Catatan Integrasi:* Gunakan `subscriptionStore` (`src/stores/subscription.svelte.ts`) untuk memicu checkout `subscriptionStore.checkout(pkg.id)`. Jika polling 30 detik selesai mendahului konfirmasi webhook, sediakan tombol interaktif "Cek Status Ulang" yang memanggil `authStore.refreshTenant()`.
