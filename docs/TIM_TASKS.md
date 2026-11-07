@@ -85,7 +85,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
     - System prompt restriksi: hanya menjawab seputar produk RestoLink (fitur, paket, cara daftar).
     - Error fallback jika kuota habis atau pertanyaan di luar topik.
 * **Milestone 9: Audit Keamanan Backend**
-  - [ ] **BE-05**: Verifikasi tidak ada secret key (`SUPABASE_SERVICE_ROLE_KEY`, `MIDTRANS_SERVER_KEY`, `CLOUDINARY_API_SECRET`, `GEMINI_API_KEY`) yang bocor ke bundle client frontend.
+  - [x] **BE-05**: Verifikasi tidak ada secret key (`SUPABASE_SERVICE_ROLE_KEY`, `MIDTRANS_SERVER_KEY`, `CLOUDINARY_API_SECRET`, `GEMINI_API_KEY`) yang bocor ke bundle client frontend.
 
 ---
 

@@ -3,7 +3,7 @@
 **Tanggal**: 5 November 2026  
 **Modul**: Cloudinary Upload Signer (`api/cloudinary/sign-upload.ts`)  
 **Branch**: `feature/backend-api-services`  
-**Status**: Selesai & Terverifikasi (18/18 Unit Test BE-03 PASS, Total 46/46 API Test Passed)  
+**Status**: Selesai & Terverifikasi (20/20 Unit Test BE-03 PASS, Total 70/70 API Test Passed)  
 **Status Git**: Tersimpan di working tree lokal (TIDAK DIPUSH).
 
 ---
@@ -81,9 +81,11 @@ Hasil: 22 Passed, 0 Failed
 [PASS] TC-16: Platform admin diizinkan generate signature untuk tenant mana pun
 [PASS] TC-17: Generator signature mengurutkan parameter alfabetis sesuai spesifikasi Cloudinary
 [PASS] TC-18: Kontrak respons JSON 100% kompatibel dengan requestUploadSignature client
-Hasil: 18 Passed, 0 Failed
+[PASS] TC-19: Custom folder menyeberang ke tenant lain ditolak 403 Forbidden (Anti-IDOR)
+[PASS] TC-20: Relative custom folder otomatis di-sandbox ke dalam namespace tenant pemohon
+Hasil: 20 Passed, 0 Failed
 
-Total Keseluruhan API Tests: 46 Passed, 0 Failed
+Total Keseluruhan API Tests: 70 Passed, 0 Failed
 ```
 
 Pemeriksaan Tambahan:
