@@ -108,11 +108,11 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FE-10**: Halaman `Orders.svelte`: Kolom/tab pesanan per status (`baru`, `diproses`, `selesai`, `dibatalkan`), kartu pesanan dengan snapshot menu & info pemesan.
     - *Catatan Integrasi:* Gunakan `ordersStore` (`src/stores/orders.svelte.ts`) untuk memuat data via `ordersStore.fetchOrders(tenantId)`, filter tab `ordersStore.setStatusFilter(status)`, pembaruan status `ordersStore.updateStatus(orderId, nextStatus)`, serta pemanggilan otomatis `startPolling(tenantId, 15000)` dan `stopPolling()`. Sediakan modal detail dengan `ordersStore.selectOrder(order)`.
 * **Milestone 6: Website Publik Tenant UI**
-  - [ ] **FE-11**: Layout resto publik `TenantHome.svelte`: Header resto, logo, alamat, badge buka, link WhatsApp.
-  - [ ] **FE-12**: Komponen katalog menu: Tab filter kategori, grid kartu menu, badge "Habis" jika non-aktif, tombol tambah ke keranjang.
-  - [ ] **FE-13**: Komponen Keranjang Belanja (Drawer/Floating Bar) & Modal Checkout (input nama pemesan wajib, no HP opsional, catatan).
+  - [x] **FE-11**: Layout resto publik `TenantHome.svelte`: Header resto, logo, alamat, badge buka, link WhatsApp.
+  - [x] **FE-12**: Komponen katalog menu: Tab filter kategori, grid kartu menu, badge "Habis" jika non-aktif, tombol tambah ke keranjang.
+  - [x] **FE-13**: Komponen Keranjang Belanja (Drawer/Floating Bar) & Modal Checkout (input nama pemesan wajib, no HP opsional, catatan).
     - *Catatan Integrasi:* Gunakan `guestOrderStore.submit(tenant.id, { buyerName, buyerContact, note })` (`src/stores/guest-order.svelte.ts`) untuk submit pesanan guest. Keranjang otomatis dikosongkan setelah sukses.
-  - [ ] **FE-14**: Halaman/modal bukti pesanan (`order_code`) untuk ditunjukkan pembeli ke kasir.
+  - [x] **FE-14**: Halaman/modal bukti pesanan (`order_code`) untuk ditunjukkan pembeli ke kasir.
     - *Catatan Integrasi:* Gunakan `guestOrderStore.orderDetail`, `guestOrderStore.statusLabel`, dan `guestOrderStore.statusTone` (`src/stores/guest-order.svelte.ts`) untuk menampilkan status live pesanan. Sediakan tombol salin (copy-to-clipboard) kode pesanan untuk memudahkan pembeli menunjukkan ke kasir. Panggil `guestOrderStore.recoverLastOrder(tenant.id)` saat inisialisasi agar bukti pesanan tidak hilang jika pembeli me-refresh browser.
 * **Milestone 8 & 9: Admin Platform UI & Polish**
   - [x] **FE-15**: Halaman `Tenants.svelte`: Tabel daftar seluruh tenant, badge status warna, filter paket, dan modal manual override status.
