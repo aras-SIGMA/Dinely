@@ -274,7 +274,7 @@ INSERT INTO public.menu_items (
     'Bebek Goreng Serundeng Lengkuas',
     'Bebek muda gurih empuk tidak amis, bertabur serundeng lengkuas renyah disajikan bersama sambal korek khas Madura.',
     38000,
-    'https://images.unsplash.com/photo-1514944298352-f472856f685c?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1598514983318-2f64f8f4796c?auto=format&fit=crop&w=600&q=80',
     true,
     3
   ),

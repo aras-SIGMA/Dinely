@@ -245,7 +245,14 @@
         <div class="flex flex-col items-center gap-3">
           <div class="relative size-28 shrink-0 overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-50 shadow-xs sm:size-32">
             {#if logoUrl}
-              <img src={logoUrl} alt="Logo usaha" class="size-full object-cover" />
+              <img
+                src={logoUrl}
+                alt="Logo usaha"
+                class="size-full object-cover"
+                onerror={() => {
+                  logoUrl = null;
+                }}
+              />
             {:else}
               <div
                 class="flex size-full items-center justify-center text-3xl font-extrabold text-white transition-colors"

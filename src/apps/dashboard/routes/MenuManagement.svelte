@@ -566,14 +566,25 @@
         <div class="flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition-all hover:border-slate-300 hover:shadow-xs">
           <!-- Card Image & Header -->
           <div>
-            <div class="relative h-44 w-full bg-slate-100">
+            <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
               {#if item.image_url}
                 <img
                   src={item.image_url}
                   alt={item.name}
                   class="size-full object-cover transition-opacity duration-200 {item.is_available ? 'opacity-100' : 'opacity-40 grayscale'}"
                   loading="lazy"
+                  onerror={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.classList.remove('hidden');
+                  }}
                 />
+                <div class="hidden size-full items-center justify-center text-slate-400 bg-slate-100">
+                  <svg class="size-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
               {:else}
                 <div class="flex size-full items-center justify-center text-slate-400">
                   <svg class="size-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -752,7 +763,14 @@
         <!-- Preview box -->
         <div class="relative size-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
           {#if formMenuImageUrl}
-            <img src={formMenuImageUrl} alt="Preview" class="size-full object-cover" />
+            <img
+              src={formMenuImageUrl}
+              alt="Preview"
+              class="size-full object-cover"
+              onerror={(e) => {
+                (e.currentTarget as HTMLElement).style.display = 'none';
+              }}
+            />
           {:else}
             <div class="flex size-full items-center justify-center text-slate-300">
               <svg class="size-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
