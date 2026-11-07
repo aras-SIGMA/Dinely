@@ -109,7 +109,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-slate-50 lg:flex">
+<div class="min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
   <!-- Mobile Top Bar -->
   <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
     <div class="flex items-center gap-3">
@@ -150,11 +150,11 @@
 
   <!-- Sidebar (Desktop & Mobile Slide-over) -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col justify-between border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:static lg:z-auto lg:w-64 lg:translate-x-0 {mobileMenuOpen
+    class="fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col justify-between border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:sticky lg:top-0 lg:z-30 lg:h-screen lg:w-64 lg:translate-x-0 {mobileMenuOpen
       ? 'translate-x-0 shadow-xl'
       : '-translate-x-full lg:shadow-none'}"
   >
-    <div class="flex flex-col">
+    <div class="flex flex-1 flex-col overflow-y-auto min-h-0">
       <!-- Header Sidebar -->
       <div class="border-b border-slate-100 p-5">
         <div class="flex items-center justify-between">
@@ -240,7 +240,7 @@
     </div>
 
     <!-- User Profile & Sign Out Footer -->
-    <div class="border-t border-slate-100 p-3">
+    <div class="shrink-0 border-t border-slate-100 p-3">
       <div class="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-slate-50/50 p-2.5">
         <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 font-semibold text-white">
           {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'P'}
@@ -270,7 +270,7 @@
   </aside>
 
   <!-- Main Content Area -->
-  <div class="flex-1 lg:overflow-y-auto">
+  <div class="flex-1 min-w-0 lg:overflow-y-auto">
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {@render children()}
     </main>
