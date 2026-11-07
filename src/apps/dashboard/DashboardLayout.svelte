@@ -109,7 +109,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
+<div class="min-h-screen bg-slate-50">
   <!-- Mobile Top Bar -->
   <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
     <div class="flex items-center gap-3">
@@ -150,7 +150,7 @@
 
   <!-- Sidebar (Desktop & Mobile Slide-over) -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col justify-between border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:sticky lg:top-0 lg:z-30 lg:h-screen lg:w-64 lg:translate-x-0 {mobileMenuOpen
+    class="fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col justify-between border-r border-slate-200 bg-white transition-transform duration-200 ease-in-out lg:w-64 lg:translate-x-0 {mobileMenuOpen
       ? 'translate-x-0 shadow-xl'
       : '-translate-x-full lg:shadow-none'}"
   >
@@ -270,7 +270,7 @@
   </aside>
 
   <!-- Main Content Area -->
-  <div class="flex-1 min-w-0 lg:overflow-y-auto">
+  <div class="lg:pl-64">
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {@render children()}
     </main>
