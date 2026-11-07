@@ -1,8 +1,36 @@
 <script lang="ts">
   import { tenantStore } from '@/stores/tenant.svelte';
+  import { cartStore } from '@/stores/cart.svelte';
+  import { guestOrderStore } from '@/stores/guest-order.svelte';
   import Badge from '@/components/ui/Badge.svelte';
+  import MenuCatalog from '../components/MenuCatalog.svelte';
+  import CartDrawer from '../components/CartDrawer.svelte';
+  import CheckoutModal from '../components/CheckoutModal.svelte';
+  import OrderReceiptModal from '../components/OrderReceiptModal.svelte';
 
   const tenant = $derived(tenantStore.tenant);
+
+  let isCheckoutOpen = $state(false);
+  let isReceiptOpen = $state(false);
+
+  // Inisialisasi keranjang & pemulihan pesanan jika browser di-refresh
+  $effect(() => {
+    const tenantId = tenant?.id;
+    if (!tenantId) return;
+
+    cartStore.initTenant(tenantId);
+
+    // Pulihkan status pesanan terakhir jika ada di localStorage
+    guestOrderStore.recoverLastOrder(tenantId).then((recovered) => {
+      if (recovered) {
+        isReceiptOpen = true;
+      }
+    });
+
+    return () => {
+      guestOrderStore.stopPolling();
+    };
+  });
 
   // Gunakan contact_whatsapp, fallback ke contact_phone jika ada
   const targetPhone = $derived(tenant?.contact_whatsapp || tenant?.contact_phone || null);
@@ -34,11 +62,53 @@
       .slice(0, 2)
       .toUpperCase();
   });
+
+  const activeOrderCodeFormatted = $derived.by(() => {
+    const raw = guestOrderStore.activeOrderCode;
+    if (!raw) return '';
+    return raw.startsWith('#') ? raw : `#${raw}`;
+  });
 </script>
 
 {#if tenant}
   <main class="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-    <!-- Header Profil Usaha Kuliner -->
+    <!-- Banner Notifikasi Pesanan Berjalan (Jika ada pesanan aktif dan modal bukti pesanan ditutup) -->
+    {#if guestOrderStore.activeOrderCode && !isReceiptOpen}
+      <aside
+        aria-label="Notifikasi pesanan yang sedang berjalan"
+        class="mb-6 rounded-2xl border border-brand-200 bg-brand-50/70 p-4 shadow-xs"
+      >
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-3">
+            <span class="relative flex size-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full size-3 bg-brand-600"></span>
+            </span>
+            <div>
+              <p class="text-xs font-semibold text-slate-700">
+                Pesanan Anda: <strong class="text-slate-900">{activeOrderCodeFormatted}</strong>
+              </p>
+              <div class="mt-0.5 flex items-center gap-1.5">
+                <Badge tone={guestOrderStore.statusTone} label={guestOrderStore.statusLabel} />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onclick={() => (isReceiptOpen = true)}
+            class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 active:scale-95 transition"
+          >
+            <span>Buka Bukti Pesanan</span>
+            <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+    {/if}
+
+    <!-- Header Profil Usaha Kuliner (FE-11) -->
     <header class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
       <div class="flex items-start gap-4 sm:gap-5">
         <!-- Logo Resto atau Inisial Brand -->
@@ -47,11 +117,23 @@
             src={tenant.logo_url}
             alt={tenant.business_name}
             class="size-16 shrink-0 rounded-2xl object-cover ring-2 ring-slate-100 sm:size-20"
+            onerror={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.style.display = 'none';
+              const fallback = target.nextElementSibling as HTMLElement;
+              if (fallback) fallback.classList.remove('hidden');
+            }}
           />
+          <div
+            class="hidden size-16 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-xs sm:size-20 sm:text-2xl"
+            style="background-color: var(--brand-primary, {tenant.primary_color || '#ea580c'});"
+          >
+            {initials}
+          </div>
         {:else}
           <div
             class="flex size-16 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white shadow-xs sm:size-20 sm:text-2xl"
-            style="background-color: var(--brand-primary, #ea580c);"
+            style="background-color: var(--brand-primary, {tenant.primary_color || '#ea580c'});"
           >
             {initials}
           </div>
@@ -104,7 +186,7 @@
       </div>
     </header>
 
-    <!-- Card Layanan Informasi & Tanya Usaha (Customer Service WhatsApp) -->
+    <!-- Card Layanan Informasi & Tanya Usaha (Customer Service WhatsApp - FE-11) -->
     {#if waInquiryLink || tenant.contact_phone}
       <section class="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6 shadow-xs sm:p-7">
         <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -155,58 +237,35 @@
       </section>
     {/if}
 
-    <!-- Katalog Menu Digital (Preview Terstruktur Pra-Milestone 6) -->
-    <section class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center sm:p-12">
-      <div
-        class="mx-auto flex size-14 items-center justify-center rounded-2xl text-white shadow-xs"
-        style="background-color: var(--brand-primary, #ea580c);"
-      >
-        <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-          />
-        </svg>
-      </div>
+    <!-- Katalog Menu Digital Interaktif (FE-12) -->
+    <MenuCatalog tenantId={tenant.id} primaryColor={tenant.primary_color} />
 
-      <h2 class="mt-4 text-xl font-bold text-slate-900 sm:text-2xl">
-        Katalog Menu Digital
-      </h2>
-      <p class="mx-auto mt-2 max-w-lg text-sm text-slate-600 sm:text-base">
-        Katalog menu makanan & minuman serta pemesanan digital untuk <strong>{tenant.business_name}</strong> sedang dipersiapkan dan akan aktif pada Milestone 6.
-      </p>
+    <!-- Komponen Keranjang Belanja & Drawer (FE-13) -->
+    <CartDrawer
+      tenantId={tenant.id}
+      primaryColor={tenant.primary_color}
+      onProceedCheckout={() => (isCheckoutOpen = true)}
+    />
 
-      <div class="mt-6 flex flex-wrap justify-center gap-2">
-        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-          Pesan Langsung Tanpa Aplikasi
-        </span>
-        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-          Snapshot Harga Aman & Akurat
-        </span>
-      </div>
+    <!-- Modal Konfirmasi & Checkout Tamu (FE-13) -->
+    <CheckoutModal
+      open={isCheckoutOpen}
+      tenantId={tenant.id}
+      primaryColor={tenant.primary_color}
+      onClose={() => (isCheckoutOpen = false)}
+      onSuccess={() => {
+        isCheckoutOpen = false;
+        isReceiptOpen = true;
+      }}
+    />
 
-      {#if waInquiryLink}
-        <div class="mt-8 flex flex-col items-center justify-center gap-2 border-t border-slate-200/80 pt-6">
-          <p class="text-xs text-slate-500">
-            Ingin memesan menu khusus atau berkonsultasi langsung dengan toko sekarang?
-          </p>
-          <a
-            href={waInquiryLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-emerald-700"
-          >
-            <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.074-1.807-.412-.969-.401-1.631-1.341-1.68-1.405-.049-.064-.383-.51-.383-.972 0-.462.242-.689.328-.784.086-.095.188-.119.251-.119.063 0 .126.002.181.004.058.003.136-.022.213.163.078.188.267.653.29.701.023.048.039.105.008.167-.031.062-.047.1-.094.155-.047.056-.099.124-.141.167-.047.047-.096.098-.041.193.055.094.244.404.524.654.361.321.666.421.76.468.095.048.151.04.207-.024.056-.064.24-.28.304-.376.064-.096.127-.08.214-.048.087.032.553.261.648.308.095.048.158.072.182.112.024.041.024.238-.12.643z"
-              />
-            </svg>
-            Hubungi WhatsApp Penjual / Toko
-          </a>
-        </div>
-      {/if}
-    </section>
+    <!-- Modal Bukti Pesanan & Live Tracking (FE-14) -->
+    <OrderReceiptModal
+      open={isReceiptOpen}
+      tenantId={tenant.id}
+      businessName={tenant.business_name}
+      primaryColor={tenant.primary_color}
+      onClose={() => (isReceiptOpen = false)}
+    />
   </main>
 {/if}

@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import { ordersStore, getOrderStatusLabel, getOrderStatusTone, type StatusFilter } from '@/stores/orders.svelte';
   import { authStore } from '@/stores/auth.svelte';
-  import { formatRupiah } from '@/stores/cart.svelte';
+  import { formatRupiah } from '@/lib/format';
   import Badge from '@/components/ui/Badge.svelte';
   import type { OrderStatus, OrderWithItems } from '@/types';
 
   const tenantId = $derived(authStore.tenant?.id);
 
-  onMount(async () => {
-    if (tenantId) {
-      await ordersStore.fetchOrders(tenantId);
-      ordersStore.startPolling(tenantId, 15000);
-    }
-  });
+  $effect(() => {
+    const currentTenantId = authStore.tenant?.id;
+    if (!currentTenantId) return;
 
-  onDestroy(() => {
-    ordersStore.stopPolling();
+    ordersStore.fetchOrders(currentTenantId);
+    ordersStore.startPolling(currentTenantId, 15000);
+
+    return () => {
+      ordersStore.stopPolling();
+    };
   });
 
   const filterTabs: { id: StatusFilter; label: string }[] = [
@@ -34,9 +34,13 @@
   function closeDetail() {
     ordersStore.selectOrder(null);
   }
+
+  function formatCode(code: string): string {
+    return code.startsWith('#') ? code : `#${code}`;
+  }
 </script>
 
-<main class="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
+<div class="space-y-6">
   <!-- Header Antrean Pesanan -->
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
@@ -46,46 +50,51 @@
       </p>
     </div>
 
-    {#if tenantId}
-      <button
-        type="button"
-        disabled={ordersStore.loading}
-        onclick={() => ordersStore.fetchOrders(tenantId)}
-        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
-      >
-        <svg class="size-4 {ordersStore.loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        <span>{ordersStore.loading ? 'Memuat...' : 'Muat Ulang'}</span>
-      </button>
-    {/if}
+    <button
+      type="button"
+      disabled={ordersStore.loading || !tenantId}
+      onclick={() => tenantId && ordersStore.fetchOrders(tenantId)}
+      class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
+    >
+      <svg class="size-4 {ordersStore.loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>{ordersStore.loading ? 'Memuat...' : 'Muat Ulang'}</span>
+    </button>
   </div>
 
   <!-- Filter Status Tabs -->
-  <div class="mt-6 flex gap-2 overflow-x-auto border-b border-slate-200 pb-2">
-    {#each filterTabs as tab (tab.id)}
-      {@const count = ordersStore.countsByStatus[tab.id]}
-      <button
-        type="button"
-        onclick={() => ordersStore.setStatusFilter(tab.id)}
-        class="flex items-center gap-2 whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium transition-colors {ordersStore.selectedStatus === tab.id
-          ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-300'
-          : 'text-slate-600 hover:bg-slate-100'}"
-      >
-        <span>{tab.label}</span>
-        <span
-          class="rounded-full px-2 py-0.5 text-xs font-semibold {tab.id === 'baru' && count > 0
-            ? 'bg-brand-600 text-white'
-            : 'bg-slate-200 text-slate-700'}"
+  <div class="border-b border-slate-200">
+    <nav class="-mb-px flex gap-6 overflow-x-auto" aria-label="Filter status pesanan">
+      {#each filterTabs as tab (tab.id)}
+        {@const active = ordersStore.selectedStatus === tab.id}
+        {@const count = ordersStore.countsByStatus[tab.id]}
+        <button
+          type="button"
+          role="tab"
+          aria-selected={active}
+          onclick={() => ordersStore.setStatusFilter(tab.id)}
+          class="group inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-medium whitespace-nowrap transition-colors {active
+            ? 'border-brand-600 text-brand-600 font-semibold'
+            : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'}"
         >
-          {count}
-        </span>
-      </button>
-    {/each}
+          <span>{tab.label}</span>
+          <span
+            class="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-xs font-semibold transition-colors {active
+              ? 'bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-600/20'
+              : tab.id === 'baru' && count > 0
+                ? 'bg-brand-100 text-brand-800 font-bold'
+                : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'}"
+          >
+            {count}
+          </span>
+        </button>
+      {/each}
+    </nav>
   </div>
 
   <!-- Daftar Pesanan -->
-  <div class="mt-6">
+  <div>
     {#if ordersStore.loading && ordersStore.isEmpty}
       <div class="rounded-xl border border-slate-200 bg-white p-12 text-center">
         <p class="text-sm text-slate-500">Memuat data pesanan...</p>
@@ -108,7 +117,7 @@
               <!-- Baris Atas: Kode & Status -->
               <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <span class="font-mono text-base font-bold text-slate-900">
-                  #{order.order_code}
+                  {formatCode(order.order_code)}
                 </span>
                 <Badge tone={getOrderStatusTone(order.status)} label={getOrderStatusLabel(order.status)} />
               </div>
@@ -208,7 +217,7 @@
       <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h3 class="text-lg font-bold text-slate-900">Rincian Pesanan #{sel.order_code}</h3>
+            <h3 class="text-lg font-bold text-slate-900">Rincian Pesanan {formatCode(sel.order_code)}</h3>
             <p class="text-xs text-slate-500">{new Date(sel.created_at).toLocaleString('id-ID')}</p>
           </div>
           <button
@@ -267,4 +276,4 @@
       </div>
     </div>
   {/if}
-</main>
+</div>

@@ -30,7 +30,7 @@ export interface SubmitOrderForm {
   note?: string | null;
 }
 
-export type OrderBadgeTone = 'info' | 'warning' | 'success' | 'error';
+export type OrderBadgeTone = 'brand' | 'warning' | 'success' | 'danger';
 
 class GuestOrderStore {
   submitting = $state(false);
@@ -65,15 +65,15 @@ class GuestOrderStore {
   get statusTone(): OrderBadgeTone {
     switch (this.currentStatus) {
       case 'baru':
-        return 'info';
+        return 'brand';
       case 'diproses':
         return 'warning';
       case 'selesai':
         return 'success';
       case 'dibatalkan':
-        return 'error';
+        return 'danger';
       default:
-        return 'info';
+        return 'brand';
     }
   }
 
