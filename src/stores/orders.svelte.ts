@@ -243,8 +243,12 @@ class OrdersStore {
         this.selectedOrder.updated_at = targetOrder.updated_at;
       }
 
+      const displayCode = targetOrder.order_code.startsWith('#')
+        ? targetOrder.order_code
+        : `#${targetOrder.order_code}`;
+
       toastState.push(
-        `Pesanan #${targetOrder.order_code} diubah menjadi "${getOrderStatusLabel(nextStatus)}".`,
+        `Pesanan ${displayCode} diubah menjadi "${getOrderStatusLabel(nextStatus)}".`,
         'success'
       );
       return true;

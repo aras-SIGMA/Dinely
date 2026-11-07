@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { subscriptionStore } from '@/stores/subscription.svelte';
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
@@ -21,10 +20,11 @@
 
   const tenant = $derived(authStore.tenant);
 
-  onMount(async () => {
+  $effect(() => {
     subscriptionStore.fetchPackages();
-    if (tenant?.id) {
-      await fetchTransactions(tenant.id);
+    const currentTenantId = authStore.tenant?.id;
+    if (currentTenantId) {
+      fetchTransactions(currentTenantId);
     }
   });
 

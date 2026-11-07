@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import { ordersStore, getOrderStatusLabel, getOrderStatusTone, type StatusFilter } from '@/stores/orders.svelte';
   import { authStore } from '@/stores/auth.svelte';
-  import { formatRupiah } from '@/stores/cart.svelte';
+  import { formatRupiah } from '@/lib/format';
   import Badge from '@/components/ui/Badge.svelte';
   import type { OrderStatus, OrderWithItems } from '@/types';
 
   const tenantId = $derived(authStore.tenant?.id);
 
-  onMount(async () => {
-    if (tenantId) {
-      await ordersStore.fetchOrders(tenantId);
-      ordersStore.startPolling(tenantId, 15000);
-    }
-  });
+  $effect(() => {
+    const currentTenantId = authStore.tenant?.id;
+    if (!currentTenantId) return;
 
-  onDestroy(() => {
-    ordersStore.stopPolling();
+    ordersStore.fetchOrders(currentTenantId);
+    ordersStore.startPolling(currentTenantId, 15000);
+
+    return () => {
+      ordersStore.stopPolling();
+    };
   });
 
   const filterTabs: { id: StatusFilter; label: string }[] = [
@@ -34,9 +34,13 @@
   function closeDetail() {
     ordersStore.selectOrder(null);
   }
+
+  function formatCode(code: string): string {
+    return code.startsWith('#') ? code : `#${code}`;
+  }
 </script>
 
-<main class="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
+<div class="space-y-6">
   <!-- Header Antrean Pesanan -->
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
@@ -46,19 +50,17 @@
       </p>
     </div>
 
-    {#if tenantId}
-      <button
-        type="button"
-        disabled={ordersStore.loading}
-        onclick={() => ordersStore.fetchOrders(tenantId)}
-        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
-      >
-        <svg class="size-4 {ordersStore.loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        <span>{ordersStore.loading ? 'Memuat...' : 'Muat Ulang'}</span>
-      </button>
-    {/if}
+    <button
+      type="button"
+      disabled={ordersStore.loading || !tenantId}
+      onclick={() => tenantId && ordersStore.fetchOrders(tenantId)}
+      class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
+    >
+      <svg class="size-4 {ordersStore.loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>{ordersStore.loading ? 'Memuat...' : 'Muat Ulang'}</span>
+    </button>
   </div>
 
   <!-- Filter Status Tabs -->
@@ -108,7 +110,7 @@
               <!-- Baris Atas: Kode & Status -->
               <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <span class="font-mono text-base font-bold text-slate-900">
-                  #{order.order_code}
+                  {formatCode(order.order_code)}
                 </span>
                 <Badge tone={getOrderStatusTone(order.status)} label={getOrderStatusLabel(order.status)} />
               </div>
@@ -208,7 +210,7 @@
       <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h3 class="text-lg font-bold text-slate-900">Rincian Pesanan #{sel.order_code}</h3>
+            <h3 class="text-lg font-bold text-slate-900">Rincian Pesanan {formatCode(sel.order_code)}</h3>
             <p class="text-xs text-slate-500">{new Date(sel.created_at).toLocaleString('id-ID')}</p>
           </div>
           <button
@@ -267,4 +269,4 @@
       </div>
     </div>
   {/if}
-</main>
+</div>

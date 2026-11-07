@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
   import { formatRupiah, formatDate } from '@/lib/format';
@@ -23,11 +22,17 @@
     return `https://${tenant.subdomain}.restolink.site`;
   });
 
-  onMount(async () => {
-    if (tenant?.id) {
-      await Promise.all([fetchMenuMetrics(tenant.id), ordersStore.fetchOrders(tenant.id)]);
-      ordersStore.startPolling(tenant.id, 15000);
-    }
+  $effect(() => {
+    const currentTenantId = authStore.tenant?.id;
+    if (!currentTenantId) return;
+
+    fetchMenuMetrics(currentTenantId);
+    ordersStore.fetchOrders(currentTenantId);
+    ordersStore.startPolling(currentTenantId, 15000);
+
+    return () => {
+      ordersStore.stopPolling();
+    };
   });
 
   async function fetchMenuMetrics(tenantId: string) {

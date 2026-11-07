@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
   import { toastState } from '@/stores/toast.svelte';
@@ -61,8 +60,10 @@
     compressionInfo = null;
   }
 
-  onMount(() => {
-    syncFormWithStore();
+  $effect(() => {
+    if ((authStore.tenant || authStore.profile) && !isDirty) {
+      syncFormWithStore();
+    }
   });
 
   const tenant = $derived(authStore.tenant);

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
   import { toastState } from '@/stores/toast.svelte';
@@ -54,9 +53,10 @@
 
   const tenant = $derived(authStore.tenant);
 
-  onMount(async () => {
-    if (tenant?.id) {
-      await fetchAllData();
+  $effect(() => {
+    const currentTenantId = authStore.tenant?.id;
+    if (currentTenantId) {
+      fetchAllData();
     }
   });
 
