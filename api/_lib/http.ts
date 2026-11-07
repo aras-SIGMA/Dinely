@@ -1,10 +1,15 @@
 import type { ApiRequest, ApiResponse } from '../_types';
 
 export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
+  const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1MB batas aman
+
   if (req.body && typeof req.body === 'object') {
     return req.body as T;
   }
   if (typeof req.body === 'string' && req.body.trim().length > 0) {
+    if (Buffer.byteLength(req.body, 'utf8') > MAX_PAYLOAD_SIZE) {
+      throw new Error('Ukuran payload melebihi batas maksimal (1MB).');
+    }
     try {
       return JSON.parse(req.body) as T;
     } catch {
@@ -14,7 +19,17 @@ export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
 
   return new Promise<T>((resolve, reject) => {
     let raw = '';
+    let bytesReceived = 0;
+
     req.on('data', (chunk) => {
+      bytesReceived += chunk.length;
+      if (bytesReceived > MAX_PAYLOAD_SIZE) {
+        if (typeof (req as any).destroy === 'function') {
+          (req as any).destroy();
+        }
+        reject(new Error('Ukuran payload melebihi batas maksimal (1MB).'));
+        return;
+      }
       raw += chunk;
     });
     req.on('end', () => {

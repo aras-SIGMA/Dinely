@@ -81,9 +81,11 @@ export function formatHistory(
     }
 
     if (text.length > 0) {
+      // Proteksi anti-abuse: potong teks riwayat maksimal 1000 karakter per pesan
+      const sanitizedText = text.length > 1000 ? text.slice(0, 1000) : text;
       formatted.push({
         role,
-        parts: [{ text }],
+        parts: [{ text: sanitizedText }],
       });
     }
   }
