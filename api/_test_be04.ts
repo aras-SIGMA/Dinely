@@ -374,6 +374,23 @@ async function runTests() {
     );
   }
 
+  // TC-14: History item teks melebihi 1000 karakter dipotong aman (Anti-DoS token limit)
+  {
+    const giantText = 'X'.repeat(5000);
+    const history = [
+      { role: 'user', text: giantText },
+      { role: 'model', text: 'Balasan model' },
+    ];
+    const formatted = formatHistory(history);
+    const userItemText = formatted[0]?.parts[0]?.text;
+
+    assert(
+      formatted.length === 2 && userItemText.length === 1000,
+      'TC-14: History item teks melebihi 1000 karakter dipotong aman ke 1000 karakter',
+      { originalLength: giantText.length, sanitizedLength: userItemText?.length }
+    );
+  }
+
   // Restore fetch
   global.fetch = originalFetch;
 
