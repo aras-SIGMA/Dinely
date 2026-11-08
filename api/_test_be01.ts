@@ -200,6 +200,8 @@ async function runTests() {
     },
   };
 
+  const nonMikroPackageId = 'b0a80123-0000-0000-0000-000000000005';
+
   const mockPackages: Record<string, any> = {
     [validPackageId]: {
       id: validPackageId,
@@ -208,6 +210,15 @@ async function runTests() {
       price_monthly: 49000,
       price_6_months: 270000,
       price_yearly: 490000,
+      is_active: true,
+    },
+    [nonMikroPackageId]: {
+      id: nonMikroPackageId,
+      name: 'Kecil',
+      tier: 'kecil',
+      price_monthly: 99000,
+      price_6_months: 549000,
+      price_yearly: 999000,
       is_active: true,
     },
     [inactivePackageId]: {
@@ -272,11 +283,38 @@ async function runTests() {
 
     if (tableName === 'transactions') {
       return {
+        select: (_cols?: string, opts?: any) => {
+          let filtered = Object.values(mockTransactions);
+          const chain: any = {
+            eq: (col: string, val: any) => {
+              filtered = filtered.filter((t: any) => t[col] === val);
+              return chain;
+            },
+            in: (col: string, vals: any[]) => {
+              filtered = filtered.filter((t: any) => vals.includes(t[col]));
+              return chain;
+            },
+            gte: (col: string, val: any) => {
+              filtered = filtered.filter((t: any) => (t[col] || '') >= val);
+              return chain;
+            },
+            async then(onFulfilled: any) {
+              const res = { count: filtered.length, data: filtered, error: null };
+              return onFulfilled ? onFulfilled(res) : res;
+            },
+          };
+          return chain;
+        },
         insert: async (row: any) => {
           if (failTxInsert) {
             return { error: { message: 'Database write error on insert transaction' } };
           }
-          mockTransactions[row.midtrans_order_id] = { ...row };
+          const record = {
+            ...row,
+            id: `tx-${Date.now()}-${Math.random()}`,
+            created_at: row.created_at || new Date().toISOString(),
+          };
+          mockTransactions[row.midtrans_order_id] = record;
           return { error: null };
         },
         update: (fields: any) => ({
@@ -542,6 +580,99 @@ async function runTests() {
       recordedTx?.amount === 49000,
       'TC-18: Happy path 201 Created: Snap Token terbit dan transaksi pending tersimpan di DB',
       { statusCode, jsonBody, recordedTx }
+    );
+  }
+
+  // TC-19: Paket non-Mikro ditolak jika memilih billing_cycle 'trial' (Anti-Price Manipulation)
+  {
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer valid-owner-jwt' },
+      body: {
+        tenant_id: validTenantId,
+        package_id: nonMikroPackageId,
+        billing_cycle: 'trial',
+      },
+    } as unknown as ApiRequest;
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+    assert(
+      statusCode === 400 && jsonBody?.error?.includes('hanya berlaku untuk paket Mikro'),
+      'TC-19: Paket non-Mikro ditolak untuk siklus trial (Anti-Price Manipulation)',
+      { statusCode, jsonBody }
+    );
+  }
+
+  // TC-20: Tenant yang sudah pernah settlement trial ditolak trial kedua kali (Anti-Trial Abuse)
+  {
+    // Simulasikan transaksi trial settlement sebelumnya
+    mockTransactions['RL-PREV-TRIAL-001'] = {
+      id: 'tx-prev-trial-settled',
+      tenant_id: validTenantId,
+      package_id: validPackageId,
+      billing_cycle: 'trial',
+      status: 'settlement',
+      amount: 49000,
+      created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer valid-owner-jwt' },
+      body: {
+        tenant_id: validTenantId,
+        package_id: validPackageId,
+        billing_cycle: 'trial',
+      },
+    } as unknown as ApiRequest;
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+    assert(
+      statusCode === 400 && jsonBody?.error?.includes('pernah menggunakan masa trial'),
+      'TC-20: Tenant yang pernah settlement trial ditolak trial berulang (Anti-Trial Abuse)',
+      { statusCode, jsonBody }
+    );
+
+    // Hapus transaksi mock settlement untuk test berikutnya
+    delete mockTransactions['RL-PREV-TRIAL-001'];
+  }
+
+  // TC-21: Throttling transaksi pending (maksimal 3 transaksi pending aktif)
+  {
+    // Bersihkan transaksi mock lama
+    for (const k of Object.keys(mockTransactions)) delete mockTransactions[k];
+
+    // Buat 3 transaksi pending aktif
+    for (let i = 1; i <= 3; i++) {
+      mockTransactions[`RL-PENDING-${i}`] = {
+        id: `tx-pending-${i}`,
+        tenant_id: validTenantId,
+        package_id: validPackageId,
+        billing_cycle: 'monthly',
+        status: 'pending',
+        amount: 49000,
+        created_at: new Date().toISOString(),
+      };
+    }
+
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer valid-owner-jwt' },
+      body: {
+        tenant_id: validTenantId,
+        package_id: validPackageId,
+        billing_cycle: 'monthly',
+      },
+    } as unknown as ApiRequest;
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+    assert(
+      statusCode === 429 && jsonBody?.error?.includes('Terlalu banyak transaksi pending'),
+      'TC-21: Throttling batas maksimal 3 transaksi pending aktif menghasilkan HTTP 429',
+      { statusCode, jsonBody }
     );
   }
 

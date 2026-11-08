@@ -111,7 +111,52 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return sendJson(res, 404, { error: 'Paket langganan tidak ditemukan atau sudah tidak aktif.' });
     }
 
-    // 6. Kalkulasi nominal transaksi
+    // 6. Validasi Aturan Siklus Langganan & Pencegahan Penyalahgunaan (Security Controls)
+    if (billing_cycle === 'trial') {
+      // a. Restriksi tier trial (Anti-Price Manipulation: hanya tier mikro yang mendukung trial)
+      if (pkg.tier !== 'mikro') {
+        return sendJson(res, 400, {
+          error: 'Siklus trial (Rp 49.000) hanya berlaku untuk paket Mikro.',
+        });
+      }
+
+      // b. Anti-Trial Abuse: Tolak jika tenant sudah pernah memiliki transaksi trial sukses
+      const { count: trialCount, error: trialCheckErr } = await supabaseAdmin
+        .from('transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenant.id)
+        .eq('billing_cycle', 'trial')
+        .in('status', ['settlement', 'capture']);
+
+      if (trialCheckErr) {
+        return sendJson(res, 500, {
+          error: `Gagal memverifikasi riwayat transaksi: ${trialCheckErr.message}`,
+        });
+      }
+
+      if (trialCount && trialCount > 0) {
+        return sendJson(res, 400, {
+          error: 'Tenant sudah pernah menggunakan masa trial sebelumnya. Silakan pilih paket langganan reguler.',
+        });
+      }
+    }
+
+    // c. Throttling Transaksi Pending (Anti-Flooding / DoS: maksimal 3 transaksi pending aktif)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: pendingCount, error: pendingCheckErr } = await supabaseAdmin
+      .from('transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('tenant_id', tenant.id)
+      .eq('status', 'pending')
+      .gte('created_at', oneHourAgo);
+
+    if (!pendingCheckErr && pendingCount !== null && pendingCount >= 3) {
+      return sendJson(res, 429, {
+        error: 'Terlalu banyak transaksi pending (maksimal 3). Selesaikan atau tunggu pembayaran sebelumnya kedaluwarsa.',
+      });
+    }
+
+    // 7. Kalkulasi nominal transaksi
     let amount: number;
     if (billing_cycle === 'trial') {
       amount = TRIAL_AMOUNT;
@@ -136,7 +181,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const orderId = generateOrderId(tenant.subdomain);
 
-    // 7. Catat transaksi ke database dengan status 'pending' (Atomic Reservation)
+    // 8. Catat transaksi ke database dengan status 'pending' (Atomic Reservation)
     const { error: insertTxError } = await supabaseAdmin.from('transactions').insert({
       tenant_id: tenant.id,
       package_id: pkg.id,
