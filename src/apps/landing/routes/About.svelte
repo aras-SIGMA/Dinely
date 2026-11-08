@@ -108,21 +108,9 @@
               <img
                 src="/restolink-icon.svg"
                 alt="Ikon RestoLink"
-                class="size-20 sm:size-24 rounded-3xl shadow-lg shadow-brand-600/20"
+                class="size-24 sm:size-28 rounded-3xl shadow-lg shadow-brand-600/20"
                 draggable="false"
               />
-
-              <div class="mt-5">
-                <img
-                  src="/restolink-logo.svg"
-                  alt="RestoLink"
-                  class="h-8 sm:h-9 mx-auto"
-                  draggable="false"
-                />
-                <p class="mt-2 font-mono text-[11px] font-semibold tracking-wider uppercase text-slate-500">
-                  Platform UMKM Kuliner
-                </p>
-              </div>
             </div>
 
             <!-- Sisi Kanan: Narasi Kisah Mengapa Aplikasi Ini Dibuat -->
