@@ -105,30 +105,22 @@
           <div class="grid items-center gap-10 lg:grid-cols-12">
             <!-- Sisi Kiri: Tampilan Logo & Identitas Brand -->
             <div class="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/70 p-8 text-center lg:col-span-4 lg:p-10">
-              <div class="flex size-20 sm:size-24 items-center justify-center rounded-3xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-600/30">
-                <svg
-                  viewBox="0 0 60 60"
-                  class="size-12 sm:size-14 text-white"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    transform="translate(-1.5, -0.25)"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M19 17C19 15.8954 19.8954 15 21 15H33C39.0751 15 44 19.9249 44 26C44 30.686 41.0708 34.6888 36.9427 36.2574L42.5298 43.7069C43.0854 44.4477 42.5566 45.5 41.6318 45.5H36.3682C35.7925 45.5 35.2505 45.2045 34.9351 44.7214L29.25 36H26V44C26 44.8284 25.3284 45.5 24.5 45.5C23.6716 45.5 23 44.8284 23 44V17H21C20.1716 17 19.5 16.3284 19 15.5C18.5 14.5 19 17 19 17ZM26 21V30H33C35.2091 30 37 28.2091 37 26C37 23.7909 35.2091 22 33 22H26Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
+              <img
+                src="/restolink-icon.svg"
+                alt="Ikon RestoLink"
+                class="size-20 sm:size-24 rounded-3xl shadow-lg shadow-brand-600/20"
+                draggable="false"
+              />
 
               <div class="mt-5">
-                <span class="font-extrabold text-2xl tracking-tight text-slate-900">
-                  Resto<span class="text-brand-600">Link</span>
-                </span>
-                <p class="mt-1 font-mono text-[11px] font-semibold tracking-wider uppercase text-slate-500">
-                  Digital Menu &amp; Kitchen OS
+                <img
+                  src="/restolink-logo.svg"
+                  alt="RestoLink"
+                  class="h-8 sm:h-9 mx-auto"
+                  draggable="false"
+                />
+                <p class="mt-2 font-mono text-[11px] font-semibold tracking-wider uppercase text-slate-500">
+                  Platform UMKM Kuliner
                 </p>
               </div>
             </div>
