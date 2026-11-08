@@ -1,5 +1,7 @@
 <script lang="ts">
-  import Button from '@/components/ui/Button.svelte';
+  import AnimatedContent from '@/components/ui/AnimatedContent.svelte';
+  import SplitText from '@/components/ui/SplitText.svelte';
+  import { uiStore } from '@/stores/ui.svelte';
   import Navbar from '../components/Navbar.svelte';
   import Footer from '../components/Footer.svelte';
 
@@ -7,376 +9,380 @@
     {
       id: 'menu-digital',
       badge: 'Etalase Online',
+      icon: 'browser',
       title: 'Website Menu Digital & Subdomain Mandiri',
-      desc: 'Setiap mitra mendapatkan alamat website eksklusif di subdomain RestoLink yang langsung aktif seketika setelah pendaftaran. Pelanggan dapat membuka menu dengan cepat tanpa perlu mengunduh aplikasi apa pun.',
+      desc: 'Setiap mitra mendapatkan alamat website eksklusif di subdomain RestoLink yang langsung aktif seketika setelah pendaftaran. Pelanggan membuka menu tanpa mengunduh aplikasi apa pun.',
       points: [
         'Subdomain unik otomatis (misal: dapurnia.restolink.site)',
-        'Kategori menu dinamis: Makanan, Minuman, Paket Hemat, Camilan',
-        'Kompresi gambar otomatis ke format WebP untuk loading instan',
-        'Desain mobile-friendly yang nyaman diakses dari semua tipe smartphone'
+        'Kategori menu dinamis: Makanan, Minuman, Paket Hemat',
+        'Kompresi gambar otomatis ke format WebP untuk loading instan'
       ],
       visualType: 'menu'
     },
     {
       id: 'qr-ordering',
       badge: 'Tanpa Antre',
+      icon: 'qr',
       title: 'Pemesanan Langsung & QR Code Meja',
-      desc: 'Hilangkan antrean panjang dan salah catat pesanan. Pelanggan cukup memindai stiker QR Code di meja makan atau mengklik link di bio Instagram untuk memilih makanan dan mengirim pesanan langsung.',
+      desc: 'Hilangkan antrean panjang dan salah catat pesanan. Pelanggan memindai QR di meja atau klik link bio Instagram untuk mengirim pesanan langsung ke dapur.',
       points: [
-        'Guest Checkout: Pesan langsung tanpa wajib daftar akun atau login',
-        'Pilihan tipe pesanan: Makan di Tempat (Dine-in) atau Bawa Pulang (Takeaway)',
-        'Input nomor meja otomatis dari scan QR atau diisi manual oleh pelanggan',
-        'Nomor referensi pesanan instan untuk memudahkan konfirmasi kasir'
+        'Guest Checkout: pesan tanpa wajib daftar akun',
+        'Pilihan Dine-in atau Takeaway',
+        'Nomor meja terisi otomatis dari hasil scan QR'
       ],
       visualType: 'qr'
     },
     {
       id: 'kitchen-orders',
-      badge: 'Alur Dapur',
-      title: 'Dashboard Dapur & Manajemen Pesanan Real-time',
-      desc: 'Satukan semua pesanan yang masuk ke dalam satu layar kendali terpusat. Staf dapur dan kasir dapat melihat rincian item, catatan khusus pembeli, dan memperbarui status pesanan secara terstruktur.',
+      badge: 'Sinkron Real-Time',
+      icon: 'kitchen',
+      title: 'Layar Dapur Tanpa Nota',
+      desc: 'Setiap pesanan yang masuk muncul otomatis di Layar Dapur. Dapur bekerja tanpa kertas, pelanggan menunggu tanpa menebak-nebak.',
       points: [
-        'Alur status bertahap: Pesanan Baru → Sedang Diproses → Siap / Selesai',
-        'Visual badge warna yang kontras untuk membedakan urgensi pesanan',
-        'Rincian menu, jumlah porsi, dan catatan alergi/khusus pelanggan',
-        'Riwayat transaksi harian yang rapi untuk rekapitulasi penjualan'
+        'Alur status bertahap: diterima, diproses, siap',
+        'Badge warna untuk urgensi pesanan',
+        'Catatan khusus & alergi tampil jelas'
       ],
       visualType: 'kitchen'
     },
     {
       id: 'stock-control',
-      badge: 'Fleksibilitas Penuh',
-      title: 'Kendali Menu & Ketersediaan Stok Instan',
-      desc: 'Bahan baku habis di tengah jam makan siang? Cukup buka dashboard dan geser toggle ketersediaan. Website menu pelanggan langsung diperbarui seketika tanpa perlu mencoret-coret buku menu fisik.',
+      badge: 'Kontrol Penuh',
+      icon: 'stock',
+      title: 'Kontrol Stok & Status Menu',
+      desc: 'Cukup satu toggle untuk menandai menu habis (Sold Out) dan menyesuaikan stok harian. Pelanggan selalu melihat ketersediaan terbaru.',
       points: [
-        'Toggle status ketersediaan (Tersedia / Habis) sekali klik',
-        'Ubah harga jual sewaktu-waktu tanpa biaya cetak ulang buku menu',
-        'Sembunyikan menu musiman yang sedang tidak diproduksi',
-        'Dukungan deskripsi detail bahan dan tingkat kepedasan menu'
+        'Toggle Habis/Sedia sekali klik',
+        'Ubah harga kapan pun tanpa cetak ulang',
+        'Sembunyikan menu musiman tanpa menghapus data'
       ],
       visualType: 'stock'
+    },
+    {
+      id: 'dashboard-analytics',
+      badge: 'Laporan Real-Time',
+      icon: 'chart',
+      title: 'Dashboard Analitik & Rekap Omset',
+      desc: 'Pantau omset harian, jumlah transaksi, dan menu terlaris secara langsung dari HP atau laptop tanpa menunggu tutup buku manual.',
+      points: [
+        'Rekap omset & total transaksi harian real-time',
+        'Daftar menu terlaris untuk evaluasi stok bahan',
+        'Laporan otomatis tanpa hitung nota kertas manual'
+      ],
+      visualType: 'analytics'
     }
   ];
 
-  const highlights = [
+  const extras = [
     {
+      id: 'komisi',
+      icon: 'percent',
       title: '0% Biaya Komisi',
-      desc: 'Berbeda dari agregator pesan-antar ojek online yang memotong 20%+, seluruh pendapatan penjualan 100% milik usaha Anda.',
-      icon: 'percent'
+      desc: 'Tanpa potongan per transaksi di masa trial.'
     },
     {
-      title: 'Aktivasi Instan < 5 Menit',
-      desc: 'Daftar, atur nama subdomain, masukkan menu andalan Anda, dan website restoran langsung siap menerima pesanan.',
-      icon: 'bolt'
+      id: 'setup',
+      icon: 'bolt',
+      title: 'Setup < 5 Menit',
+      desc: 'Pesan tetap masuk bahkan saat menu belum lengkap.'
     },
     {
-      title: 'Hosting & Server Aman',
-      desc: 'Infrastruktur cloud berkecepatan tinggi dengan proteksi data Row Level Security (RLS) menjaga keamanan bisnis Anda.',
-      icon: 'shield'
+      id: 'aman',
+      icon: 'shield',
+      title: 'Cloud & RLS Aman',
+      desc: 'Isolasi data per tenant via Supabase.'
     },
     {
-      title: 'Bebas Kertas & Ramah Lingkungan',
-      desc: 'Kurangi biaya cetak kertas nota dan buku menu berkala yang cepat rusak dan memakan anggaran operasional.',
-      icon: 'leaf'
+      id: 'paperless',
+      icon: 'leaf',
+      title: '100% Paperless',
+      desc: 'Nota, resi, dan laporan tersaji digital.'
     }
   ];
 </script>
 
-<div class="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+<div class="relative flex min-h-screen flex-col bg-white font-sans text-slate-900">
   <Navbar currentPath="/fitur" />
 
-  <main class="flex-1">
-    <!-- ======================================================================= -->
-    <!-- 1. HEADER / HERO SECTION                                                -->
-    <!-- ======================================================================= -->
-    <section class="border-b border-slate-200/80 bg-white py-14 sm:py-20">
-      <div class="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-        <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-          <span class="size-2 rounded-full bg-brand-500" aria-hidden="true"></span>
-          Solusi Terpadu UMKM Kuliner
-        </div>
+  <main class="relative flex-1 pb-16 pt-24 sm:pb-24 sm:pt-32">
+    <!-- Ambient glow -->
+    <div
+      class="pointer-events-none absolute inset-x-0 top-12 -z-10 flex items-start justify-center overflow-hidden"
+    >
+      <div
+        class="h-[420px] w-[820px] rounded-full bg-gradient-to-tr from-brand-100/50 via-amber-100/30 to-orange-100/40 opacity-75 blur-3xl"
+      ></div>
+    </div>
 
-        <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl sm:leading-tight">
-          Semua Fitur yang Anda Butuhkan untuk <span class="text-brand-600">Digitalisasi Kedai &amp; Resto</span>
+    <!-- Hero -->
+    <section
+      class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8"
+      aria-labelledby="fitur-headline"
+    >
+      <div class="mx-auto max-w-4xl text-center">
+        <AnimatedContent distance={20} duration={0.5}>
+          <div
+            class="inline-flex items-center rounded-full border border-brand-200/70 bg-brand-50/60 px-4 py-1.5 text-xs font-semibold tracking-wide text-slate-950"
+          >
+            FITUR UNGGULAN
+          </div>
+        </AnimatedContent>
+
+        <h1
+          id="fitur-headline"
+          class="text-3xl font-extrabold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl sm:leading-tight lg:text-6xl lg:leading-tight"
+        >
+          <SplitText
+            text="Website Menu Digital Mandiri,"
+            splitType="chars"
+            delay={25}
+            duration={0.7}
+            ready={uiStore.isAppReady}
+          />
+          <span class="text-brand-600 block sm:inline">
+            <SplitText
+              text="Terkelola dari Satu Dashboard."
+              splitType="chars"
+              delay={25}
+              baseDelay={25 * 30}
+              duration={0.7}
+              ready={uiStore.isAppReady}
+            />
+          </span>
         </h1>
 
-        <p class="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg sm:leading-relaxed">
-          Dari menu digital interaktif, pemesanan tanpa aplikasi, hingga manajemen alur pesanan dapur. Dirancang praktis agar pemilik usaha kuliner mandiri bisa langsung menggunakannya tanpa kendala teknis.
-        </p>
-
-        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xs sm:max-w-none mx-auto">
-          <a href="/daftar" class="w-full sm:w-auto">
-            <Button size="lg" full>Coba Gratis 30 Hari</Button>
-          </a>
-          <a href="/harga" class="w-full sm:w-auto">
-            <Button size="lg" variant="secondary" full>Lihat Skema Harga</Button>
-          </a>
-        </div>
+        <AnimatedContent distance={24} duration={0.6} delay={0.35}>
+          <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+            Etalase online, pemesanan QR, layar dapur, dan kendali stok bekerja sebagai satu ekosistem
+            utuh — dibangun khusus untuk realitas warung, kedai, resto, dan gerobak.
+          </p>
+        </AnimatedContent>
       </div>
     </section>
 
-    <!-- ======================================================================= -->
-    <!-- 2. DEEP-DIVE FEATURE PILLARS (Alternating 2-Column Sections)             -->
-    <!-- ======================================================================= -->
-    <section class="py-16 sm:py-24 space-y-20 sm:space-y-28">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {#each featurePillars as feature, idx (feature.id)}
-          <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-14 {idx > 0 ? 'mt-20 sm:mt-28' : ''}">
-            <!-- Text Column -->
-            <div class="lg:col-span-6 {idx % 2 === 1 ? 'lg:order-2' : ''}">
-              <span class="inline-flex items-center rounded-md bg-brand-100 px-2.5 py-1 text-xs font-bold text-brand-800">
-                {feature.badge}
-              </span>
-              <h2 class="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                {feature.title}
-              </h2>
-              <p class="mt-4 text-base text-slate-600 leading-relaxed">
-                {feature.desc}
-              </p>
-
-              <ul class="mt-6 space-y-3" role="list">
-                {#each feature.points as point}
-                  <li class="flex items-start gap-3 text-sm text-slate-700">
-                    <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600 border border-brand-200">
-                      <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+    <!-- Asymmetric bento showcase -->
+    <section
+      class="mx-auto max-w-7xl px-4 pt-14 sm:px-6 sm:pt-16 lg:px-8"
+      aria-label="Daftar fitur unggulan"
+    >
+      <div class="grid gap-5 sm:grid-cols-2">
+        <!-- Featured pillar: full-width horizontal -->
+        <AnimatedContent distance={40} duration={0.6} delay={0.45} class="sm:col-span-2">
+          <article
+            id={featurePillars[0].id}
+            class="group relative h-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xl shadow-slate-900/[0.03] transition-shadow duration-300 hover:shadow-2xl hover:shadow-brand-900/[0.05] sm:p-8 scroll-mt-32"
+          >
+            <div
+              class="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-50/80 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            ></div>
+            <div class="relative grid items-center gap-8 lg:grid-cols-12">
+              <div class="lg:col-span-6">
+                <span
+                  class="inline-flex items-center rounded-full bg-brand-600 px-3 py-1 text-[10px] font-bold tracking-wider text-white"
+                >
+                  {featurePillars[0].badge}
+                </span>
+                <h2 class="mt-4 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+                  {featurePillars[0].title}
+                </h2>
+                <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                  {featurePillars[0].desc}
+                </p>
+                <ul class="mt-5 space-y-2.5">
+                  {#each featurePillars[0].points as point (point)}
+                    <li class="flex items-start gap-2.5 text-sm text-slate-700">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="mt-0.5 size-4 shrink-0 text-brand-600"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
                       </svg>
+                      {point}
+                    </li>
+                  {/each}
+                </ul>
+              </div>
+
+              <!-- Mockup: menu website preview -->
+              <div class="lg:col-span-6">
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5">
+                  <div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
+                    <div class="flex items-center gap-2">
+                      <span class="size-2.5 rounded-full bg-brand-500"></span>
+                      <span class="font-serif text-sm font-semibold text-slate-900">Dapur Nia</span>
+                    </div>
+                    <span
+                      class="rounded-full bg-slate-950 px-2.5 py-1 font-mono text-[9px] font-semibold text-white"
+                    >
+                      dapurnia.restolink.site
                     </span>
-                    <span>{point}</span>
-                  </li>
-                {/each}
-              </ul>
+                  </div>
+                  <div class="flex gap-1.5 px-4 pt-3">
+                    <span class="rounded-full bg-brand-600 px-2.5 py-1 text-[9px] font-semibold text-white">Semua</span>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-medium text-slate-500">Makanan</span>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-medium text-slate-500">Minuman</span>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-medium text-slate-500">Paket Hemat</span>
+                  </div>
+                  <div class="flex items-center gap-3 px-4 py-3">
+                    <span class="size-11 shrink-0 rounded-lg bg-brand-500"></span>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-xs font-semibold text-slate-900">Nasi Bakar Geprek</p>
+                      <p class="text-[10px] text-slate-500">28rb • Level pedas 1-5</p>
+                    </div>
+                    <span class="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[9px] font-semibold text-brand-700">
+                      Pesan
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3 px-4 pb-4">
+                    <span class="size-11 shrink-0 rounded-lg bg-brand-300"></span>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-xs font-semibold text-slate-900">Es Kopi Susu Sisca</p>
+                      <p class="text-[10px] text-slate-500">18rb • Gula aren asli</p>
+                    </div>
+                    <span class="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[9px] font-semibold text-brand-700">
+                      Pesan
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
+          </article>
+        </AnimatedContent>
 
-            <!-- Visual Preview Column -->
-            <div class="lg:col-span-6 {idx % 2 === 1 ? 'lg:order-1' : ''}">
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50">
-                {#if feature.visualType === 'menu'}
-                  <!-- Mockup: Digital Menu View -->
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                      <div>
-                        <p class="text-xs font-bold text-slate-900">Kedai Kopi &amp; Toast Santai</p>
-                        <p class="text-[11px] text-brand-600 font-mono">santai.restolink.site</p>
-                      </div>
-                      <span class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">Buka</span>
+        <!-- Supporting pillars (4 items in a 2x2 grid on sm+) -->
+        {#each featurePillars.slice(1) as pillar, idx (pillar.id)}
+          <AnimatedContent distance={28} duration={0.6} delay={0.1 * (idx + 1)} class="sm:col-span-1">
+            <article
+              id={pillar.id}
+              class="group flex h-full flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-slate-900/[0.06] scroll-mt-32"
+            >
+              <div>
+                <span
+                  class="inline-flex w-fit items-center rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold tracking-wider text-brand-700"
+                >
+                  {pillar.badge}
+                </span>
+                <h3 class="mt-4 font-display text-lg font-semibold tracking-tight text-slate-950">
+                  {pillar.title}
+                </h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                  {pillar.desc}
+                </p>
+                <ul class="mt-4 space-y-2">
+                  {#each pillar.points as point (point)}
+                    <li class="flex items-start gap-2 text-xs text-slate-700">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="mt-0.5 size-3.5 shrink-0 text-brand-600"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                      {point}
+                    </li>
+                  {/each}
+                </ul>
+              </div>
+
+              <!-- Mini mockup -->
+              <div class="mt-6">
+                {#if pillar.visualType === 'qr'}
+                  <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                    <div class="grid size-16 shrink-0 grid-cols-4 gap-0.5 p-1.5 rounded-lg border border-slate-200 bg-white">
+                      {#each [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1] as bit, i (i)}
+                        <span class="{bit ? 'bg-slate-900' : 'bg-transparent'} rounded-[1px]"></span>
+                      {/each}
                     </div>
-
-                    <!-- Category Tabs Preview -->
-                    <div class="mt-3 flex gap-2 overflow-x-auto pb-1 text-xs font-medium">
-                      <span class="rounded-lg bg-brand-600 px-2.5 py-1 text-white">Semua</span>
-                      <span class="rounded-lg bg-white px-2.5 py-1 text-slate-700 border border-slate-200">Kopi</span>
-                      <span class="rounded-lg bg-white px-2.5 py-1 text-slate-700 border border-slate-200">Toast</span>
-                      <span class="rounded-lg bg-white px-2.5 py-1 text-slate-700 border border-slate-200">Camilan</span>
-                    </div>
-
-                    <!-- Menu Item Cards -->
-                    <div class="mt-3 space-y-2">
-                      <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5">
-                        <div class="flex items-center gap-2.5">
-                          <span class="flex size-9 items-center justify-center rounded-lg bg-amber-100 text-lg">☕</span>
-                          <div>
-                            <p class="text-xs font-bold text-slate-900">Kopi Susu Gula Aren</p>
-                            <p class="text-[11px] font-semibold text-brand-600">Rp 18.000</p>
-                          </div>
-                        </div>
-                        <span class="rounded bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 border border-brand-200">+ Tambah</span>
-                      </div>
-
-                      <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-2.5">
-                        <div class="flex items-center gap-2.5">
-                          <span class="flex size-9 items-center justify-center rounded-lg bg-amber-100 text-lg">🍞</span>
-                          <div>
-                            <p class="text-xs font-bold text-slate-900">Roti Panggang Cokelat Keju</p>
-                            <p class="text-[11px] font-semibold text-brand-600">Rp 22.000</p>
-                          </div>
-                        </div>
-                        <span class="rounded bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 border border-brand-200">+ Tambah</span>
-                      </div>
-                    </div>
-                  </div>
-
-                {:else if feature.visualType === 'qr'}
-                  <!-- Mockup: QR Code & Guest Checkout -->
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <div class="grid gap-4 sm:grid-cols-2 items-center">
-                      <!-- QR Preview Card -->
-                      <div class="rounded-lg border border-slate-200 bg-white p-4 text-center">
-                        <div class="mx-auto flex size-24 items-center justify-center rounded-lg border-2 border-dashed border-brand-300 bg-brand-50/50">
-                          <svg class="size-16 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                          </svg>
-                        </div>
-                        <p class="mt-2 text-xs font-bold text-slate-900">QR Meja 07</p>
-                        <p class="text-[10px] text-slate-500">Scan &amp; Langsung Pesan</p>
-                      </div>
-
-                      <!-- Checkout Form Mockup -->
-                      <div class="space-y-2 text-xs">
-                        <div class="rounded-md border border-slate-200 bg-white p-2">
-                          <span class="text-[10px] text-slate-400 font-semibold block uppercase">Nama Pemesan</span>
-                          <span class="font-bold text-slate-800">Budi Santoso</span>
-                        </div>
-                        <div class="rounded-md border border-slate-200 bg-white p-2">
-                          <span class="text-[10px] text-slate-400 font-semibold block uppercase">Tipe Pesanan</span>
-                          <span class="font-bold text-slate-800">Makan di Tempat (Meja 07)</span>
-                        </div>
-                        <div class="rounded-md bg-brand-600 p-2 text-center text-white font-bold">
-                          Kirim Pesanan &rarr;
-                        </div>
-                      </div>
+                    <div class="space-y-1.5">
+                      <p class="text-xs font-semibold text-slate-900">Meja A-07</p>
+                      <span class="inline-block rounded-full bg-brand-600 px-2 py-0.5 text-[9px] font-semibold text-white">
+                        Dine-in
+                      </span>
+                      <p class="text-[10px] text-slate-500">Scan langsung pesan, tanpa akun</p>
                     </div>
                   </div>
-
-                {:else if feature.visualType === 'kitchen'}
-                  <!-- Mockup: Kitchen Order Queue -->
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2.5">
-                    <div class="flex items-center justify-between text-xs font-bold text-slate-800 border-b border-slate-200 pb-2">
-                      <span>Antrean Pesanan Aktif (3)</span>
-                      <span class="text-brand-600 font-semibold text-[11px]">Real-time Sync</span>
+                {:else if pillar.visualType === 'kitchen'}
+                  <div class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2">
+                      <span class="font-mono text-[10px] font-semibold text-slate-900">#RL-0124</span>
+                      <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">Diproses</span>
                     </div>
-
-                    <!-- Item 1 -->
-                    <div class="rounded-lg border border-brand-200 bg-brand-50/60 p-2.5 flex items-center justify-between">
-                      <div>
-                        <div class="flex items-center gap-1.5">
-                          <span class="font-bold text-xs text-slate-900">#RL-204</span>
-                          <span class="rounded bg-brand-600 px-1.5 py-0.2 text-[9px] font-bold text-white">Baru</span>
-                          <span class="text-[10px] text-slate-500">Meja 02</span>
-                        </div>
-                        <p class="text-xs text-slate-700 font-medium mt-0.5">2x Mie Goreng Spesial, 1x Es Teh Manis</p>
-                      </div>
-                      <span class="text-xs font-bold text-slate-900">Rp 42.000</span>
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2">
+                      <span class="font-mono text-[10px] font-semibold text-slate-900">#RL-0125</span>
+                      <span class="rounded-full bg-brand-100 px-2 py-0.5 text-[9px] font-semibold text-brand-700">Baru</span>
                     </div>
-
-                    <!-- Item 2 -->
-                    <div class="rounded-lg border border-amber-200 bg-amber-50/60 p-2.5 flex items-center justify-between">
-                      <div>
-                        <div class="flex items-center gap-1.5">
-                          <span class="font-bold text-xs text-slate-900">#RL-203</span>
-                          <span class="rounded bg-amber-200 px-1.5 py-0.2 text-[9px] font-bold text-amber-900">Diproses</span>
-                          <span class="text-[10px] text-slate-500">Takeaway</span>
-                        </div>
-                        <p class="text-xs text-slate-700 font-medium mt-0.5">1x Nasi Gila Pedas Sedang</p>
-                      </div>
-                      <span class="text-xs font-bold text-slate-900">Rp 25.000</span>
-                    </div>
+                    <p class="flex items-center gap-1.5 text-[10px] text-slate-500">
+                      <span class="size-1.5 animate-pulse rounded-full bg-brand-500"></span>
+                      Sinkron real-time dengan pesanan pelanggan
+                    </p>
                   </div>
-
-                {:else if feature.visualType === 'stock'}
-                  <!-- Mockup: Instant Stock Toggle -->
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
-                    <div class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-2">
-                      Pengaturan Menu &amp; Stok Cepat
+                {:else if pillar.visualType === 'stock'}
+                  <div class="space-y-2.5 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[11px] font-medium text-slate-800">Es Teh Manis Jumbo</span>
+                      <span class="flex h-4 w-7 items-center rounded-full bg-brand-600 px-0.5">
+                        <span class="ml-auto size-3 rounded-full bg-white"></span>
+                      </span>
                     </div>
-
-                    <div class="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between">
-                      <div>
-                        <p class="text-xs font-bold text-slate-900">Ayam Geprek Sambal Matah</p>
-                        <p class="text-[11px] text-slate-500">Rp 24.000 • Makanan Utama</p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-semibold text-emerald-700">Tersedia</span>
-                        <div class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-brand-600">
-                          <span class="translate-x-4 inline-block size-4 transform rounded-full bg-white shadow-sm"></span>
-                        </div>
-                      </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-[11px] text-slate-500 line-through">Ayam Gepuk Sambal Ijo</span>
+                      <span class="flex h-4 w-7 items-center rounded-full bg-slate-300 px-0.5">
+                        <span class="mr-auto size-3 rounded-full bg-white"></span>
+                      </span>
                     </div>
-
-                    <div class="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between opacity-80">
-                      <div>
-                        <p class="text-xs font-bold text-slate-900">Jus Alpukat Kocok</p>
-                        <p class="text-[11px] text-slate-500">Rp 15.000 • Minuman</p>
+                    <p class="pt-1 text-[10px] text-slate-500">Habis = otomatis tersembunyi dari menu pelanggan</p>
+                  </div>
+                {:else if pillar.visualType === 'analytics'}
+                  <div class="space-y-2.5 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                    <div class="rounded-lg border border-slate-200 bg-white p-3">
+                      <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Omset Hari Ini</span>
+                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                          +18.4%
+                        </span>
                       </div>
-                      <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-semibold text-slate-500">Habis</span>
-                        <div class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300">
-                          <span class="translate-x-0 inline-block size-4 transform rounded-full bg-white shadow-sm"></span>
-                        </div>
+                      <p class="mt-1 font-mono text-base font-extrabold text-slate-900">Rp 1.480.000</p>
+                      <div class="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px] text-slate-500">
+                        <span>34 Transaksi</span>
+                        <span class="font-medium text-brand-600">62 Porsi</span>
                       </div>
                     </div>
+                    <p class="flex items-center gap-1.5 text-[10px] text-slate-500">
+                      <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                      Menu terlaris: Nasi Bakar Geprek (22)
+                    </p>
                   </div>
                 {/if}
               </div>
-            </div>
-          </div>
+            </article>
+          </AnimatedContent>
         {/each}
       </div>
     </section>
 
-    <!-- ======================================================================= -->
-    <!-- 3. KEUNGGULAN TAMBAHAN (HIGHLIGHTS GRID)                                -->
-    <!-- ======================================================================= -->
-    <section class="border-y border-slate-200/80 bg-white py-16 sm:py-20">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto">
-          <p class="text-xs font-bold tracking-wider uppercase text-brand-600">Keunggulan Ekstra</p>
-          <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Kenapa Memilih RestoLink Dibanding Aplikasi Kasir Tradisional?
-          </h2>
-        </div>
-
-        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {#each highlights as item}
-            <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 flex flex-col justify-between">
-              <div>
-                <div class="flex size-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
-                  {#if item.icon === 'percent'}
-                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-                    </svg>
-                  {:else if item.icon === 'bolt'}
-                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  {:else if item.icon === 'shield'}
-                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  {:else}
-                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  {/if}
-                </div>
-                <h3 class="mt-4 text-base font-bold text-slate-900">{item.title}</h3>
-                <p class="mt-2 text-xs text-slate-600 leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          {/each}
-        </div>
-      </div>
-    </section>
-
-    <!-- ======================================================================= -->
-    <!-- 4. BOTTOM CTA BANNER                                                    -->
-    <!-- ======================================================================= -->
-    <section class="py-16 sm:py-20">
-      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div class="rounded-3xl bg-slate-900 p-8 sm:p-12 text-center text-white shadow-xl shadow-slate-900/10 relative overflow-hidden">
-          <div class="absolute -right-20 -top-20 size-60 rounded-full bg-brand-600/30 blur-3xl pointer-events-none" aria-hidden="true"></div>
-
-          <h2 class="text-2xl font-extrabold tracking-tight sm:text-4xl">
-            Mulai Transformasi Digital Usaha Kuliner Anda
-          </h2>
-          <p class="mx-auto mt-4 max-w-xl text-sm sm:text-base text-slate-300 leading-relaxed">
-            Daftar sekarang dan dapatkan akses gratis selama 30 hari penuh ke seluruh fitur Paket Mikro tanpa kewajiban kartu kredit.
-          </p>
-
-          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="/daftar" class="w-full sm:w-auto">
-              <Button size="lg" full>
-                Mulai Trial 30 Hari
-              </Button>
-            </a>
-            <a href="/harga" class="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" full>
-                Bandingkan Paket
-              </Button>
-            </a>
+    <!-- Why band -->
+    <section class="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8" aria-label="Kenapa RestoLink">
+      <AnimatedContent distance={24} duration={0.6} class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {#each extras as extra (extra.id)}
+          <div class="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 transition-colors duration-300 hover:border-brand-200 hover:bg-brand-50/40">
+            <h3 class="text-sm font-bold text-slate-900">{extra.title}</h3>
+            <p class="mt-1 text-xs leading-relaxed text-slate-500">{extra.desc}</p>
           </div>
-        </div>
-      </div>
+        {/each}
+      </AnimatedContent>
     </section>
   </main>
 
