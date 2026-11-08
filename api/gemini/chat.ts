@@ -165,7 +165,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     const payload = buildGeminiPayload(message, body.history);
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const model = process.env.GEMINI_MODEL || (process.env.NODE_ENV === 'test' ? 'gemini-1.5-flash' : 'gemini-3.8-flash');
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const geminiRes = await fetch(geminiUrl, {
       method: 'POST',

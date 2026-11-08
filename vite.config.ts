@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
@@ -40,11 +40,21 @@ function apiDevPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [svelte(), tailwindcss(), apiDevPlugin()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+export default defineConfig(({ mode }) => {
+  // Load environment variables (including backend secrets) into process.env for local API dev server
+  const env = loadEnv(mode, process.cwd(), '');
+  for (const [key, value] of Object.entries(env)) {
+    if (process.env[key] === undefined || process.env[key] === '') {
+      process.env[key] = value;
     }
   }
+
+  return {
+    plugins: [svelte(), tailwindcss(), apiDevPlugin()],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
+    }
+  };
 });
