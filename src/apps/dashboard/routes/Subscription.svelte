@@ -426,7 +426,7 @@
       </div>
     {:else}
       <div class="mt-4 overflow-x-auto">
-        <table class="w-full text-left text-xs">
+        <table class="w-full min-w-[540px] text-left text-xs">
           <thead class="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase">
             <tr>
               <th scope="col" class="py-3 pl-3 pr-4">Order ID</th>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Logo from '@/components/ui/Logo.svelte';
+  import ChatbotWidget from './ChatbotWidget.svelte';
 
   const currentYear = 2026;
 </script>
@@ -137,4 +138,7 @@
       </p>
     </div>
   </div>
+
+  <!-- AI Chatbot Floating Widget (FE-17) -->
+  <ChatbotWidget />
 </footer>

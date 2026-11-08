@@ -199,7 +199,7 @@
       </div>
     {:else}
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-slate-600">
+        <table class="w-full min-w-[640px] text-left text-xs text-slate-600">
           <thead class="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-700 uppercase">
             <tr>
               <th scope="col" class="px-4 py-3">Usaha & Subdomain</th>

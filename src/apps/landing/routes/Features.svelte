@@ -104,12 +104,12 @@
           Dari menu digital interaktif, pemesanan tanpa aplikasi, hingga manajemen alur pesanan dapur. Dirancang praktis agar pemilik usaha kuliner mandiri bisa langsung menggunakannya tanpa kendala teknis.
         </p>
 
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a href="/daftar">
-            <Button size="lg">Coba Gratis 30 Hari</Button>
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xs sm:max-w-none mx-auto">
+          <a href="/daftar" class="w-full sm:w-auto">
+            <Button size="lg" full>Coba Gratis 30 Hari</Button>
           </a>
-          <a href="/harga">
-            <Button size="lg" variant="secondary">Lihat Skema Harga</Button>
+          <a href="/harga" class="w-full sm:w-auto">
+            <Button size="lg" variant="secondary" full>Lihat Skema Harga</Button>
           </a>
         </div>
       </div>
