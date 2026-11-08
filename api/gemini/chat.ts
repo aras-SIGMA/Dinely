@@ -165,29 +165,65 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     const payload = buildGeminiPayload(message, body.history);
-    const model = process.env.GEMINI_MODEL || (process.env.NODE_ENV === 'test' ? 'gemini-1.5-flash' : 'gemini-3.8-flash');
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const primaryModel =
+      process.env.GEMINI_MODEL ||
+      (process.env.NODE_ENV === 'test' ? 'gemini-1.5-flash' : 'gemini-flash-lite-latest');
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${primaryModel}:generateContent?key=${apiKey}`;
 
-    const geminiRes = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    let geminiRes: Response | null = null;
+    try {
+      geminiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch (fetchErr: any) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(`Gemini primary (${primaryModel}) error:`, fetchErr?.message);
+      }
+    }
 
-    if (!geminiRes.ok) {
+    // Jika model utama overload (503/timeout) di mode non-test, fallback cepat ke gemini-3.5-flash
+    if (
+      (!geminiRes || !geminiRes.ok) &&
+      process.env.NODE_ENV !== 'test' &&
+      primaryModel === 'gemini-flash-lite-latest' &&
+      geminiRes?.status !== 429
+    ) {
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+      try {
+        geminiRes = await fetch(fallbackUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(15000),
+        });
+      } catch (fallbackErr: any) {
+        if (process.env.NODE_ENV !== 'test') {
+          console.warn('Gemini secondary fallback model error:', fallbackErr?.message);
+        }
+      }
+    }
+
+    if (!geminiRes || !geminiRes.ok) {
       // 429 Too Many Requests / Quota Exceeded -> Berikan fallback santun agar UI tidak crash
-      if (geminiRes.status === 429) {
+      if (geminiRes?.status === 429) {
         return sendJson(res, 200, {
           reply: FALLBACK_REPLY_QUOTA,
           fallback: true,
         });
       }
 
-      const errText = await geminiRes.text().catch(() => '');
+      const errText = geminiRes
+        ? await geminiRes.text().catch(() => '')
+        : 'Network timeout / no response from Gemini service';
       if (process.env.NODE_ENV !== 'test') {
-        console.error(`Gemini API Error (${geminiRes.status}):`, errText);
+        console.error(`Gemini API Error (${geminiRes?.status ?? 'TIMEOUT'}):`, errText);
       }
 
       return sendJson(res, 200, {

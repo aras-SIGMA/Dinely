@@ -46,7 +46,8 @@ export async function sendChatMessage(
       body: JSON.stringify({
         message: trimmed,
         history: input.history || []
-      })
+      }),
+      signal: AbortSignal.timeout(20000)
     });
 
     const data = await res.json().catch(() => ({}));
@@ -65,8 +66,11 @@ export async function sendChatMessage(
     };
   } catch (err: any) {
     console.error('[Chatbot Service] Network exception:', err);
+    const isTimeout = err?.name === 'TimeoutError' || err?.name === 'AbortError';
     return {
-      reply: 'Maaf, sambungan ke asisten AI terganggu. Silakan periksa koneksi internet Anda dan coba lagi.',
+      reply: isTimeout
+        ? 'Maaf, waktu tunggu habis saat memproses jawaban. Silakan coba tanyakan kembali.'
+        : 'Maaf, sambungan ke Linka terganggu. Silakan periksa koneksi internet Anda dan coba lagi.',
       fallback: true
     };
   }
