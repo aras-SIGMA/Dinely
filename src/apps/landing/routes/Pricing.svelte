@@ -269,7 +269,7 @@
         </div>
 
         <div class="mt-10 overflow-x-auto rounded-xl border border-slate-200">
-          <table class="w-full text-left text-xs border-collapse">
+          <table class="w-full min-w-[520px] text-left text-xs border-collapse">
             <thead>
               <tr class="border-b border-slate-200 bg-slate-50">
                 <th class="py-3.5 px-4 font-bold text-slate-900 w-1/2">Fitur &amp; Kemampuan</th>

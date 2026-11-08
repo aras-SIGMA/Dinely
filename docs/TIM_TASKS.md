@@ -117,8 +117,8 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 * **Milestone 8 & 9: Admin Platform UI & Polish**
   - [x] **FE-15**: Halaman `Tenants.svelte`: Tabel daftar seluruh tenant, badge status warna, filter paket, dan modal manual override status.
   - [x] **FE-16**: Halaman `Transactions.svelte`: Tabel riwayat transaksi Midtrans (order ID, nominal, status) dan manual settlement override.
-  - [ ] **FE-17**: Widget Chatbot AI di pojok kanan bawah Landing Page (bubble chat popup, chat bubble user/AI, input pesan).
-  - [ ] **FE-18**: Audit tampilan responsif mobile (HP Android/iPhone) di seluruh halaman publik tenant dan dashboard.
+  - [x] **FE-17**: Widget Chatbot AI "Linka" di pojok kanan bawah Landing Page (bubble chat popup, chat bubble user/AI, input pesan, persona Linka).
+  - [x] **FE-18**: Audit tampilan responsif mobile (HP Android/iPhone) di seluruh halaman publik tenant dan dashboard.
 
 ---
 

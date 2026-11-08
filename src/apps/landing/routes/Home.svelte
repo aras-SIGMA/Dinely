@@ -127,7 +127,7 @@
               </div>
 
               <!-- Mockup 2: Floating Smartphone Digital Menu (Overlapping Bottom Right) -->
-              <div class="absolute -bottom-8 -right-3 sm:-right-6 w-56 rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-2xl shadow-brand-900/10">
+              <div class="absolute -bottom-8 -right-2 sm:-right-6 w-52 sm:w-56 rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-3.5 shadow-2xl shadow-brand-900/10">
                 <!-- Subdomain Browser Bar -->
                 <div class="flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] text-slate-600 font-mono border border-slate-200/60">
                   <svg class="size-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -225,7 +225,7 @@
         <!-- Bento Grid -->
         <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <!-- Bento 1: Large Span (Subdomain Unik) -->
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs lg:col-span-2 flex flex-col justify-between">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-xs lg:col-span-2 flex flex-col justify-between">
             <div>
               <div class="size-11 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -239,15 +239,15 @@
             </div>
 
             <!-- Visual Bar -->
-            <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-3.5 flex items-center gap-3">
-              <span class="size-3 rounded-full bg-emerald-500"></span>
-              <span class="text-xs font-mono font-medium text-slate-700">https://<span class="text-brand-600 font-bold">usaha-anda</span>.restolink.site</span>
-              <span class="ml-auto rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 border border-slate-200">Aktif</span>
+            <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-3.5 flex items-center gap-2 sm:gap-3 overflow-hidden">
+              <span class="size-2.5 sm:size-3 rounded-full bg-emerald-500 shrink-0"></span>
+              <span class="text-xs font-mono font-medium text-slate-700 truncate min-w-0">https://<span class="text-brand-600 font-bold">usaha-anda</span>.restolink.site</span>
+              <span class="ml-auto shrink-0 rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 border border-slate-200">Aktif</span>
             </div>
           </div>
 
           <!-- Bento 2: Toggle Ketersediaan Real-time -->
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs flex flex-col justify-between">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-xs flex flex-col justify-between">
             <div>
               <div class="size-11 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -269,7 +269,7 @@
           </div>
 
           <!-- Bento 3: Guest Checkout -->
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs flex flex-col justify-between">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-xs flex flex-col justify-between">
             <div>
               <div class="size-11 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -288,7 +288,7 @@
           </div>
 
           <!-- Bento 4: Large Span (Dashboard Pelacakan Pesanan) -->
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs lg:col-span-2 flex flex-col justify-between">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-xs lg:col-span-2 flex flex-col justify-between">
             <div>
               <div class="size-11 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -302,15 +302,15 @@
             </div>
 
             <!-- Pipeline Status Visual -->
-            <div class="mt-6 grid grid-cols-3 gap-2 text-center text-xs font-semibold">
-              <div class="rounded-lg bg-brand-50 p-2.5 text-brand-800 border border-brand-200/60">
-                1. Pesanan Baru
+            <div class="mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[11px] sm:text-xs font-semibold">
+              <div class="rounded-lg bg-brand-50 p-2 sm:p-2.5 text-brand-800 border border-brand-200/60">
+                1. Baru
               </div>
-              <div class="rounded-lg bg-amber-50 p-2.5 text-amber-800 border border-amber-200/60">
-                2. Sedang Masak
+              <div class="rounded-lg bg-amber-50 p-2 sm:p-2.5 text-amber-800 border border-amber-200/60">
+                2. Masak
               </div>
-              <div class="rounded-lg bg-emerald-50 p-2.5 text-emerald-800 border border-emerald-200/60">
-                3. Siap / Selesai
+              <div class="rounded-lg bg-emerald-50 p-2 sm:p-2.5 text-emerald-800 border border-emerald-200/60">
+                3. Selesai
               </div>
             </div>
           </div>
