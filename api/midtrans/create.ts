@@ -33,6 +33,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
   }
 
+  const contentType = req.headers?.['content-type'] || req.headers?.['Content-Type'];
+  if (contentType && !contentType.includes('application/json')) {
+    return sendJson(res, 415, { error: 'Content-Type harus application/json.' });
+  }
+
   try {
     // 1. Verifikasi autentikasi user (Owner)
     const { user } = await authenticateUser(req);
@@ -79,7 +84,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .maybeSingle();
 
     if (tenantError) {
-      return sendJson(res, 500, { error: `Gagal memverifikasi tenant: ${tenantError.message}` });
+      console.error('[BE-01] Database tenant verification error:', tenantError);
+      return sendJson(res, 500, { error: 'Gagal memverifikasi tenant: Terjadi kesalahan internal database.' });
     }
 
     if (!tenant) {
@@ -104,7 +110,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .maybeSingle();
 
     if (pkgError) {
-      return sendJson(res, 500, { error: `Gagal memverifikasi paket: ${pkgError.message}` });
+      console.error('[BE-01] Database package verification error:', pkgError);
+      return sendJson(res, 500, { error: 'Gagal memverifikasi paket: Terjadi kesalahan internal database.' });
     }
 
     if (!pkg || !pkg.is_active) {
@@ -120,23 +127,24 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         });
       }
 
-      // b. Anti-Trial Abuse: Tolak jika tenant sudah pernah memiliki transaksi trial sukses
+      // b. Anti-Trial Abuse: Tolak jika tenant sudah pernah memiliki transaksi trial sukses atau pending
       const { count: trialCount, error: trialCheckErr } = await supabaseAdmin
         .from('transactions')
         .select('id', { count: 'exact', head: true })
         .eq('tenant_id', tenant.id)
         .eq('billing_cycle', 'trial')
-        .in('status', ['settlement', 'capture']);
+        .in('status', ['settlement', 'capture', 'pending']);
 
       if (trialCheckErr) {
+        console.error('[BE-01] Database trial history check error:', trialCheckErr);
         return sendJson(res, 500, {
-          error: `Gagal memverifikasi riwayat transaksi: ${trialCheckErr.message}`,
+          error: 'Gagal memverifikasi riwayat transaksi: Terjadi kesalahan internal database.',
         });
       }
 
       if (trialCount && trialCount > 0) {
         return sendJson(res, 400, {
-          error: 'Tenant sudah pernah menggunakan masa trial sebelumnya. Silakan pilih paket langganan reguler.',
+          error: 'Tenant sudah pernah menggunakan masa trial sebelumnya atau sedang memiliki transaksi trial aktif. Silakan pilih paket langganan reguler.',
         });
       }
     }
@@ -192,8 +200,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     });
 
     if (insertTxError) {
+      console.error('[BE-01] Database transaction insert error:', insertTxError);
       return sendJson(res, 500, {
-        error: `Gagal mencatat transaksi ke database: ${insertTxError.message}`,
+        error: 'Gagal mencatat transaksi ke database: Terjadi kesalahan internal database.',
       });
     }
 
@@ -201,7 +210,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const authString = Buffer.from(`${serverKey}:`).toString('base64');
     const rawPhone = tenant.contact_whatsapp || tenant.contact_phone || '';
     const cleanPhone = rawPhone.replace(/[^0-9+]/g, '').slice(0, 19) || undefined;
-    const customerName = ((user.user_metadata?.full_name as string) || tenant.business_name || 'Owner RestoLink')
+    const rawFullName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
+    const customerName = (rawFullName || tenant.business_name || 'Owner RestoLink')
       .trim()
       .slice(0, 50);
 

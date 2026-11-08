@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -46,6 +47,7 @@ async function runTests() {
     'SUPABASE_SERVICE_ROLE_KEY',
     'MIDTRANS_SERVER_KEY',
     'CLOUDINARY_API_SECRET',
+    'CLOUDINARY_URL',
     'GEMINI_API_KEY',
   ];
 
@@ -162,17 +164,27 @@ async function runTests() {
     );
   }
 
-  // TC-06: File .gitignore melindungi file environment lokal (.env, .env.*)
+  // TC-06: File .gitignore melindungi file environment lokal (.env, .env.*) dan git index bersih
   {
     const gitignorePath = join(rootDir, '.gitignore');
     const content = existsSync(gitignorePath) ? readFileSync(gitignorePath, 'utf8') : '';
     const hasEnv = content.split('\n').some((l) => l.trim() === '.env');
     const hasEnvWildcard = content.split('\n').some((l) => l.trim().startsWith('.env.'));
 
+    let trackedEnvFiles: string[] = [];
+    try {
+      const tracked = execSync('git ls-files', { encoding: 'utf8' }).split('\n');
+      trackedEnvFiles = tracked.filter(
+        (f) => (f === '.env' || f.startsWith('.env.')) && f !== '.env.example'
+      );
+    } catch {
+      trackedEnvFiles = [];
+    }
+
     assert(
-      hasEnv && hasEnvWildcard,
-      'TC-06: File .gitignore memproteksi .env dan .env.* dari commit git',
-      { hasEnv, hasEnvWildcard }
+      hasEnv && hasEnvWildcard && trackedEnvFiles.length === 0,
+      'TC-06: File .gitignore memproteksi .env dan .env.* serta tidak ada file rahasia di git index',
+      { hasEnv, hasEnvWildcard, trackedEnvFiles }
     );
   }
 

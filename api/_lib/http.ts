@@ -1,4 +1,5 @@
 import type { ApiRequest, ApiResponse } from '../_types';
+import { HttpError } from './auth';
 
 export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
   const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1MB batas aman
@@ -8,12 +9,12 @@ export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
   }
   if (typeof req.body === 'string' && req.body.trim().length > 0) {
     if (Buffer.byteLength(req.body, 'utf8') > MAX_PAYLOAD_SIZE) {
-      throw new Error('Ukuran payload melebihi batas maksimal (1MB).');
+      throw new HttpError(413, 'Ukuran payload melebihi batas maksimal (1MB).');
     }
     try {
       return JSON.parse(req.body) as T;
     } catch {
-      throw new Error('Format JSON pada body request tidak valid.');
+      throw new HttpError(400, 'Format JSON pada body request tidak valid.');
     }
   }
 
@@ -27,7 +28,7 @@ export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
         if (typeof (req as any).destroy === 'function') {
           (req as any).destroy();
         }
-        reject(new Error('Ukuran payload melebihi batas maksimal (1MB).'));
+        reject(new HttpError(413, 'Ukuran payload melebihi batas maksimal (1MB).'));
         return;
       }
       raw += chunk;
@@ -39,7 +40,7 @@ export async function parseJsonBody<T = any>(req: ApiRequest): Promise<T> {
       try {
         resolve(JSON.parse(raw) as T);
       } catch {
-        reject(new Error('Format JSON pada body request tidak valid.'));
+        reject(new HttpError(400, 'Format JSON pada body request tidak valid.'));
       }
     });
     req.on('error', (err) => reject(err));
