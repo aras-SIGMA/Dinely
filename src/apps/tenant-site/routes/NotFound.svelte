@@ -63,11 +63,11 @@
     {/if}
   </p>
 
-  <div class="mt-8 flex flex-wrap justify-center gap-3">
+  <div class="mt-8 flex flex-col sm:flex-row justify-center gap-3 w-full max-w-xs sm:max-w-none">
     <button
       type="button"
       onclick={goToPlatform}
-      class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+      class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 w-full sm:w-auto"
     >
       Buka Beranda RestoLink
     </button>
@@ -75,7 +75,7 @@
     <button
       type="button"
       onclick={goToRegister}
-      class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+      class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 w-full sm:w-auto"
     >
       Daftarkan Usaha Kuliner
     </button>
