@@ -4,13 +4,15 @@
     showTagline?: boolean;
     iconOnly?: boolean;
     class?: string;
+    theme?: 'light' | 'dark';
   };
 
   let {
     size = 'md',
     showTagline = false,
     iconOnly = false,
-    class: className = ''
+    class: className = '',
+    theme = 'light'
   }: Props = $props();
 
   const iconSizes = {
@@ -27,9 +29,9 @@
 </script>
 
 <div class="inline-flex items-center gap-2.5 {className}">
-  <!-- Monogram R Squircle Icon -->
+  <!-- Monogram R Squircle/Circle Icon -->
   <div
-    class="flex {iconSizes[size]} shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-sm shadow-brand-600/20"
+    class="flex {iconSizes[size]} shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-600 shadow-sm shadow-brand-600/30"
     aria-hidden="true"
   >
     <!-- Centered & Balanced SVG R Monogram -->
@@ -51,11 +53,19 @@
 
   {#if !iconOnly}
     <div class="flex flex-col">
-      <span class="font-extrabold tracking-tight leading-none text-slate-900 {textSizes[size]}">
-        Resto<span class="text-brand-600">Link</span>
+      <span
+        class="font-extrabold tracking-tight leading-none {theme === 'dark'
+          ? 'text-white'
+          : 'text-slate-900'} {textSizes[size]}"
+      >
+        Resto<span class="text-brand-500">Link</span>
       </span>
       {#if showTagline}
-        <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500 mt-1">
+        <span
+          class="text-[9px] font-bold tracking-widest uppercase {theme === 'dark'
+            ? 'text-slate-400'
+            : 'text-slate-500'} mt-1"
+        >
           Digital Menu & Order
         </span>
       {/if}
