@@ -1,4 +1,5 @@
 import type { ApiRequest, ApiResponse } from '../_types';
+import { HttpError } from '../_lib/auth';
 import { parseJsonBody, sendJson } from '../_lib/http';
 
 export interface ChatMessage {
@@ -140,6 +141,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
   }
 
+  const contentType = req.headers?.['content-type'] || req.headers?.['Content-Type'];
+  if (contentType && !contentType.includes('application/json')) {
+    return sendJson(res, 415, { error: 'Content-Type harus application/json.' });
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return sendJson(res, 500, {
@@ -176,9 +182,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
         },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(10000),
       });
     } catch (fetchErr: any) {
       if (process.env.NODE_ENV !== 'test') {
@@ -247,6 +254,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       reply: replyText.trim(),
     });
   } catch (err: any) {
+    if (err instanceof HttpError) {
+      return sendJson(res, err.statusCode, { error: err.message });
+    }
     if (process.env.NODE_ENV !== 'test') {
       console.error('Gemini Chat Handler Exception:', err);
     }

@@ -1,5 +1,6 @@
 import type { ApiRequest, ApiResponse } from '../_types';
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { HttpError } from '../_lib/auth';
 import { parseJsonBody, sendJson } from '../_lib/http';
 import { getSupabaseAdmin } from '../_lib/supabase';
 
@@ -22,7 +23,18 @@ function verifySignature(
   serverKey: string,
   signatureKey: string
 ): boolean {
-  if (!orderId || !statusCode || !grossAmount || !serverKey || !signatureKey) {
+  if (
+    typeof orderId !== 'string' ||
+    typeof statusCode !== 'string' ||
+    typeof grossAmount !== 'string' ||
+    typeof serverKey !== 'string' ||
+    typeof signatureKey !== 'string' ||
+    !orderId ||
+    !statusCode ||
+    !grossAmount ||
+    !serverKey ||
+    !signatureKey
+  ) {
     return false;
   }
   const payloadString = `${orderId}${statusCode}${grossAmount}${serverKey}`;
@@ -68,6 +80,11 @@ export function calculateSubscriptionExtension(
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') {
     return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
+  }
+
+  const contentType = req.headers?.['content-type'] || req.headers?.['Content-Type'];
+  if (contentType && !contentType.includes('application/json')) {
+    return sendJson(res, 415, { error: 'Content-Type harus application/json.' });
   }
 
   const serverKey = process.env.MIDTRANS_SERVER_KEY;
@@ -120,8 +137,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .maybeSingle();
 
     if (txError) {
+      console.error('[BE-02] Database error searching transaction:', txError);
       return sendJson(res, 500, {
-        error: `Database error saat mencari transaksi: ${txError.message}`,
+        error: 'Database error saat mencari transaksi: Terjadi kesalahan internal database.',
       });
     }
 
@@ -132,10 +150,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     // Validasi kesesuaian gross_amount terhadap database tagihan
+    const payloadAmount = Math.round(Number(gross_amount));
+    if (isNaN(payloadAmount) || payloadAmount <= 0) {
+      return sendJson(res, 400, {
+        error: 'Format gross_amount tidak valid atau bernilai <= 0.',
+      });
+    }
+
     if (tx.amount != null) {
-      const payloadAmount = Math.round(Number(gross_amount));
       const txAmount = Math.round(Number(tx.amount));
-      if (!isNaN(payloadAmount) && !isNaN(txAmount) && payloadAmount !== txAmount) {
+      if (payloadAmount !== txAmount) {
         return sendJson(res, 400, {
           error: `Nominal pembayaran tidak sesuai. Payload: ${payloadAmount}, Tagihan: ${txAmount}.`,
         });
@@ -151,8 +175,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .maybeSingle();
 
       if (tenantCheckErr) {
+        console.error('[BE-02] Database error verifying tenant on recovery:', tenantCheckErr);
         return sendJson(res, 500, {
-          error: `Gagal memverifikasi status tenant saat recovery: ${tenantCheckErr.message}`,
+          error: 'Gagal memverifikasi status tenant saat recovery: Terjadi kesalahan internal database.',
         });
       }
 
@@ -215,8 +240,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           .eq('id', tx.tenant_id);
 
         if (recoveryErr) {
+          console.error('[BE-02] Database error restoring tenant on recovery:', recoveryErr);
           return sendJson(res, 500, {
-            error: `Gagal memulihkan aktivasi tenant pada retry: ${recoveryErr.message}`,
+            error: 'Gagal memulihkan aktivasi tenant pada retry: Terjadi kesalahan internal database.',
           });
         }
 
@@ -233,8 +259,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           .eq('id', tx.id);
 
         if (markErr) {
+          console.error('[BE-02] Database error marking transaction on recovery:', markErr);
           return sendJson(res, 500, {
-            error: `Gagal menandai finalisasi transaksi pada recovery: ${markErr.message}`,
+            error: 'Gagal menandai finalisasi transaksi pada recovery: Terjadi kesalahan internal database.',
           });
         }
       } else if (!isExtensionApplied) {
@@ -252,8 +279,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           .eq('id', tx.id);
 
         if (markErr) {
+          console.error('[BE-02] Database error marking finalized transaction:', markErr);
           return sendJson(res, 500, {
-            error: `Gagal menandai finalisasi transaksi: ${markErr.message}`,
+            error: 'Gagal menandai finalisasi transaksi: Terjadi kesalahan internal database.',
           });
         }
       }
@@ -288,8 +316,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .maybeSingle();
 
       if (getTenantErr || !targetTenant) {
+        console.error('[BE-02] Database error fetching target tenant:', getTenantErr);
         return sendJson(res, 500, {
-          error: `Gagal membaca data tenant: ${getTenantErr?.message || 'Tenant tidak ditemukan'}`,
+          error: 'Gagal membaca data tenant: Terjadi kesalahan internal database.',
         });
       }
 
@@ -315,8 +344,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('id', tx.id);
 
       if (updateTxError) {
+        console.error('[BE-02] Database error locking transaction to settlement:', updateTxError);
         return sendJson(res, 500, {
-          error: `Gagal memperbarui status transaksi: ${updateTxError.message}`,
+          error: 'Gagal memperbarui status transaksi: Terjadi kesalahan internal database.',
         });
       }
 
@@ -344,8 +374,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       // Jika update tenant gagal di sini, respon 500 memicu retry Midtrans,
       // dan retry otomatis masuk ke blok idempotency recovery (R1) dengan target yang sudah tercatat!
       if (updateTenantError) {
+        console.error('[BE-02] Database error activating tenant:', updateTenantError);
         return sendJson(res, 500, {
-          error: `Gagal mengaktifkan tenant: ${updateTenantError.message}`,
+          error: 'Gagal mengaktifkan tenant: Terjadi kesalahan internal database.',
         });
       }
 
@@ -362,8 +393,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('id', tx.id);
 
       if (markSuccessError) {
+        console.error('[BE-02] Database error marking transaction success:', markSuccessError);
         return sendJson(res, 500, {
-          error: `Gagal menandai status transaksi: ${markSuccessError.message}`,
+          error: 'Gagal menandai status transaksi: Terjadi kesalahan internal database.',
         });
       }
 
@@ -388,8 +420,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('id', tx.id);
 
       if (updateTxError) {
+        console.error('[BE-02] Database error updating failure status:', updateTxError);
         return sendJson(res, 500, {
-          error: `Gagal mencatat status pembatalan/kegagalan transaksi: ${updateTxError.message}`,
+          error: 'Gagal mencatat status pembatalan/kegagalan transaksi: Terjadi kesalahan internal database.',
         });
       }
 
@@ -408,8 +441,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('id', tx.id);
 
       if (updateRawError) {
+        console.error('[BE-02] Database error storing raw notification:', updateRawError);
         return sendJson(res, 500, {
-          error: `Gagal menyimpan notifikasi transaksi: ${updateRawError.message}`,
+          error: 'Gagal menyimpan notifikasi transaksi: Terjadi kesalahan internal database.',
         });
       }
 
@@ -420,8 +454,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       });
     }
   } catch (err: any) {
+    if (err instanceof HttpError) {
+      return sendJson(res, err.statusCode, { error: err.message });
+    }
     return sendJson(res, 500, {
-      error: `Internal Server Error: ${err?.message || 'Terjadi kesalahan tidak terduga.'}`,
+      error: 'Internal Server Error: Terjadi kesalahan tidak terduga pada server webhook.',
     });
   }
 }

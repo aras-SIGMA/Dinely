@@ -1,7 +1,7 @@
 import type { ApiRequest, ApiResponse } from '../_types';
 import { createHash } from 'node:crypto';
 import { parseJsonBody, sendJson } from '../_lib/http';
-import { authenticateUser } from '../_lib/auth';
+import { authenticateUser, HttpError } from '../_lib/auth';
 import { getSupabaseAdmin } from '../_lib/supabase';
 
 export interface SignUploadPayload {
@@ -36,6 +36,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
   }
 
+  const contentType = req.headers?.['content-type'] || req.headers?.['Content-Type'];
+  if (contentType && !contentType.includes('application/json')) {
+    return sendJson(res, 415, { error: 'Content-Type harus application/json.' });
+  }
+
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -62,6 +67,18 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   try {
     const body = await parseJsonBody<SignUploadPayload>(req);
     const { type, folder, tenant_id } = body || {};
+
+    if (folder !== undefined && typeof folder !== 'string') {
+      return sendJson(res, 400, {
+        error: 'Format parameter folder tidak valid (harus string).',
+      });
+    }
+
+    if (tenant_id !== undefined && typeof tenant_id !== 'string') {
+      return sendJson(res, 400, {
+        error: 'Format parameter tenant_id tidak valid (harus string).',
+      });
+    }
 
     // 2. Validasi Kategori Upload (type)
     const uploadType = type || 'menu';
@@ -91,8 +108,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .maybeSingle();
 
     if (profileError) {
+      console.error('[BE-03] Database profile verification error:', profileError);
       return sendJson(res, 500, {
-        error: `Gagal memverifikasi profil user: ${profileError.message}`,
+        error: 'Gagal memverifikasi profil user: Terjadi kesalahan internal database.',
       });
     }
 
@@ -109,8 +127,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .maybeSingle();
 
       if (tenantError) {
+        console.error('[BE-03] Database tenant verification error:', tenantError);
         return sendJson(res, 500, {
-          error: `Gagal memverifikasi tenant: ${tenantError.message}`,
+          error: 'Gagal memverifikasi tenant: Terjadi kesalahan internal database.',
         });
       }
 
@@ -139,8 +158,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .eq('owner_id', user.id);
 
       if (tenantsError) {
+        console.error('[BE-03] Database user tenants read error:', tenantsError);
         return sendJson(res, 500, {
-          error: `Gagal membaca tenant akun: ${tenantsError.message}`,
+          error: 'Gagal membaca tenant akun: Terjadi kesalahan internal database.',
         });
       }
 
@@ -208,8 +228,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       folder: targetFolder,
     });
   } catch (err: any) {
+    if (err instanceof HttpError) {
+      return sendJson(res, err.statusCode, { error: err.message });
+    }
     return sendJson(res, 500, {
-      error: `Internal Server Error: ${err?.message || 'Terjadi kesalahan tidak terduga.'}`,
+      error: 'Internal Server Error: Terjadi kesalahan tidak terduga pada server.',
     });
   }
 }
