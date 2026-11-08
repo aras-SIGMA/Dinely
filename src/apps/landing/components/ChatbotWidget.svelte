@@ -58,7 +58,7 @@
   <button
     type="button"
     onclick={() => chatbotStore.toggle()}
-    aria-label={chatbotStore.isOpen ? 'Tutup obrolan asisten AI' : 'Buka bantuan asisten virtual AI RestoLink'}
+    aria-label={chatbotStore.isOpen ? 'Tutup obrolan dengan Linka' : 'Buka obrolan dengan Linka, asisten AI RestoLink'}
     aria-expanded={chatbotStore.isOpen}
     aria-haspopup="dialog"
     class="group relative flex items-center gap-2.5 rounded-full bg-slate-900 px-4 py-3.5 text-white shadow-xl ring-4 ring-white/80 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl active:scale-95 sm:px-5"
@@ -91,7 +91,7 @@
 
     <!-- Label Text -->
     <span class="text-xs font-bold tracking-wide sm:text-sm">
-      {chatbotStore.isOpen ? 'Tutup' : 'Tanya AI RestoLink'}
+      {chatbotStore.isOpen ? 'Tutup' : 'Tanya Linka'}
     </span>
   </button>
 </div>
@@ -107,24 +107,18 @@
     <!-- Header -->
     <header class="flex items-center justify-between border-b border-slate-100 bg-slate-900 px-5 py-3.5 text-white">
       <div class="flex items-center gap-3">
-        <div class="relative flex size-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-xs">
-          <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
+        <div class="relative flex size-9 items-center justify-center rounded-xl bg-brand-600 text-white font-bold text-sm shadow-xs select-none" aria-hidden="true">
+          <span>L</span>
           <span class="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-slate-900 bg-emerald-500"></span>
         </div>
 
         <div>
-          <h2 id="chatbot-title" class="text-xs font-bold text-white sm:text-sm">
-            Asisten AI RestoLink
+          <h2 id="chatbot-title" class="text-xs font-bold text-white sm:text-sm flex items-center gap-1.5">
+            Linka
+            <span class="rounded bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300 border border-brand-500/30">AI</span>
           </h2>
           <p class="text-[10px] text-slate-300">
-            Online &bull; Siap jawab seputar platform
+            Online &bull; Asisten Virtual RestoLink
           </p>
         </div>
       </div>
@@ -134,7 +128,7 @@
         <button
           type="button"
           onclick={() => chatbotStore.clear()}
-          aria-label="Bersihkan riwayat percakapan"
+          aria-label="Bersihkan riwayat percakapan dengan Linka"
           title="Reset percakapan"
           class="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white transition"
         >
@@ -152,7 +146,7 @@
         <button
           type="button"
           onclick={() => chatbotStore.close()}
-          aria-label="Tutup jendela chat"
+          aria-label="Tutup jendela obrolan Linka"
           class="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white transition"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,10 +165,8 @@
         {#if msg.sender === 'assistant'}
           <!-- Bubble Assistant (Left-aligned) -->
           <div class="flex items-start gap-2.5 max-w-[85%]">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow-2xs mt-0.5">
-              <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+            <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-xs shadow-2xs mt-0.5 select-none" aria-hidden="true">
+              L
             </div>
             <div
               class="rounded-2xl rounded-tl-xs px-3.5 py-2.5 text-xs leading-relaxed shadow-2xs {msg.isError
@@ -201,16 +193,14 @@
       <!-- Typing Indicator -->
       {#if chatbotStore.loading}
         <div class="flex items-start gap-2.5 max-w-[85%]">
-          <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow-2xs mt-0.5">
-            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-xs shadow-2xs mt-0.5 select-none" aria-hidden="true">
+            L
           </div>
           <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-xs border border-slate-200 bg-white px-4 py-3 shadow-2xs">
             <span class="size-1.5 rounded-full bg-slate-400 animate-bounce"></span>
             <span class="size-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.15s]"></span>
             <span class="size-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.3s]"></span>
-            <span class="ml-1 text-[11px] text-slate-400">Mengetik...</span>
+            <span class="ml-1 text-[11px] text-slate-400">Linka sedang mengetik...</span>
           </div>
         </div>
       {/if}
@@ -219,7 +209,7 @@
       {#if chatbotStore.messages.length <= 1 && !chatbotStore.loading}
         <div class="pt-2">
           <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Pertanyaan Populer:
+            Pertanyaan Populer untuk Linka:
           </p>
           <div class="flex flex-col gap-1.5">
             {#each QUICK_PROMPTS as prompt}
@@ -251,15 +241,15 @@
           disabled={chatbotStore.loading}
           type="text"
           maxlength="1000"
-          placeholder="Tanya seputar RestoLink..."
-          aria-label="Ketik pesan ke asisten AI RestoLink"
+          placeholder="Tanya Linka seputar RestoLink..."
+          aria-label="Ketik pesan untuk Linka"
           class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 transition focus:border-brand-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60"
         />
 
         <button
           type="submit"
           disabled={!inputMessage.trim() || chatbotStore.loading}
-          aria-label="Kirim pesan"
+          aria-label="Kirim pesan ke Linka"
           class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-xs transition hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
