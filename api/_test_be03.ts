@@ -488,6 +488,42 @@ async function runTests() {
     );
   }
 
+  // TC-19: Custom folder yang mencoba membajak namespace tenant lain ditolak 403 Forbidden (Anti-IDOR)
+  {
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer token-owner-1' },
+      body: { type: 'menu', folder: 'restolink/tenants/tenant-2/menus' },
+    } as unknown as ApiRequest;
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+
+    assert(
+      statusCode === 403 && jsonBody?.error?.includes('di luar ruang tenant Anda'),
+      'TC-19: Custom folder menyeberang ke tenant lain ditolak 403 Forbidden (Anti-IDOR)',
+      { statusCode, jsonBody }
+    );
+  }
+
+  // TC-20: Relative custom folder otomatis di-sandbox ke dalam namespace tenant pemohon
+  {
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer token-owner-1' },
+      body: { type: 'menu', folder: 'promos/summer' },
+    } as unknown as ApiRequest;
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+
+    assert(
+      statusCode === 200 && jsonBody?.folder === 'restolink/tenants/tenant-1/promos/summer',
+      'TC-20: Relative custom folder otomatis di-sandbox ke dalam namespace tenant pemohon',
+      { statusCode, jsonBody }
+    );
+  }
+
   console.log(`\nHasil: ${passed} Passed, ${failed} Failed`);
   if (failed > 0) process.exit(1);
 }

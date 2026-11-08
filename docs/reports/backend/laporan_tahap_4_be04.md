@@ -3,7 +3,7 @@
 **Tanggal**: 5 November 2026  
 **Modul**: Chatbot AI Proxy (`api/gemini/chat.ts`)  
 **Branch**: `feature/backend-api-services`  
-**Status**: Selesai & Terverifikasi (13/13 Unit Test BE-04 PASS, Total 59/59 API Test Passed)  
+**Status**: Selesai & Terverifikasi (14/14 Unit Test BE-04 PASS, Total 70/70 API Test Passed)  
 **Status Git**: Tersimpan di working tree lokal (TIDAK DIPUSH).
 
 ---
@@ -56,9 +56,10 @@ Endpoint `api/gemini/chat.ts` adalah proxy backend serverless yang menghubungkan
 [PASS] TC-11: Network exception / timeout ditangani aman dengan fallback
 [PASS] TC-12: Candidates respons Gemini kosong ditangani dengan fallback
 [PASS] TC-13: System prompt memuat informasi fitur, paket Mikro, alur daftar, dan aturan penolakan off-topic
-Hasil: 13 Passed, 0 Failed
+[PASS] TC-14: History item teks melebihi 1000 karakter dipotong aman ke 1000 karakter
+Hasil: 14 Passed, 0 Failed
 
-TOTAL KESELURUHAN API TESTS: 59 PASSED, 0 FAILED
+TOTAL KESELURUHAN API TESTS: 70 PASSED, 0 FAILED
 ```
 
 Verifikasi Statis & Build:

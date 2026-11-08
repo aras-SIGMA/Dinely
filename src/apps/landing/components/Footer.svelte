@@ -1,5 +1,6 @@
 <script lang="ts">
   import MotionFooter from '@/components/ui/MotionFooter.svelte';
+  import ChatbotWidget from './ChatbotWidget.svelte';
 
   type Props = {
     showCta?: boolean;
@@ -29,3 +30,6 @@
   copyrightText="© 2026 RestoLink. Hak Cipta Dilindungi."
   authorName="Kepiting Purba — SMK Taruna Bhakti"
 />
+
+<!-- AI Chatbot Floating Widget (FE-17) -->
+<ChatbotWidget />

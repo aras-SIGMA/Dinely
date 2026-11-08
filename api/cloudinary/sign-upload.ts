@@ -161,10 +161,28 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       }
     }
 
-    // 5. Resolusi Target Folder di Cloudinary
+    // 5. Resolusi Target Folder di Cloudinary & Isolasi Tenant Sandbox
     let targetFolder: string;
     if (folder && typeof folder === 'string' && folder.trim().length > 0) {
-      targetFolder = folder.trim().replace(/^\/+|\/+$/g, '');
+      const cleanedFolder = folder.trim().replace(/^\/+|\/+$/g, '');
+
+      if (!isPlatformAdmin && targetTenant) {
+        // Enforce tenant boundary: non-admin dilarang mengakses/membuat folder tenant lain
+        const tenantPrefix = `restolink/tenants/${targetTenant.id}`;
+        if (cleanedFolder.startsWith('restolink/tenants/')) {
+          if (cleanedFolder !== tenantPrefix && !cleanedFolder.startsWith(`${tenantPrefix}/`)) {
+            return sendJson(res, 403, {
+              error: 'Akses ditolak: Tidak dapat membuat folder di luar ruang tenant Anda.',
+            });
+          }
+          targetFolder = cleanedFolder;
+        } else {
+          // Otomatis sandboxing ke direktori tenant jika path relatif dikirim
+          targetFolder = `${tenantPrefix}/${cleanedFolder}`;
+        }
+      } else {
+        targetFolder = cleanedFolder;
+      }
     } else {
       const sub = uploadType === 'logo' ? 'logos' : 'menus';
       targetFolder = targetTenant

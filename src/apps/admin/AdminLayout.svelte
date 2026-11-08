@@ -51,9 +51,23 @@
             </span>
             RestoLink
           </a>
-          <span class="rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-semibold text-brand-400 border border-brand-500/30">
-            Platform Admin
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-semibold text-brand-400 border border-brand-500/30">
+              Admin
+            </span>
+            <button
+              type="button"
+              onclick={signOut}
+              class="lg:hidden inline-flex items-center gap-1 rounded-md bg-slate-800 px-2 py-1 text-[11px] font-medium text-slate-300 hover:text-rose-400 transition"
+              title="Keluar Akun"
+              aria-label="Keluar dari akun admin"
+            >
+              <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Keluar</span>
+            </button>
+          </div>
         </div>
         {#if authStore.profile}
           <p class="mt-2 text-xs text-slate-400 truncate">
