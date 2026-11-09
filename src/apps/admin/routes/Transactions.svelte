@@ -12,6 +12,8 @@
   import Badge from '@/components/ui/Badge.svelte';
   import Button from '@/components/ui/Button.svelte';
   import Modal from '@/components/ui/Modal.svelte';
+  import StatCard from '../components/StatCard.svelte';
+  import StatusDistribution from '../components/StatusDistribution.svelte';
   import type { AdminTransactionItem, TransactionStatus } from '@/types';
 
   let selectedTx = $state<AdminTransactionItem | null>(null);
@@ -82,12 +84,12 @@
   <!-- Header -->
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Riwayat Transaksi Midtrans</h1>
-      <p class="text-sm text-slate-500">
+      <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Riwayat Transaksi Midtrans</h1>
+      <p class="mt-1 max-w-2xl text-sm text-slate-500">
         Monitoring transaksi pembayaran paket langganan seluruh tenant dan penanganan kendala webhook.
       </p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex shrink-0 items-center gap-2">
       <Button
         variant="secondary"
         size="sm"
@@ -95,14 +97,17 @@
         onclick={() => adminStore.fetchTransactions()}
       >
         <svg
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="size-4 {adminStore.loadingTransactions ? 'animate-spin' : ''}"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          class="size-4"
+          stroke-width="1.8"
+          aria-hidden="true"
         >
           <path
-            fill-rule="evenodd"
-            d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.75a.75.75 0 0 0-.75.75v4.482a.75.75 0 0 0 1.5 0v-2.193l.354.354a7 7 0 1 0 11.233-3.056.75.75 0 0 0-.775-.992Z"
-            clip-rule="evenodd"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16.023 9.348h4.992V7.348m-4.992 0l-3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
           />
         </svg>
         Segarkan
@@ -110,25 +115,40 @@
     </div>
   </div>
 
-  <!-- Metric Stat Cards -->
-  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-      <p class="text-xs font-medium text-slate-500">Total Transaksi</p>
-      <p class="mt-2 text-2xl font-bold text-slate-900">{adminStore.transactionStats.total}</p>
-    </div>
-    <div class="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-emerald-800">Settlement (Sukses)</p>
-      <p class="mt-2 text-2xl font-bold text-emerald-700">{adminStore.transactionStats.settlementCount}</p>
-    </div>
-    <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-amber-800">Menunggu (Pending)</p>
-      <p class="mt-2 text-2xl font-bold text-amber-700">{adminStore.transactionStats.pendingCount}</p>
-    </div>
-    <div class="rounded-xl border border-brand-100 bg-brand-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-brand-800">Total Pendapatan Terverifikasi</p>
-      <p class="mt-2 text-xl font-bold text-brand-700">{adminStore.transactionStats.formattedSettledAmount}</p>
-    </div>
+  <!-- Metric Stat Cards (shadcn-style) -->
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <StatCard
+      label="Total Transaksi"
+      value={adminStore.transactionStats.total}
+      tone="neutral"
+      iconPath="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3z"
+      hint="Seluruh riwayat Midtrans"
+    />
+    <StatCard
+      label="Settlement (Sukses)"
+      value={adminStore.transactionStats.settlementCount}
+      tone="success"
+      iconPath="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      hint="Pembayaran terverifikasi"
+    />
+    <StatCard
+      label="Menunggu (Pending)"
+      value={adminStore.transactionStats.pendingCount}
+      tone="warning"
+      iconPath="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      hint="Belum terselesaikan"
+    />
+    <StatCard
+      label="Pendapatan Terverifikasi"
+      value={adminStore.transactionStats.formattedSettledAmount}
+      tone="brand"
+      iconPath="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 0 1 5.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.94"
+      hint="Akumulasi nominal settlement"
+    />
   </div>
+
+  <div class="grid items-start gap-6 lg:grid-cols-3">
+    <div class="space-y-6 lg:col-span-2">
 
   <!-- Filters & Search -->
   <div class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
@@ -146,21 +166,17 @@
     </div>
 
     <!-- Search Input -->
-    <div class="relative w-full sm:w-72">
+    <div class="relative w-full sm:w-64">
       <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <svg class="size-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fill-rule="evenodd"
-            d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
-            clip-rule="evenodd"
-          />
+        <svg class="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
       </div>
       <input
         type="search"
         placeholder="Cari order ID atau resto..."
         bind:value={adminStore.transactionSearchQuery}
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pr-3 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+        class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pr-3 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
       />
     </div>
   </div>
@@ -279,6 +295,20 @@
         </table>
       </div>
     {/if}
+    </div>
+  </div>
+
+    <!-- Chart distribusi status transaksi (data store existing) -->
+    <StatusDistribution
+      title="Distribusi Status Transaksi"
+      description="Proporsi seluruh transaksi Midtrans berdasarkan status"
+      emptyLabel="Belum ada transaksi tercatat"
+      items={[
+        { label: 'Settlement (Berhasil)', count: adminStore.transactionStats.settlementCount, color: 'bg-green-500' },
+        { label: 'Pending (Menunggu)', count: adminStore.transactionStats.pendingCount, color: 'bg-amber-500' },
+        { label: 'Gagal / Kedaluwarsa', count: adminStore.transactionStats.failedCount, color: 'bg-red-500' }
+      ]}
+    />
   </div>
 </div>
 

@@ -217,8 +217,8 @@
 
   // Handle Verify OTP
   async function handleVerifyOtp(codeToVerify?: string) {
-    const token = codeToVerify || otpCode;
-    if (token.length < 6 || isVerifyingOtp) return;
+    const token = (codeToVerify || otpCode).replace(/\D/g, '');
+    if (token.length < 6 || token.length > 8 || isVerifyingOtp) return;
 
     isVerifyingOtp = true;
     otpErrorMessage = '';
@@ -433,6 +433,7 @@
                 required
                 autocomplete="organization"
                 placeholder="Contoh: Dapur Bu Nia"
+                maxlength="100"
                 value={businessName}
                 oninput={handleBusinessNameInput}
                 class="h-10 sm:h-11 w-full px-3.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 focus:outline-none transition-all"
@@ -505,6 +506,7 @@
                   required
                   autocomplete="tel"
                   placeholder="081234567890"
+                  maxlength="20"
                   bind:value={phone}
                   class="h-10 sm:h-11 w-full pl-9 pr-3 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 focus:outline-none transition-all font-medium"
                 />
@@ -559,6 +561,7 @@
                 required
                 autocomplete="name"
                 placeholder="Contoh: Budi Setiawan"
+                maxlength="100"
                 bind:value={fullName}
                 class="h-10 sm:h-11 w-full px-3.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 focus:outline-none transition-all"
               />
@@ -801,7 +804,7 @@
             <div class="space-y-3">
               <button
                 type="button"
-                disabled={isVerifyingOtp || otpCode.length < 6}
+                disabled={isVerifyingOtp || otpCode.length < 6 || otpCode.length > 8}
                 onclick={() => handleVerifyOtp()}
                 class="w-full h-11 sm:h-12 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
               >

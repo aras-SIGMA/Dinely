@@ -102,8 +102,8 @@
 
   // Handle Submit OTP
   async function handleVerifyOtp(codeToVerify?: string) {
-    const token = codeToVerify || otpCode;
-    if (token.length < 6 || isVerifyingOtp) return;
+    const token = (codeToVerify || otpCode).replace(/\D/g, '');
+    if (token.length < 6 || token.length > 8 || isVerifyingOtp) return;
 
     isVerifyingOtp = true;
     otpErrorMessage = '';

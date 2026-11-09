@@ -10,6 +10,8 @@
   import Badge from '@/components/ui/Badge.svelte';
   import Button from '@/components/ui/Button.svelte';
   import Modal from '@/components/ui/Modal.svelte';
+  import StatCard from '../components/StatCard.svelte';
+  import StatusDistribution from '../components/StatusDistribution.svelte';
   import type { AdminTenantItem, TenantStatus } from '@/types';
 
   let selectedTenant = $state<AdminTenantItem | null>(null);
@@ -79,12 +81,12 @@
   <!-- Header -->
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Monitoring Tenant</h1>
-      <p class="text-sm text-slate-500">
+      <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Monitoring Tenant</h1>
+      <p class="mt-1 max-w-2xl text-sm text-slate-500">
         Kelola seluruh pendaftaran usaha kuliner, status akun, dan manual override aktivasi.
       </p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex shrink-0 items-center gap-2">
       <Button
         variant="secondary"
         size="sm"
@@ -92,14 +94,17 @@
         onclick={() => adminStore.fetchTenants()}
       >
         <svg
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="size-4 {adminStore.loadingTenants ? 'animate-spin' : ''}"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          class="size-4"
+          stroke-width="1.8"
+          aria-hidden="true"
         >
           <path
-            fill-rule="evenodd"
-            d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.75a.75.75 0 0 0-.75.75v4.482a.75.75 0 0 0 1.5 0v-2.193l.354.354a7 7 0 1 0 11.233-3.056.75.75 0 0 0-.775-.992Z"
-            clip-rule="evenodd"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16.023 9.348h4.992V7.348m-4.992 0l-3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
           />
         </svg>
         Segarkan
@@ -107,33 +112,54 @@
     </div>
   </div>
 
-  <!-- Metric Stat Cards -->
-  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-      <p class="text-xs font-medium text-slate-500">Total Tenant</p>
-      <p class="mt-2 text-2xl font-bold text-slate-900">{adminStore.tenantCounts.all}</p>
-    </div>
-    <div class="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-emerald-800">Aktif</p>
-      <p class="mt-2 text-2xl font-bold text-emerald-700">{adminStore.tenantCounts.active}</p>
-    </div>
-    <div class="rounded-xl border border-brand-100 bg-brand-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-brand-800">Trial</p>
-      <p class="mt-2 text-2xl font-bold text-brand-700">{adminStore.tenantCounts.trial}</p>
-    </div>
-    <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-amber-800">Pending</p>
-      <p class="mt-2 text-2xl font-bold text-amber-700">{adminStore.tenantCounts.pending}</p>
-    </div>
-    <div class="rounded-xl border border-rose-100 bg-rose-50/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-rose-800">Ditangguhkan</p>
-      <p class="mt-2 text-2xl font-bold text-rose-700">{adminStore.tenantCounts.suspended}</p>
-    </div>
-    <div class="rounded-xl border border-slate-200 bg-slate-100/60 p-4 shadow-xs">
-      <p class="text-xs font-medium text-slate-600">Kedaluwarsa</p>
-      <p class="mt-2 text-2xl font-bold text-slate-700">{adminStore.tenantCounts.expired}</p>
-    </div>
+  <!-- Metric Stat Cards (shadcn-style) -->
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+    <StatCard
+      label="Total Tenant"
+      value={adminStore.tenantCounts.all}
+      tone="neutral"
+      iconPath="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+      hint="Seluruh usaha terdaftar"
+    />
+    <StatCard
+      label="Aktif"
+      value={adminStore.tenantCounts.active}
+      tone="success"
+      iconPath="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      hint="Langganan berjalan"
+    />
+    <StatCard
+      label="Trial"
+      value={adminStore.tenantCounts.trial}
+      tone="brand"
+      iconPath="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.346L11.48 3.5Z"
+      hint="Masa percobaan"
+    />
+    <StatCard
+      label="Pending"
+      value={adminStore.tenantCounts.pending}
+      tone="warning"
+      iconPath="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      hint="Menunggu bayar"
+    />
+    <StatCard
+      label="Ditangguhkan"
+      value={adminStore.tenantCounts.suspended}
+      tone="danger"
+      iconPath="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      hint="Akses dibekukan"
+    />
+    <StatCard
+      label="Kedaluwarsa"
+      value={adminStore.tenantCounts.expired}
+      tone="neutral"
+      iconPath="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+      hint="Perlu perpanjangan"
+    />
   </div>
+
+  <div class="grid items-start gap-6 lg:grid-cols-3">
+    <div class="space-y-6 lg:col-span-2">
 
   <!-- Filters & Search -->
   <div class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
@@ -156,21 +182,17 @@
     </div>
 
     <!-- Search Input -->
-    <div class="relative w-full sm:w-72">
+    <div class="relative w-full sm:w-64">
       <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <svg class="size-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fill-rule="evenodd"
-            d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
-            clip-rule="evenodd"
-          />
+        <svg class="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
       </div>
       <input
         type="search"
         placeholder="Cari resto, subdomain, pemilik..."
         bind:value={adminStore.tenantSearchQuery}
-        class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pr-3 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+        class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pr-3 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
       />
     </div>
   </div>
@@ -311,6 +333,22 @@
         </table>
       </div>
     {/if}
+    </div>
+  </div>
+
+    <!-- Chart distribusi status tenant (data store existing) -->
+    <StatusDistribution
+      title="Distribusi Status Tenant"
+      description="Proporsi seluruh tenant berdasarkan status langganan"
+      emptyLabel="Belum ada tenant terdaftar"
+      items={[
+        { label: 'Aktif', count: adminStore.tenantCounts.active, color: 'bg-green-500' },
+        { label: 'Trial', count: adminStore.tenantCounts.trial, color: 'bg-brand-500' },
+        { label: 'Pending', count: adminStore.tenantCounts.pending, color: 'bg-amber-500' },
+        { label: 'Ditangguhkan', count: adminStore.tenantCounts.suspended, color: 'bg-red-500' },
+        { label: 'Kedaluwarsa', count: adminStore.tenantCounts.expired, color: 'bg-slate-400' }
+      ]}
+    />
   </div>
 </div>
 

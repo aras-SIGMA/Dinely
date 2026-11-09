@@ -121,7 +121,7 @@ class AuthStore {
   }
 
   async loadTenant(userId: string): Promise<void> {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('tenants')
       .select('*')
       .eq('owner_id', userId)
@@ -129,7 +129,46 @@ class AuthStore {
       .limit(1)
       .maybeSingle();
 
+    if (!data && !error) {
+      // Retry 1x dengan jeda 350ms jika trigger handle_new_user membutuhkan jeda eksekusi
+      await new Promise((res) => setTimeout(res, 350));
+      const retry = await supabase
+        .from('tenants')
+        .select('*')
+        .eq('owner_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      data = retry.data;
+      error = retry.error;
+    }
+
     this.tenant = error ? null : (data as Tenant | null);
+  }
+
+  /**
+   * Fallback defense-in-depth jika trigger database tertunda atau belum membuat tenant
+   */
+  async ensureTenantExists(user: { id: string; user_metadata?: Record<string, any> }): Promise<void> {
+    if (this.tenant) return;
+    const meta = user.user_metadata;
+    if (meta?.subdomain && meta?.business_name) {
+      const { data: fallbackTenant, error: insertError } = await supabase
+        .from('tenants')
+        .insert({
+          owner_id: user.id,
+          business_name: String(meta.business_name).trim(),
+          subdomain: String(meta.subdomain).trim().toLowerCase(),
+          status: 'pending',
+          primary_color: '#ea580c'
+        })
+        .select()
+        .maybeSingle();
+
+      if (!insertError && fallbackTenant) {
+        this.tenant = fallbackTenant as Tenant;
+      }
+    }
   }
 
   async refreshTenant(): Promise<void> {
@@ -140,6 +179,17 @@ class AuthStore {
 
   async signUp(params: SignUpParams): Promise<AuthActionResult> {
     const { email, password, fullName, phone, businessName, subdomain } = params;
+
+    // 0. Batas panjang input (defense-in-depth anti payload bloat)
+    if (fullName.trim().length > 100) {
+      return { success: false, error: 'Nama lengkap maksimal 100 karakter.' };
+    }
+    if (phone && phone.trim().length > 20) {
+      return { success: false, error: 'Nomor WhatsApp maksimal 20 karakter.' };
+    }
+    if (businessName.trim().length > 100) {
+      return { success: false, error: 'Nama usaha maksimal 100 karakter.' };
+    }
 
     // 1. Verifikasi ketersediaan subdomain di database
     const subCheck = await checkSubdomainAvailability(subdomain);
@@ -179,32 +229,17 @@ class AuthStore {
       };
     }
 
-    // 3. Jika sesi auth aktif langsung tersedia
+    // 3. Jika sesi auth aktif langsung tersedia (tanpa konfirmasi email)
     if (authData.session) {
-      await this.loadProfile(user.id);
+      await Promise.all([
+        this.loadProfile(user.id),
+        this.loadTenant(user.id)
+      ]);
 
-      // Provision tenant baru status 'pending'
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenants')
-        .insert({
-          owner_id: user.id,
-          business_name: businessName.trim(),
-          subdomain: subdomain.trim().toLowerCase(),
-          status: 'pending',
-          primary_color: '#ea580c'
-        })
-        .select()
-        .single();
-
-      if (tenantError) {
-        console.error('[authStore] Failed to insert tenant:', tenantError);
-        return {
-          success: false,
-          error: `Akun dibuat namun gagal mendaftarkan resto: ${tenantError.message}`
-        };
+      if (!this.tenant) {
+        await this.ensureTenantExists(user);
       }
 
-      this.tenant = tenantData as Tenant;
       return {
         success: true,
         session: true,
@@ -212,11 +247,52 @@ class AuthStore {
       };
     }
 
-    // Kasus jika project Supabase mengaktifkan konfirmasi email
+    // Kasus jika project Supabase mengaktifkan konfirmasi email OTP
     return {
       success: true,
       session: false,
-      error: 'Pendaftaran berhasil. Silakan periksa inbox email Anda untuk verifikasi.'
+      error: 'Pendaftaran berhasil. Silakan periksa inbox email Anda untuk kode verifikasi 6-digit.'
+    };
+  }
+
+  /**
+   * Verifikasi 6-Digit Email OTP dari Supabase Auth
+   * Ref: https://supabase.com/docs/reference/javascript/auth-verifyotp
+   */
+  async verifyEmailOtp(email: string, token: string): Promise<AuthActionResult> {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: token.trim(),
+      type: 'signup'
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+
+    if (!data.user) {
+      return {
+        success: false,
+        error: 'Sesi gagal dibuat setelah verifikasi kode.'
+      };
+    }
+
+    await Promise.all([
+      this.loadProfile(data.user.id),
+      this.loadTenant(data.user.id)
+    ]);
+
+    if (!this.tenant) {
+      await this.ensureTenantExists(data.user);
+    }
+
+    return {
+      success: true,
+      session: true,
+      role: this.role ?? 'owner'
     };
   }
 
@@ -246,6 +322,10 @@ class AuthStore {
       this.loadProfile(data.user.id),
       this.loadTenant(data.user.id)
     ]);
+
+    if (!this.tenant) {
+      await this.ensureTenantExists(data.user);
+    }
 
     return {
       success: true,
@@ -307,12 +387,19 @@ class AuthStore {
     }
   }
 
-  async resendOtp(params: { email: string; type?: 'signup' | 'email' }): Promise<{ success: boolean; error?: string }> {
-    const { email, type = 'signup' } = params;
+  async resendOtp(
+    emailOrParams: string | { email: string; type?: 'signup' | 'email' }
+  ): Promise<{ success: boolean; error?: string }> {
+    const emailRaw = typeof emailOrParams === 'string' ? emailOrParams : emailOrParams.email;
+    const type = typeof emailOrParams === 'string' ? 'signup' : emailOrParams.type ?? 'signup';
+    const email = typeof emailRaw === 'string' ? emailRaw.trim() : '';
+    if (!email) {
+      return { success: false, error: 'Email tidak boleh kosong.' };
+    }
     try {
       const { error } = await supabase.auth.resend({
         type: (type === 'email' ? 'email_change' : 'signup') as 'signup' | 'email_change',
-        email: email.trim()
+        email
       });
 
       if (error) {
@@ -321,7 +408,7 @@ class AuthStore {
           const res = await fetch('/api/auth/send-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim() })
+            body: JSON.stringify({ email })
           });
           if (res.ok) return { success: true };
         } catch {
