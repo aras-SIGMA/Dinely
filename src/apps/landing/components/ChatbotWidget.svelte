@@ -210,7 +210,7 @@
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
                 <span class="text-xs font-bold text-slate-900">Linka</span>
-                <span class="rounded bg-brand-500/10 px-1.5 py-0.5 text-[9px] font-bold text-brand-700">Maskot AI</span>
+                <span class="rounded bg-brand-500/10 px-1.5 py-0.5 text-[9px] font-bold text-brand-700">Asisten AI</span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug mt-0.5">
                 Maskot &amp; asisten koki pintar RestoLink. Ada yang bisa Linka bantu?

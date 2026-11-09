@@ -2,7 +2,6 @@
   import AnimatedContent from '@/components/ui/AnimatedContent.svelte';
   import SplitText from '@/components/ui/SplitText.svelte';
   import Logo from '@/components/ui/Logo.svelte';
-  import LinkaMascot from '@/components/ui/LinkaMascot.svelte';
   import { uiStore } from '@/stores/ui.svelte';
   import Navbar from '../components/Navbar.svelte';
   import Footer from '../components/Footer.svelte';
@@ -308,38 +307,6 @@
             </article>
           </AnimatedContent>
         {/each}
-      </div>
-
-      <!-- CARD SPESIAL: MASKOT RESMI LINKA -->
-      <div class="mt-12">
-        <AnimatedContent distance={30} duration={0.6}>
-          <div class="relative overflow-hidden rounded-3xl border border-brand-200/80 bg-gradient-to-r from-brand-50/90 via-orange-50/60 to-amber-50/50 p-6 sm:p-8 lg:p-10 shadow-lg shadow-brand-900/[0.03]">
-            <div class="grid items-center gap-6 md:grid-cols-12">
-              <div class="flex justify-center md:col-span-4">
-                <div class="relative flex size-28 sm:size-32 items-center justify-center rounded-3xl bg-white border border-brand-200/80 p-3 shadow-md">
-                  <LinkaMascot variant="waving" size="xl" animated={true} />
-                </div>
-              </div>
-              <div class="text-center md:text-left md:col-span-8">
-                <div class="inline-flex items-center gap-2 rounded-full bg-brand-500/10 px-3 py-1 text-xs font-bold text-brand-700">
-                  <span>🦀</span>
-                  <span>Maskot Resmi RestoLink</span>
-                </div>
-                <h3 class="mt-2 font-display text-xl sm:text-2xl font-bold text-slate-950">
-                  Kenalan dengan Linka!
-                </h3>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                  Linka adalah maskot sekaligus asisten koki cerdas berkepala topi koki dan antena sinyal cloud. Linka siap memandu Anda di website RestoLink, menjawab pertanyaan seputar fitur, paket langganan, hingga tips operasional secara ramah dan tanggap.
-                </p>
-                <div class="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-semibold text-slate-700">
-                  <span class="rounded-lg bg-white/80 border border-brand-200/60 px-3 py-1.5 shadow-2xs">Capit Cepat &bull; Solusi Tepat</span>
-                  <span class="rounded-lg bg-white/80 border border-brand-200/60 px-3 py-1.5 shadow-2xs">Didukung Gemini AI</span>
-                  <span class="rounded-lg bg-white/80 border border-brand-200/60 px-3 py-1.5 shadow-2xs">Online 24/7 di Pojok Kanan Bawah</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </AnimatedContent>
       </div>
     </section>
   </main>
