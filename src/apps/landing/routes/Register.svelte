@@ -343,89 +343,89 @@
 
   <!-- CENTER CONTENT GRID (CationGate Layout: Col-7 Visual + Col-5 Form) -->
   <div class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto z-10 relative pt-4 lg:pt-8">
-    <!-- SISI KIRI (Col-7): Dynamic Step Typography & Highlighted Glassmorphic Preview -->
+    <!-- SISI KIRI (Col-7): Dynamic Step Typography & Highlighted High-Contrast Card -->
     <div class="hidden lg:flex lg:col-span-7 xl:col-span-7 items-center justify-between relative pl-4 pr-2">
-      <!-- Headline & Subtitle -->
+      <!-- Headline & Subtitle (Crisp High-Contrast White) -->
       <div class="z-10 w-[50%] xl:w-[48%] text-left space-y-4">
         {#if step === 1}
           <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Data <br />
-            <span class="text-amber-200 drop-shadow-sm">Restoran</span>
+            <span class="text-white drop-shadow-md">Restoran</span>
           </h2>
-          <p class="text-xs lg:text-sm text-white/95 font-medium leading-relaxed max-w-xs">
+          <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[1].desc}
           </p>
         {:else if step === 2}
           <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Akun <br />
-            <span class="text-amber-200 drop-shadow-sm">Pemilik</span>
+            <span class="text-white drop-shadow-md">Pemilik</span>
           </h2>
-          <p class="text-xs lg:text-sm text-white/95 font-medium leading-relaxed max-w-xs">
+          <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[2].desc}
           </p>
         {:else if step === 3}
           <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Konfirmasi <br />
-            <span class="text-amber-200 drop-shadow-sm">Akhir</span>
+            <span class="text-white drop-shadow-md">Akhir</span>
           </h2>
-          <p class="text-xs lg:text-sm text-white/95 font-medium leading-relaxed max-w-xs">
+          <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[3].desc}
           </p>
         {:else}
           <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Verifikasi <br />
-            <span class="text-amber-200 drop-shadow-sm">Email OTP</span>
+            <span class="text-white drop-shadow-md">Email OTP</span>
           </h2>
-          <p class="text-xs lg:text-sm text-white/95 font-medium leading-relaxed max-w-xs">
+          <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[4].desc}
           </p>
         {/if}
       </div>
 
-      <!-- Right Visual Component: Live Highlighted Glassmorphic Preview (Shifted to the right) -->
-      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-4 lg:pl-6 translate-x-2 lg:translate-x-6 xl:translate-x-10">
-        <div class="relative group w-full max-w-72">
-          <!-- Ambient Glow behind Glass Card for Separation from Orange Wave -->
-          <div class="absolute -inset-1.5 rounded-3xl bg-white/25 blur-xl opacity-75 pointer-events-none" aria-hidden="true"></div>
+      <!-- Right Visual Component: Live Repositioned & High-Contrast Card -->
+      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4 translate-x-0 lg:translate-x-1">
+        <div class="relative group w-full max-w-68">
+          <!-- Ambient Glow behind Glass Card -->
+          <div class="absolute -inset-1 rounded-3xl bg-white/30 blur-lg opacity-80 pointer-events-none" aria-hidden="true"></div>
 
-          <!-- Glassmorphic Card Container -->
-          <div class="relative w-full rounded-2xl border border-white/60 bg-gradient-to-b from-white/30 via-white/20 to-white/10 backdrop-blur-2xl p-4.5 text-white shadow-[0_20px_50px_rgba(0,0,0,0.28),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(0,0,0,0.12)] space-y-3.5 transition-all duration-300">
+          <!-- Glass Card with High Readability (Crisp Dark Text on Frosted Canvas) -->
+          <div class="relative w-full rounded-2xl border border-white/80 bg-white/90 backdrop-blur-2xl p-4 text-slate-900 shadow-[0_20px_45px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,1)] space-y-3 transition-all duration-300">
             <!-- Top Specular Highlight Edge -->
-            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"></div>
 
             <!-- Card Header -->
-            <div class="flex items-center justify-between border-b border-white/25 pb-2">
+            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
               <div class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-rose-400"></span>
+                <span class="size-2 rounded-full bg-rose-500"></span>
                 <span class="size-2 rounded-full bg-amber-400"></span>
-                <span class="size-2 rounded-full bg-emerald-400"></span>
+                <span class="size-2 rounded-full bg-emerald-500"></span>
               </div>
-              <span class="font-mono text-[10px] text-white/90 font-bold tracking-wider uppercase drop-shadow-sm">Live Preview</span>
+              <span class="font-mono text-[10px] text-slate-500 font-bold tracking-wider uppercase">Live Preview</span>
             </div>
 
-            <!-- Browser Address Simulator with High-Contrast Dark-Glass Interior -->
-            <div class="rounded-xl bg-slate-950/40 border border-white/30 px-3 py-2 text-xs font-mono flex items-center gap-1.5 shadow-inner">
-              <svg class="size-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Browser Address Simulator with High-Contrast Clean Interior -->
+            <div class="rounded-xl bg-slate-100/90 border border-slate-200/80 px-3 py-2 text-xs font-mono flex items-center gap-1.5 text-slate-700">
+              <svg class="size-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <span class="text-emerald-300">https://</span>
-              <span class="font-bold text-amber-200 truncate">{subdomain || 'nama-resto'}</span>
-              <span class="text-white/80">.restolink.site</span>
+              <span class="text-emerald-700 font-semibold">https://</span>
+              <span class="font-bold text-brand-600 truncate">{subdomain || 'nama-resto'}</span>
+              <span class="text-slate-500">.restolink.site</span>
             </div>
 
             <!-- Live Feature Checklist with Defined Badges -->
-            <div class="space-y-2 pt-0.5 text-xs text-white">
+            <div class="space-y-2 pt-0.5 text-xs text-slate-700">
               <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
-                <span class="font-medium drop-shadow-sm">Website Menu Instan</span>
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
+                <span class="font-medium text-slate-800">Website Menu Instan</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
-                <span class="font-medium drop-shadow-sm">Pemesanan QR Meja Mandiri</span>
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
+                <span class="font-medium text-slate-800">Pemesanan QR Meja Mandiri</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
-                <span class="font-medium drop-shadow-sm">Rekap Keuangan 0% Komisi</span>
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
+                <span class="font-medium text-slate-800">Rekap Keuangan 0% Komisi</span>
               </div>
             </div>
           </div>

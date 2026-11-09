@@ -248,57 +248,57 @@
 
   <!-- CENTER CONTENT GRID (CationGate Layout: Col-7 Visual + Col-5 Form) -->
   <div class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto z-10 relative pt-4 lg:pt-10">
-    <!-- SISI KIRI (Col-7): Headline Hero & Highlighted Glassmorphic Order Mockup -->
+    <!-- SISI KIRI (Col-7): Headline Hero & High-Contrast Glass Card -->
     <div class="hidden lg:flex lg:col-span-7 xl:col-span-7 items-center justify-between relative pl-4 pr-2">
-      <!-- Headline & Subtitle -->
+      <!-- Headline & Subtitle (Crisp High-Contrast White) -->
       <div class="z-10 w-[50%] xl:w-[48%] text-left space-y-4">
         <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
           Portal <br />
-          <span class="text-amber-200 drop-shadow-sm">Pemilik Resto</span>
+          <span class="text-white drop-shadow-md">Pemilik Resto</span>
         </h2>
-        <p class="text-xs lg:text-sm text-white/95 font-medium leading-relaxed max-w-xs">
-          Masuk untuk mengelola sistem <strong class="text-white font-bold">pesanan meja</strong>, menu digital, dan operasional dapur restoran Anda.
+        <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
+          Masuk untuk mengelola sistem <strong class="text-white font-bold underline decoration-white/30 underline-offset-4">pesanan meja</strong>, menu digital, dan operasional dapur restoran Anda.
         </p>
       </div>
 
-      <!-- Right Visual Component inside wave: Highlighted Glassmorphic Order Receipt -->
-      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-4 lg:pl-6 translate-x-2 lg:translate-x-6 xl:translate-x-10">
-        <div class="relative group w-full max-w-72">
-          <!-- Ambient Glow behind Glass Card for Separation from Orange Wave -->
-          <div class="absolute -inset-1.5 rounded-3xl bg-white/25 blur-xl opacity-75 pointer-events-none" aria-hidden="true"></div>
+      <!-- Right Visual Component inside wave: Repositioned & High-Contrast Card -->
+      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4 translate-x-0 lg:translate-x-1">
+        <div class="relative group w-full max-w-68">
+          <!-- Ambient Glow behind Glass Card -->
+          <div class="absolute -inset-1 rounded-3xl bg-white/30 blur-lg opacity-80 pointer-events-none" aria-hidden="true"></div>
 
-          <!-- Glassmorphic Card Container -->
-          <div class="relative w-full rounded-2xl border border-white/60 bg-gradient-to-b from-white/30 via-white/20 to-white/10 backdrop-blur-2xl p-4.5 text-white shadow-[0_20px_50px_rgba(0,0,0,0.28),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(0,0,0,0.12)] space-y-3.5 transition-all duration-300">
+          <!-- Glass Card with High Readability (Crisp Dark Text on Frosted Canvas) -->
+          <div class="relative w-full rounded-2xl border border-white/80 bg-white/90 backdrop-blur-2xl p-4 text-slate-900 shadow-[0_20px_45px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,1)] space-y-3 transition-all duration-300">
             <!-- Top Specular Highlight Edge -->
-            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"></div>
 
             <!-- Card Header -->
-            <div class="flex items-center justify-between border-b border-white/25 pb-2.5">
+            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
               <div class="flex items-center gap-2">
-                <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-white drop-shadow-sm">Meja 04 • Baru</span>
+                <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-800">Meja 04 • Baru</span>
               </div>
-              <span class="rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-100 border border-emerald-300/40 shadow-xs">
+              <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 shadow-xs">
                 QRIS Lunas
               </span>
             </div>
 
-            <!-- Card Items -->
-            <div class="space-y-1.5 text-xs text-white">
-              <div class="flex justify-between font-semibold drop-shadow-sm">
+            <!-- Card Items (Dark text for maximum readability) -->
+            <div class="space-y-1.5 text-xs text-slate-700">
+              <div class="flex justify-between font-medium">
                 <span>1x Ayam Bakar Madu</span>
-                <span class="font-mono text-white/90">32.000</span>
+                <span class="font-mono text-slate-900 font-semibold">32.000</span>
               </div>
-              <div class="flex justify-between font-semibold drop-shadow-sm">
+              <div class="flex justify-between font-medium">
                 <span>1x Es Teh Manis Jumbo</span>
-                <span class="font-mono text-white/90">7.000</span>
+                <span class="font-mono text-slate-900 font-semibold">7.000</span>
               </div>
             </div>
 
             <!-- Card Total -->
-            <div class="border-t border-white/25 pt-2 flex items-center justify-between text-xs">
-              <span class="text-white/90 font-medium">Total Pesanan</span>
-              <span class="font-mono font-black text-amber-200 text-sm drop-shadow-sm">Rp 39.000</span>
+            <div class="border-t border-slate-200/80 pt-2 flex items-center justify-between text-xs">
+              <span class="text-slate-600 font-medium">Total Pesanan</span>
+              <span class="font-mono font-black text-brand-600 text-sm">Rp 39.000</span>
             </div>
           </div>
         </div>
