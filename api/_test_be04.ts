@@ -391,6 +391,59 @@ async function runTests() {
     );
   }
 
+  // TC-15: Model utama gagal (503) otomatis beralih ke model sekunder (gemini-1.5-flash-8b) dengan auth header
+  {
+    const capturedCalls: { url: string; headers: any }[] = [];
+    global.fetch = (async (url: string, opts: any) => {
+      capturedCalls.push({ url, headers: opts?.headers });
+      if (url.includes('gemini-1.5-flash:generateContent')) {
+        return {
+          ok: false,
+          status: 503,
+          text: async () => 'Service Unavailable / Overloaded',
+        };
+      }
+      if (url.includes('gemini-1.5-flash-8b:generateContent')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            candidates: [
+              {
+                content: {
+                  parts: [{ text: 'Balasan sukses dari secondary fallback model.' }],
+                },
+              },
+            ],
+          }),
+        };
+      }
+      return { ok: false, status: 500 };
+    }) as any;
+
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: { message: 'Pertanyaan saat server utama overload' },
+    } as unknown as ApiRequest;
+
+    const { res, getData } = createMockRes();
+    await handler(req, res);
+    const { statusCode, jsonBody } = getData();
+
+    const fallbackCall = capturedCalls.find((c) => c.url.includes('gemini-1.5-flash-8b'));
+    const hasHeaderKey = fallbackCall?.headers?.['x-goog-api-key'] === 'mock-gemini-api-key-12345';
+
+    assert(
+      statusCode === 200 &&
+      jsonBody?.reply === 'Balasan sukses dari secondary fallback model.' &&
+      fallbackCall !== undefined &&
+      hasHeaderKey,
+      'TC-15: Model utama 503 otomatis beralih ke secondary fallback dengan auth header aman',
+      { statusCode, jsonBody, capturedCalls }
+    );
+  }
+
   // Restore fetch
   global.fetch = originalFetch;
 

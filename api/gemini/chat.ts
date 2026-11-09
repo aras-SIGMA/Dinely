@@ -171,9 +171,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     const payload = buildGeminiPayload(message, body.history);
-    const primaryModel =
-      process.env.GEMINI_MODEL ||
-      (process.env.NODE_ENV === 'test' ? 'gemini-1.5-flash' : 'gemini-flash-lite-latest');
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${primaryModel}:generateContent?key=${apiKey}`;
 
     let geminiRes: Response | null = null;
@@ -185,7 +183,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           'x-goog-api-key': apiKey,
         },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(5000),
       });
     } catch (fetchErr: any) {
       if (process.env.NODE_ENV !== 'test') {
@@ -193,26 +191,23 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       }
     }
 
-    // Jika model utama overload (503/timeout) di mode non-test, fallback cepat ke gemini-3.5-flash
-    if (
-      (!geminiRes || !geminiRes.ok) &&
-      process.env.NODE_ENV !== 'test' &&
-      primaryModel === 'gemini-flash-lite-latest' &&
-      geminiRes?.status !== 429
-    ) {
-      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+    // Jika model utama overload (503/timeout), fallback cepat ke model sekunder resmi
+    if ((!geminiRes || !geminiRes.ok) && geminiRes?.status !== 429) {
+      const fallbackModel = process.env.GEMINI_FALLBACK_MODEL || 'gemini-1.5-flash-8b';
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${apiKey}`;
       try {
         geminiRes = await fetch(fallbackUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey,
           },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(4000),
         });
       } catch (fallbackErr: any) {
         if (process.env.NODE_ENV !== 'test') {
-          console.warn('Gemini secondary fallback model error:', fallbackErr?.message);
+          console.warn(`Gemini secondary fallback (${fallbackModel}) error:`, fallbackErr?.message);
         }
       }
     }
