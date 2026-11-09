@@ -6,12 +6,23 @@
   import Navbar from '../components/Navbar.svelte';
   import Footer from '../components/Footer.svelte';
 
+  // Foto profil tim: letakkan file di src/assets/team dengan nama:
+  // stefano.jpg, adi.jpg, tubagus.jpg — kartu otomatis memakai foto bila file ada,
+  // fallback ke inisial bila tidak. Resolusi via glob import per dokumentasi Vite:
+  // https://vite.dev/guide/features#glob-import
+  const teamPhotos = import.meta.glob<string>('/src/assets/team/*.{jpg,jpeg,png,webp,avif}', {
+    eager: true,
+    import: 'default'
+  });
+  const photoFor = (fileName: string): string | null =>
+    teamPhotos[`/src/assets/team/${fileName}`] ?? null;
+
   const developers: { id: string; name: string; role: string; photo: string | null; initials: string; avatarBg: string }[] = [
     {
       id: 'fullstack',
       name: 'Stefano Hari Prasanto .G',
       role: 'Fullstack Developer',
-      photo: null,
+      photo: photoFor('stefano.jpeg'),
       initials: 'SH',
       avatarBg: 'from-orange-100 to-amber-100'
     },
@@ -19,7 +30,7 @@
       id: 'frontend',
       name: 'Adi Setio Nugroho',
       role: 'Frontend Developer',
-      photo: null,
+      photo: photoFor('adi.png'),
       initials: 'AN',
       avatarBg: 'from-blue-100 to-indigo-100'
     },
@@ -27,7 +38,7 @@
       id: 'backend-qa',
       name: 'Tubagus Kevin Keynaro Christiawan',
       role: 'Backend & QA Engineer',
-      photo: null,
+      photo: photoFor('tubagus.jpeg'),
       initials: 'TK',
       avatarBg: 'from-emerald-100 to-teal-100'
     }
@@ -283,7 +294,7 @@
           <AnimatedContent distance={30} duration={0.6} delay={0.1 * (idx + 1)}>
             <article class="group h-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/[0.02] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-900/[0.06]">
               <!-- Slot Foto Profil -->
-              <div class="relative aspect-[4/5] w-full overflow-hidden bg-slate-100">
+              <div class="relative aspect-square w-full overflow-hidden bg-slate-100">
                 {#if dev.photo}
                   <img src={dev.photo} alt="Foto {dev.name}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
                 {:else}
