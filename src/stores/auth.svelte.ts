@@ -180,6 +180,17 @@ class AuthStore {
   async signUp(params: SignUpParams): Promise<AuthActionResult> {
     const { email, password, fullName, phone, businessName, subdomain } = params;
 
+    // 0. Batas panjang input (defense-in-depth anti payload bloat)
+    if (fullName.trim().length > 100) {
+      return { success: false, error: 'Nama lengkap maksimal 100 karakter.' };
+    }
+    if (phone && phone.trim().length > 20) {
+      return { success: false, error: 'Nomor WhatsApp maksimal 20 karakter.' };
+    }
+    if (businessName.trim().length > 100) {
+      return { success: false, error: 'Nama usaha maksimal 100 karakter.' };
+    }
+
     // 1. Verifikasi ketersediaan subdomain di database
     const subCheck = await checkSubdomainAvailability(subdomain);
     if (!subCheck.available) {

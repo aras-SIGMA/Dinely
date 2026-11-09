@@ -7,7 +7,7 @@
  * ============================================================================
  */
 
-import { sendChatMessage, type ChatHistoryItem } from '@/lib/chatbot';
+import { streamChatMessage, fetchSuggestions, type ChatHistoryItem } from '@/lib/chatbot';
 
 export interface UiChatMessage {
   id: string;
@@ -17,12 +17,13 @@ export interface UiChatMessage {
   isError?: boolean;
 }
 
-const STORAGE_KEY = 'restolink_chat_messages_v3';
+const STORAGE_KEY = 'restolink_chat_messages_v4';
+const MAX_PERSISTED_MESSAGES = 60;
 
 const INITIAL_GREETING: UiChatMessage = {
   id: 'greeting-default',
   sender: 'assistant',
-  text: 'Halo! 🦀 Saya Linka, maskot & asisten virtual resmi RestoLink. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
+  text: 'Halo! Saya Linka, maskot & asisten virtual resmi RestoLink. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
   timestamp: new Date().toISOString()
 };
 
@@ -37,7 +38,7 @@ class ChatbotStore {
   isOpen = $state(false);
   loading = $state(false);
   messages = $state<UiChatMessage[]>([INITIAL_GREETING]);
-  hasUnread = $state(false);
+  suggestions = $state<string[]>([]);
 
   constructor() {
     this.loadFromStorage();
@@ -46,7 +47,7 @@ class ChatbotStore {
   private loadFromStorage(): void {
     if (typeof window === 'undefined') return;
     try {
-      const raw = window.sessionStorage.getItem(STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -61,7 +62,8 @@ class ChatbotStore {
   private saveToStorage(): void {
     if (typeof window === 'undefined') return;
     try {
-      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this.messages));
+      const capped = this.messages.slice(-MAX_PERSISTED_MESSAGES);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(capped));
     } catch {
       // Abaikan quota error
     }
@@ -69,7 +71,6 @@ class ChatbotStore {
 
   open(): void {
     this.isOpen = true;
-    this.hasUnread = false;
   }
 
   close(): void {
@@ -89,10 +90,11 @@ class ChatbotStore {
       {
         id: `greeting-${Date.now()}`,
         sender: 'assistant',
-        text: 'Halo kembali! 🦀 Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar RestoLink yang bisa saya bantu?',
+        text: 'Halo kembali! Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar RestoLink yang bisa saya bantu?',
         timestamp: new Date().toISOString()
       }
     ];
+    this.suggestions = [];
     this.saveToStorage();
   }
 
@@ -119,47 +121,73 @@ class ChatbotStore {
     this.saveToStorage();
 
     this.loading = true;
+    this.suggestions = [];
+
+    // Placeholder bubble assistant untuk streaming inkremental
+    const assistantId = `assistant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const placeholder: UiChatMessage = {
+      id: assistantId,
+      sender: 'assistant',
+      text: '',
+      timestamp: new Date().toISOString()
+    };
+    this.messages = [...this.messages, placeholder];
+
+    const updateAssistant = (text: string, isError = false) => {
+      this.messages = this.messages.map((msg) =>
+        msg.id === assistantId ? { ...msg, text, isError } : msg
+      );
+    };
+
+    const historyForRequest = this.historyPayload.slice(0, -1);
 
     try {
-      const result = await sendChatMessage({
-        message: trimmed,
-        history: this.historyPayload
-      });
-
-      const replyText = result.error
-        ? `Maaf, kendala: ${result.error}`
-        : result.reply;
-
-      const assistantMsg: UiChatMessage = {
-        id: `assistant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        sender: 'assistant',
-        text: replyText,
-        timestamp: new Date().toISOString(),
-        isError: Boolean(result.error)
-      };
-
-      this.messages = [...this.messages, assistantMsg];
-
-      // Jika window sedang ditutup, beri notifikasi unread
-      if (!this.isOpen) {
-        this.hasUnread = true;
-      }
-
-      this.saveToStorage();
+      await streamChatMessage(
+        {
+          message: trimmed,
+          history: historyForRequest
+        },
+        {
+          onDelta: (delta) => {
+            const current = this.messages.find((m) => m.id === assistantId);
+            updateAssistant((current?.text ?? '') + delta);
+          },
+          onDone: (fullText) => {
+            if (!fullText.trim()) {
+              updateAssistant(
+                'Maaf, saya tidak dapat memproses jawaban saat ini. Silakan coba lagi.',
+                true
+              );
+              return;
+            }
+            this.saveToStorage();
+            void this.loadSuggestions(trimmed, fullText, historyForRequest);
+          },
+          onError: (message) => {
+            updateAssistant(`Maaf, kendala: ${message}`, true);
+            this.saveToStorage();
+          }
+        }
+      );
     } catch (err: any) {
-      console.error('[chatbotStore] Error sending message:', err);
-      const fallbackMsg: UiChatMessage = {
-        id: `assistant-err-${Date.now()}`,
-        sender: 'assistant',
-        text: 'Maaf, terjadi kendala koneksi ke server asisten AI. Silakan coba kembali sesaat lagi.',
-        timestamp: new Date().toISOString(),
-        isError: true
-      };
-      this.messages = [...this.messages, fallbackMsg];
+      console.error('[chatbotStore] Error streaming message:', err);
+      updateAssistant(
+        'Maaf, terjadi kendala koneksi ke server asisten AI. Silakan coba kembali sesaat lagi.',
+        true
+      );
       this.saveToStorage();
     } finally {
       this.loading = false;
     }
+  }
+
+  async loadSuggestions(
+    question: string,
+    reply: string,
+    history: ChatHistoryItem[]
+  ): Promise<void> {
+    const list = await fetchSuggestions({ question, reply, history });
+    this.suggestions = list;
   }
 }
 

@@ -8,6 +8,23 @@
 export const APP_DOMAIN = 'restolink.site';
 
 /**
+ * Kontak Dukungan Resmi Platform
+ * Sinkron dengan modal bantuan pada halaman Login.
+ */
+export const SUPPORT_EMAIL = 'support@restolink.site';
+export const SUPPORT_WHATSAPP_DISPLAY = '+62 812-3456-7890';
+export const SUPPORT_WHATSAPP_NUMBER = '6281234567890';
+
+/**
+ * Membangun tautan WhatsApp untuk handoff percakapan ke tim dukungan.
+ */
+export function buildSupportWhatsAppLink(context?: string): string {
+  const base = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}`;
+  if (!context) return base;
+  return `${base}?text=${encodeURIComponent(context)}`;
+}
+
+/**
  * Daftar Subdomain yang Dipesan (Reserved Subdomains)
  *
  * Sinkron 100% dengan constraint database check_subdomain_reserved pada 001_initial_schema.sql.

@@ -1,6 +1,7 @@
 import type { ApiRequest, ApiResponse } from '../_types';
 import { HttpError } from '../_lib/auth';
 import { parseJsonBody, sendJson } from '../_lib/http';
+import { buildRestoLinkSystemPrompt } from './knowledge';
 
 export interface ChatMessage {
   role?: string;
@@ -13,33 +14,10 @@ export interface ChatMessage {
 export interface ChatRequestPayload {
   message?: string;
   history?: ChatMessage[];
+  stream?: boolean;
 }
 
-export const RESTOLINK_SYSTEM_PROMPT = `Nama Anda adalah Linka, asisten virtual AI dan maskot koki resmi RestoLink, platform web multi-tenant untuk UMKM kuliner di Indonesia.
-Tugas Anda adalah membantu calon pengguna dan pengunjung memahami platform RestoLink dengan ramah, jelas, ringkas, dan profesional dalam Bahasa Indonesia. Perkenalkan diri Anda sebagai Linka saat menyapa atau jika ditanya mengenai identitas dan nama Anda.
-
-Informasi Resmi RestoLink:
-1. Tentang Platform:
-   - RestoLink adalah platform pusat kendali terpadu bagi UMKM kuliner untuk mengelola profil resto, menu digital, dan pemesanan secara mandiri tanpa perlu membuat website dari nol.
-2. Fitur Utama:
-   - Website menu digital berbasis subdomain unik (contoh: warungmakan.restolink.site) yang langsung aktif dan cepat dibuka pelanggan via mobile browser.
-   - Manajemen Kategori & Menu: CRUD menu, upload foto menu & logo usaha (terkompresi WebP otomatis via Cloudinary), penandaan menu terlaris / stok habis.
-   - Pemesanan Tamu (Guest Checkout): Pelanggan dapat memesan langsung dari meja via scan QR Code tanpa perlu download aplikasi atau registrasi akun.
-   - Dashboard Pemilik: Pemantauan pesanan masuk secara real-time dengan status (baru -> diproses -> selesai).
-   - Pengaturan Resto: Jam operasional, alamat, kontak WhatsApp, nomor meja, rekening/QRIS resto.
-3. Paket Layanan & Harga:
-   - Paket Mikro: Rp 49.000 / bulan dengan uji coba (trial) berbayar 30 hari pertama via Midtrans Sandbox.
-   - Paket Kecil & Menengah: Segera hadir (dalam tahap pengembangan fitur lanjutan).
-4. Cara Pendaftaran & Memulai:
-   - Buka menu 'Daftar' di landing page RestoLink (restolink.site).
-   - Masukkan nama pemilik, nama resto, pilih subdomain unik yang diinginkan, email, dan kata sandi.
-   - Selesaikan pembayaran paket Mikro untuk mengaktifkan tenant dan subdomain.
-   - Masuk ke Dashboard Pemilik untuk mengatur menu dan mencetak QR Code meja.
-
-Batasan & Aturan Ketat:
-- Anda HANYA boleh menjawab pertanyaan yang berkaitan dengan RestoLink (fitur, harga/paket, cara daftar, cara kerja).
-- JIKA pengguna bertanya di luar topik RestoLink (seperti pengetahuan umum, coding, politik, cuaca, lelucon, atau hal di luar RestoLink), tolak dengan sopan dan arahkan kembali ke RestoLink. Contoh: 'Maaf, saya Linka, asisten virtual resmi RestoLink dan hanya dapat membantu menjawab pertanyaan seputar platform RestoLink, fitur, paket harga, dan cara pendaftarannya. Ada yang ingin Anda tanyakan seputar RestoLink?'
-- Jangan pernah memberikan informasi palsu, menjanjikan diskon di luar paket resmi, atau keluar dari persona RestoLink.`;
+export const RESTOLINK_SYSTEM_PROMPT = buildRestoLinkSystemPrompt();
 
 export const FALLBACK_REPLY_QUOTA =
   'Maaf, Linka (asisten AI RestoLink) saat ini sedang mengalami lonjakan permintaan atau batas kuota layanan sementara. Silakan tinjau informasi fitur dan paket langganan langsung pada menu Fitur dan Harga di halaman ini, atau hubungi tim dukungan kami.';
@@ -114,6 +92,38 @@ export function formatHistory(
   return sanitized;
 }
 
+export function extractTextDelta(chunk: any): string {
+  const text = chunk?.candidates?.[0]?.content?.parts?.[0]?.text;
+  return typeof text === 'string' ? text : '';
+}
+
+function initSse(res: ApiResponse): void {
+  if (typeof (res as any).setHeader === 'function') {
+    (res as any).setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    (res as any).setHeader('Cache-Control', 'no-cache, no-transform');
+    (res as any).setHeader('Connection', 'keep-alive');
+    (res as any).setHeader('X-Accel-Buffering', 'no');
+  }
+  if (typeof (res as any).flushHeaders === 'function') {
+    (res as any).flushHeaders();
+  }
+}
+
+function writeSse(res: ApiResponse, data: unknown): void {
+  if (typeof (res as any).write === 'function') {
+    (res as any).write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+}
+
+export function resolveModelEndpoint(
+  model: string,
+  method: 'generateContent' | 'streamGenerateContent',
+  apiKey: string
+): string {
+  const base = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${method}?key=${apiKey}`;
+  return method === 'streamGenerateContent' ? `${base}&alt=sse` : base;
+}
+
 export function buildGeminiPayload(message: string, history?: ChatMessage[]) {
   const formattedHistory = formatHistory(history);
   const contents = [
@@ -131,7 +141,7 @@ export function buildGeminiPayload(message: string, history?: ChatMessage[]) {
     },
     generationConfig: {
       temperature: 0.4,
-      maxOutputTokens: 800,
+      maxOutputTokens: 1500,
     },
   };
 }
@@ -153,6 +163,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     });
   }
 
+  let message: string;
+  let history: ChatMessage[] | undefined;
+  let wantsStream = false;
+
   try {
     const body = await parseJsonBody<ChatRequestPayload>(req);
     const rawMessage = body?.message;
@@ -163,16 +177,42 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       });
     }
 
-    const message = rawMessage.trim();
+    message = rawMessage.trim();
     if (message.length > 1000) {
       return sendJson(res, 400, {
         error: 'Pesan terlalu panjang. Maksimal 1000 karakter.',
       });
     }
 
-    const payload = buildGeminiPayload(message, body.history);
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${primaryModel}:generateContent?key=${apiKey}`;
+    history = body.history;
+    wantsStream = body.stream === true;
+  } catch (err: any) {
+    if (err instanceof HttpError) {
+      return sendJson(res, err.statusCode, { error: err.message });
+    }
+    return sendJson(res, 200, {
+      reply: FALLBACK_REPLY_GENERIC,
+      fallback: true,
+    });
+  }
+
+  if (wantsStream) {
+    return streamGeminiReply(res, apiKey, message, history);
+  }
+
+  return jsonGeminiReply(res, apiKey, message, history);
+}
+
+async function jsonGeminiReply(
+  res: ApiResponse,
+  apiKey: string,
+  message: string,
+  history?: ChatMessage[]
+) {
+  try {
+    const payload = buildGeminiPayload(message, history);
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+    const geminiUrl = resolveModelEndpoint(primaryModel, 'generateContent', apiKey);
 
     let geminiRes: Response | null = null;
     try {
@@ -193,8 +233,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     // Jika model utama overload (503/timeout), fallback cepat ke model sekunder resmi
     if ((!geminiRes || !geminiRes.ok) && geminiRes?.status !== 429) {
-      const fallbackModel = process.env.GEMINI_FALLBACK_MODEL || 'gemini-1.5-flash-8b';
-      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${apiKey}`;
+      const fallbackModel = process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite';
+      const fallbackUrl = resolveModelEndpoint(fallbackModel, 'generateContent', apiKey);
       try {
         geminiRes = await fetch(fallbackUrl, {
           method: 'POST',
@@ -259,5 +299,117 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       reply: FALLBACK_REPLY_GENERIC,
       fallback: true,
     });
+  }
+}
+
+function parseSseBuffer(buffer: string): { events: string[]; rest: string } {
+  const events: string[] = [];
+  let rest = buffer;
+  const boundary = /\r?\n\r?\n/;
+  let match: RegExpExecArray | null;
+  while ((match = boundary.exec(rest)) !== null) {
+    events.push(rest.slice(0, match.index));
+    rest = rest.slice(match.index + match[0].length);
+  }
+  return { events, rest };
+}
+
+function extractSseDataLines(block: string): string[] {
+  const lines = block.split('\n');
+  const dataLines: string[] = [];
+  for (const line of lines) {
+    if (line.startsWith('data:')) {
+      dataLines.push(line.slice(5).trim());
+    }
+  }
+  return dataLines;
+}
+
+async function streamGeminiReply(
+  res: ApiResponse,
+  apiKey: string,
+  message: string,
+  history?: ChatMessage[]
+) {
+  initSse(res);
+
+  const payload = buildGeminiPayload(message, history);
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const url = resolveModelEndpoint(primaryModel, 'streamGenerateContent', apiKey);
+
+  let geminiRes: Response | null = null;
+  try {
+    geminiRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(55000),
+    });
+  } catch (fetchErr: any) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn(`Gemini stream (${primaryModel}) error:`, fetchErr?.message);
+    }
+  }
+
+  if (!geminiRes || !geminiRes.ok || !geminiRes.body) {
+    if (geminiRes?.status === 429) {
+      writeSse(res, { text: FALLBACK_REPLY_QUOTA, fallback: true });
+    } else {
+      const errText = geminiRes
+        ? await geminiRes.text().catch(() => '')
+        : 'Network timeout / no response from Gemini stream service';
+      if (process.env.NODE_ENV !== 'test') {
+        console.error(`Gemini Stream Error (${geminiRes?.status ?? 'TIMEOUT'}):`, errText);
+      }
+      writeSse(res, { text: FALLBACK_REPLY_GENERIC, fallback: true });
+    }
+    writeSse(res, '[DONE]');
+    if (typeof (res as any).end === 'function') (res as any).end();
+    return;
+  }
+
+  const reader = (geminiRes.body as ReadableStream<Uint8Array>).getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let emitted = false;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const { events, rest } = parseSseBuffer(buffer);
+      buffer = rest;
+
+      for (const block of events) {
+        for (const dataLine of extractSseDataLines(block)) {
+          if (!dataLine || dataLine === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(dataLine);
+            const delta = extractTextDelta(parsed);
+            if (delta) {
+              emitted = true;
+              writeSse(res, { text: delta });
+            }
+          } catch {
+            // Lewati potongan SSE yang tidak bisa diparse
+          }
+        }
+      }
+    }
+  } catch (streamErr: any) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('Gemini stream read error:', streamErr?.message);
+    }
+  } finally {
+    if (!emitted) {
+      writeSse(res, { text: FALLBACK_REPLY_GENERIC, fallback: true });
+    }
+    writeSse(res, '[DONE]');
+    if (typeof (res as any).end === 'function') (res as any).end();
   }
 }
