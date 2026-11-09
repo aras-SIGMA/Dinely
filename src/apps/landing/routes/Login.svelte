@@ -15,7 +15,28 @@
   let showPassword = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state('');
+  let isEmailNotConfirmed = $state(false);
+  let isResendingFromLogin = $state(false);
+  let resendSuccessFromLogin = $state('');
   let isForgotPasswordModalOpen = $state(false);
+
+  async function handleResendFromLogin() {
+    if (!email.trim() || isResendingFromLogin) return;
+    isResendingFromLogin = true;
+    resendSuccessFromLogin = '';
+    try {
+      const res = await authStore.resendOtp(email.trim());
+      if (res.success) {
+        resendSuccessFromLogin = 'Kode OTP verifikasi berhasil dikirim ulang ke Gmail Anda.';
+      } else {
+        errorMessage = res.error || 'Gagal mengirim ulang kode OTP.';
+      }
+    } catch (err: unknown) {
+      errorMessage = err instanceof Error ? err.message : 'Gagal mengirim kode verifikasi.';
+    } finally {
+      isResendingFromLogin = false;
+    }
+  }
 
   // Form Validation
   let isFormValid = $derived(
@@ -26,6 +47,8 @@
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     errorMessage = '';
+    isEmailNotConfirmed = false;
+    resendSuccessFromLogin = '';
 
     if (!isFormValid || isSubmitting) return;
 
@@ -45,6 +68,9 @@
         // Tampilkan pesan error ramah pengguna
         if (result.error?.toLowerCase().includes('invalid login credentials')) {
           errorMessage = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
+        } else if (result.error?.toLowerCase().includes('email not confirmed')) {
+          errorMessage = 'Email akun Anda belum dikonfirmasi. Silakan periksa kode OTP di Gmail Anda.';
+          isEmailNotConfirmed = true;
         } else if (result.error?.toLowerCase().includes('failed to fetch')) {
           errorMessage = 'Gagal terhubung ke database (Failed to fetch). Pastikan file .env sudah dibuat dan diisi VITE_SUPABASE_URL serta VITE_SUPABASE_ANON_KEY dari proyek Supabase tim.';
         } else {
@@ -122,7 +148,36 @@
           <div class="flex-1">
             <p class="font-bold">Gagal Masuk</p>
             <p class="mt-0.5 text-xs text-red-700">{errorMessage}</p>
+
+            {#if isEmailNotConfirmed}
+              <div class="mt-2.5 pt-2 border-t border-red-200 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  class="font-bold text-brand-700 hover:text-brand-800 underline text-xs disabled:opacity-50"
+                  onclick={handleResendFromLogin}
+                  disabled={isResendingFromLogin}
+                >
+                  {isResendingFromLogin ? 'Mengirim ulang...' : 'Kirim Ulang Kode OTP ke Gmail'}
+                </button>
+                <span class="text-slate-400 text-xs">&bull;</span>
+                <a href="/daftar" class="font-semibold text-slate-700 hover:text-slate-900 underline text-xs">
+                  Buka Form Verifikasi OTP &rarr;
+                </a>
+              </div>
+            {/if}
           </div>
+        </div>
+      {/if}
+
+      {#if resendSuccessFromLogin}
+        <div
+          role="status"
+          class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800 flex items-start gap-2.5"
+        >
+          <svg class="size-4 shrink-0 text-emerald-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <p class="flex-1 font-medium">{resendSuccessFromLogin}</p>
         </div>
       {/if}
 

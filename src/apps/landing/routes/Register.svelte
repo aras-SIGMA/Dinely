@@ -19,6 +19,16 @@
   let password = $state('');
 
   // UI States
+  let currentStep = $state<'form' | 'otp'>('form');
+  let registeredEmail = $state('');
+  let otpCode = $state('');
+  let otpError = $state('');
+  let isVerifyingOtp = $state(false);
+  let isResendingOtp = $state(false);
+  let resendCountdown = $state(0);
+  let resendNotice = $state('');
+  let resendInterval: ReturnType<typeof setInterval> | null = null;
+
   let isSubdomainManuallyEdited = $state(false);
   let showPassword = $state(false);
   let isCheckingSubdomain = $state(false);
@@ -30,6 +40,72 @@
 
   // Debounce Timer Reference
   let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function startResendTimer(seconds = 60) {
+    if (resendInterval) clearInterval(resendInterval);
+    resendCountdown = seconds;
+    resendInterval = setInterval(() => {
+      resendCountdown -= 1;
+      if (resendCountdown <= 0) {
+        if (resendInterval) clearInterval(resendInterval);
+        resendInterval = null;
+      }
+    }, 1000);
+  }
+
+  async function handleVerifyOtp(e: SubmitEvent) {
+    e.preventDefault();
+    otpError = '';
+    const cleanToken = otpCode.trim().replace(/\D/g, '');
+
+    if (cleanToken.length !== 6 || isVerifyingOtp) {
+      otpError = 'Harap masukkan 6 digit kode angka verifikasi.';
+      return;
+    }
+
+    isVerifyingOtp = true;
+
+    try {
+      const result = await authStore.verifyEmailOtp(registeredEmail, cleanToken);
+      if (result.success) {
+        router.navigate('/dashboard');
+      } else {
+        if (result.error?.toLowerCase().includes('token has expired') || result.error?.toLowerCase().includes('expired')) {
+          otpError = 'Kode verifikasi sudah kedaluwarsa. Silakan klik tombol kirim ulang kode.';
+        } else if (result.error?.toLowerCase().includes('invalid')) {
+          otpError = 'Kode verifikasi tidak cocok. Silakan periksa kembali email Anda.';
+        } else {
+          otpError = result.error || 'Verifikasi gagal. Pastikan kode yang dimasukkan benar.';
+        }
+      }
+    } catch (err: unknown) {
+      otpError = err instanceof Error ? err.message : 'Terjadi kendala saat memverifikasi kode.';
+    } finally {
+      isVerifyingOtp = false;
+    }
+  }
+
+  async function handleResendOtp() {
+    if (resendCountdown > 0 || isResendingOtp || !registeredEmail) return;
+
+    isResendingOtp = true;
+    resendNotice = '';
+    otpError = '';
+
+    try {
+      const result = await authStore.resendOtp(registeredEmail);
+      if (result.success) {
+        resendNotice = 'Kode verifikasi baru berhasil dikirim ke Gmail Anda.';
+        startResendTimer(60);
+      } else {
+        otpError = result.error || 'Gagal mengirim ulang kode. Silakan coba sesaat lagi.';
+      }
+    } catch (err: unknown) {
+      otpError = err instanceof Error ? err.message : 'Koneksi bermasalah saat meminta kode baru.';
+    } finally {
+      isResendingOtp = false;
+    }
+  }
 
   // Auto-slugify Subdomain when Business Name changes (if not manually edited)
   function handleBusinessNameInput(e: Event) {
@@ -134,8 +210,10 @@
           // Auto-login session tersedia -> langsung arahkan ke dashboard
           router.navigate('/dashboard');
         } else {
-          // Butuh konfirmasi email
-          successNotice = result.error || 'Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi.';
+          // Butuh konfirmasi email OTP 6-digit
+          registeredEmail = email.trim();
+          currentStep = 'otp';
+          startResendTimer(60);
         }
       } else {
         if (result.error?.toLowerCase().includes('failed to fetch')) {
@@ -165,6 +243,11 @@
         router.navigate('/admin');
       }
     }
+
+    return () => {
+      if (resendInterval) clearInterval(resendInterval);
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+    };
   });
 </script>
 
@@ -191,8 +274,130 @@
       </a>
     </div>
 
-    <!-- Main Registration Card -->
-    <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-9 shadow-xl shadow-slate-200/50">
+    {#if currentStep === 'otp'}
+      <!-- OTP Step Card: Verifikasi 6-Digit Gmail OTP -->
+      <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-9 shadow-xl shadow-slate-200/50">
+        <div class="text-center sm:text-left">
+          <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 border border-brand-200/80">
+            Langkah 2 dari 2: Verifikasi Email
+          </span>
+          <h1 class="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            Verifikasi Kode Akun Toko
+          </h1>
+          <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Kami telah mengirimkan 6 digit kode OTP ke alamat Gmail <strong class="text-slate-900 font-semibold">{registeredEmail}</strong>. Masukkan kode di bawah untuk mengaktifkan toko Anda.
+          </p>
+        </div>
+
+        <!-- Alert Banners for OTP -->
+        {#if otpError}
+          <div
+            role="alert"
+            class="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-xs sm:text-sm text-red-800 flex items-start gap-3"
+          >
+            <svg class="size-5 shrink-0 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="flex-1">
+              <p class="font-bold">Verifikasi Gagal</p>
+              <p class="mt-0.5 text-xs text-red-700">{otpError}</p>
+            </div>
+          </div>
+        {/if}
+
+        {#if resendNotice}
+          <div
+            role="status"
+            class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs sm:text-sm text-emerald-800 flex items-start gap-3"
+          >
+            <svg class="size-5 shrink-0 text-emerald-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="flex-1">
+              <p class="font-bold">Kode Terkirim</p>
+              <p class="mt-0.5 text-xs text-emerald-700">{resendNotice}</p>
+            </div>
+          </div>
+        {/if}
+
+        <!-- OTP Form -->
+        <form onsubmit={handleVerifyOtp} class="mt-6 space-y-5" novalidate>
+          <div>
+            <label for="otpCode" class="block text-xs font-semibold text-slate-700 mb-2 text-center sm:text-left">
+              Kode OTP 6 Digit <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="otpCode"
+              name="otpCode"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="6"
+              autocomplete="one-time-code"
+              placeholder="000000"
+              value={otpCode}
+              oninput={(e) => {
+                const target = e.target as HTMLInputElement;
+                otpCode = target.value.replace(/\D/g, '').slice(0, 6);
+              }}
+              class="h-14 w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 text-center font-mono text-2xl sm:text-3xl font-extrabold tracking-[0.4em] sm:tracking-[0.6em] text-slate-900 placeholder:text-slate-300 placeholder:tracking-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:bg-white focus-visible:border-transparent transition-all"
+            />
+            <p class="mt-2 text-center text-[11px] text-slate-500">
+              Periksa kotak masuk (Inbox) atau folder Spam pada Gmail Anda.
+            </p>
+          </div>
+
+          <div class="pt-2">
+            <Button
+              type="submit"
+              size="lg"
+              full
+              loading={isVerifyingOtp}
+              disabled={isVerifyingOtp || otpCode.trim().length !== 6}
+            >
+              {isVerifyingOtp ? 'Memverifikasi Kode...' : 'Verifikasi & Aktifkan Toko'}
+            </Button>
+          </div>
+        </form>
+
+        <!-- Resend & Back actions -->
+        <div class="mt-6 border-t border-slate-100 pt-5 space-y-3 text-center">
+          <div class="text-xs text-slate-600">
+            {#if resendCountdown > 0}
+              <span class="text-slate-500">
+                Belum menerima kode? Kirim ulang dalam <strong class="text-brand-600 font-mono">{resendCountdown} detik</strong>
+              </span>
+            {:else}
+              <button
+                type="button"
+                class="font-semibold text-brand-600 hover:text-brand-700 hover:underline disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
+                onclick={handleResendOtp}
+                disabled={isResendingOtp}
+              >
+                {isResendingOtp ? 'Mengirim ulang...' : 'Kirim Ulang Kode OTP'}
+              </button>
+            {/if}
+          </div>
+
+          <div>
+            <button
+              type="button"
+              class="text-xs text-slate-500 hover:text-slate-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
+              onclick={() => {
+                currentStep = 'form';
+                otpCode = '';
+                otpError = '';
+                resendNotice = '';
+              }}
+            >
+              &larr; Ubah data pendaftaran atau perbaiki email
+            </button>
+          </div>
+        </div>
+      </div>
+    {:else}
+      <!-- Main Registration Card -->
+      <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-9 shadow-xl shadow-slate-200/50">
       <!-- Title & Headline -->
       <div class="text-center sm:text-left">
         <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 border border-brand-200/80">
@@ -451,6 +656,7 @@
         </a>
       </div>
     </div>
+    {/if}
 
     <!-- Security & Trust Badges -->
     <div class="mt-8 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-slate-500 font-medium">
