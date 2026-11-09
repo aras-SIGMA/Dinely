@@ -41,7 +41,7 @@
     xmlns="http://www.w3.org/2000/svg"
   >
     <defs>
-      <!-- Gradient Tubuh Utama Crabby Linka -->
+      <!-- Gradient Tubuh Utama Linka -->
       <linearGradient id="linkaShellGrad" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#FB923C" />
         <stop offset="45%" stop-color="#F97316" />

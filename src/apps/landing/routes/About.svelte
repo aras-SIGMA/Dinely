@@ -310,7 +310,7 @@
         {/each}
       </div>
 
-      <!-- CARD SPESIAL: MASKOT RESMI LINKA (KEPITING PURBA) -->
+      <!-- CARD SPESIAL: MASKOT RESMI LINKA -->
       <div class="mt-12">
         <AnimatedContent distance={30} duration={0.6}>
           <div class="relative overflow-hidden rounded-3xl border border-brand-200/80 bg-gradient-to-r from-brand-50/90 via-orange-50/60 to-amber-50/50 p-6 sm:p-8 lg:p-10 shadow-lg shadow-brand-900/[0.03]">
@@ -326,10 +326,10 @@
                   <span>Maskot Resmi RestoLink</span>
                 </div>
                 <h3 class="mt-2 font-display text-xl sm:text-2xl font-bold text-slate-950">
-                  Kenalan dengan "Crabby Linka"!
+                  Kenalan dengan Linka!
                 </h3>
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                  Terinspirasi langsung dari identitas tim kami <strong>"Kepiting Purba"</strong>, Linka adalah asisten koki cerdas berkepala topi koki dan antena sinyal cloud. Linka siap memandu Anda di website RestoLink, menjawab pertanyaan seputar fitur, paket langganan, hingga tips operasional secara ramah dan tanggap.
+                  Linka adalah maskot sekaligus asisten koki cerdas berkepala topi koki dan antena sinyal cloud. Linka siap memandu Anda di website RestoLink, menjawab pertanyaan seputar fitur, paket langganan, hingga tips operasional secara ramah dan tanggap.
                 </p>
                 <div class="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-semibold text-slate-700">
                   <span class="rounded-lg bg-white/80 border border-brand-200/60 px-3 py-1.5 shadow-2xs">Capit Cepat &bull; Solusi Tepat</span>
