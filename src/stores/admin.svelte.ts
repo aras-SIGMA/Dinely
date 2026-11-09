@@ -336,7 +336,27 @@ class AdminStore {
 
       if (options?.extendDays && options.extendDays > 0) {
         const days = options.extendDays;
-        const baseDate = new Date();
+
+        // Ambil masa berlaku terkini dari DB (maybeSingle(): https://supabase.com/docs/reference/javascript/maybe-single)
+        const { data: tenantRow } = await supabase
+          .from('tenants')
+          .select('trial_ends_at, subscription_ends_at')
+          .eq('id', tenantId)
+          .maybeSingle();
+
+        // Base = masa berlaku berjalan jika masih di masa depan, selain itu now()
+        // Konsisten dengan calculateSubscriptionExtension (api/midtrans/webhook.ts).
+        // Guard NaN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
+        const now = new Date();
+        let baseDate = now;
+        const existingEndsAt =
+          nextStatus === 'trial' ? tenantRow?.trial_ends_at : tenantRow?.subscription_ends_at;
+        if (existingEndsAt) {
+          const parsed = new Date(existingEndsAt);
+          if (!isNaN(parsed.getTime()) && parsed.getTime() > now.getTime()) {
+            baseDate = parsed;
+          }
+        }
         const targetExpiry = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000);
 
         if (nextStatus === 'trial') {
