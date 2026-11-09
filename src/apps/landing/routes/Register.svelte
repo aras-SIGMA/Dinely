@@ -9,6 +9,7 @@
   import { router } from '@/lib/router';
   import Logo from '@/components/ui/Logo.svelte';
   import OtpInput from '@/components/ui/OtpInput.svelte';
+  import RegisterMotionIllustration from '@/components/illustrations/RegisterMotionIllustration.svelte';
 
   // Form Fields
   let businessName = $state('');
@@ -382,54 +383,9 @@
         {/if}
       </div>
 
-      <!-- Right Visual Component: Live Repositioned & High-Contrast Card -->
-      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4 translate-x-0 lg:translate-x-1">
-        <div class="relative group w-full max-w-68">
-          <!-- Ambient Glow behind Glass Card -->
-          <div class="absolute -inset-1 rounded-3xl bg-white/30 blur-lg opacity-80 pointer-events-none" aria-hidden="true"></div>
-
-          <!-- Glass Card with High Readability (Crisp Dark Text on Frosted Canvas) -->
-          <div class="relative w-full rounded-2xl border border-white/80 bg-white/90 backdrop-blur-2xl p-4 text-slate-900 shadow-[0_20px_45px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,1)] space-y-3 transition-all duration-300">
-            <!-- Top Specular Highlight Edge -->
-            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"></div>
-
-            <!-- Card Header -->
-            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
-              <div class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-rose-500"></span>
-                <span class="size-2 rounded-full bg-amber-400"></span>
-                <span class="size-2 rounded-full bg-emerald-500"></span>
-              </div>
-              <span class="font-mono text-[10px] text-slate-500 font-bold tracking-wider uppercase">Live Preview</span>
-            </div>
-
-            <!-- Browser Address Simulator with High-Contrast Clean Interior -->
-            <div class="rounded-xl bg-slate-100/90 border border-slate-200/80 px-3 py-2 text-xs font-mono flex items-center gap-1.5 text-slate-700">
-              <svg class="size-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <span class="text-emerald-700 font-semibold">https://</span>
-              <span class="font-bold text-brand-600 truncate">{subdomain || 'nama-resto'}</span>
-              <span class="text-slate-500">.restolink.site</span>
-            </div>
-
-            <!-- Live Feature Checklist with Defined Badges -->
-            <div class="space-y-2 pt-0.5 text-xs text-slate-700">
-              <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
-                <span class="font-medium text-slate-800">Website Menu Instan</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
-                <span class="font-medium text-slate-800">Pemesanan QR Meja Mandiri</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px] border border-emerald-200">✓</span>
-                <span class="font-medium text-slate-800">Rekap Keuangan 0% Komisi</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Right Visual Component: Live Animated Vector Motion Illustration -->
+      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4">
+        <RegisterMotionIllustration subdomain={subdomain} />
       </div>
     </div>
 

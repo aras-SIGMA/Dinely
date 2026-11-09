@@ -7,6 +7,7 @@
   import Logo from '@/components/ui/Logo.svelte';
   import Modal from '@/components/ui/Modal.svelte';
   import OtpInput from '@/components/ui/OtpInput.svelte';
+  import LoginMotionIllustration from '@/components/illustrations/LoginMotionIllustration.svelte';
 
   // Form Fields
   let email = $state('');
@@ -261,47 +262,9 @@
         </p>
       </div>
 
-      <!-- Right Visual Component inside wave: Repositioned & High-Contrast Card -->
-      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4 translate-x-0 lg:translate-x-1">
-        <div class="relative group w-full max-w-68">
-          <!-- Ambient Glow behind Glass Card -->
-          <div class="absolute -inset-1 rounded-3xl bg-white/30 blur-lg opacity-80 pointer-events-none" aria-hidden="true"></div>
-
-          <!-- Glass Card with High Readability (Crisp Dark Text on Frosted Canvas) -->
-          <div class="relative w-full rounded-2xl border border-white/80 bg-white/90 backdrop-blur-2xl p-4 text-slate-900 shadow-[0_20px_45px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,1)] space-y-3 transition-all duration-300">
-            <!-- Top Specular Highlight Edge -->
-            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"></div>
-
-            <!-- Card Header -->
-            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
-              <div class="flex items-center gap-2">
-                <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-800">Meja 04 • Baru</span>
-              </div>
-              <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 shadow-xs">
-                QRIS Lunas
-              </span>
-            </div>
-
-            <!-- Card Items (Dark text for maximum readability) -->
-            <div class="space-y-1.5 text-xs text-slate-700">
-              <div class="flex justify-between font-medium">
-                <span>1x Ayam Bakar Madu</span>
-                <span class="font-mono text-slate-900 font-semibold">32.000</span>
-              </div>
-              <div class="flex justify-between font-medium">
-                <span>1x Es Teh Manis Jumbo</span>
-                <span class="font-mono text-slate-900 font-semibold">7.000</span>
-              </div>
-            </div>
-
-            <!-- Card Total -->
-            <div class="border-t border-slate-200/80 pt-2 flex items-center justify-between text-xs">
-              <span class="text-slate-600 font-medium">Total Pesanan</span>
-              <span class="font-mono font-black text-brand-600 text-sm">Rp 39.000</span>
-            </div>
-          </div>
-        </div>
+      <!-- Right Visual Component inside wave: Animated Vector Motion Illustration -->
+      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-2 lg:pl-4">
+        <LoginMotionIllustration />
       </div>
     </div>
 
