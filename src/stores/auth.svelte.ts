@@ -296,26 +296,6 @@ class AuthStore {
     };
   }
 
-  /**
-   * Kirim ulang kode 6-digit OTP ke email user
-   * Ref: https://supabase.com/docs/reference/javascript/auth-resend
-   */
-  async resendOtp(email: string): Promise<{ success: boolean; error?: string }> {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email.trim()
-    });
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-
-    return { success: true };
-  }
-
   async signIn(params: SignInParams): Promise<AuthActionResult> {
     const { email, password } = params;
 
@@ -352,6 +332,95 @@ class AuthStore {
       session: true,
       role: this.role ?? undefined
     };
+  }
+
+  async verifyOtp(params: { email: string; token: string; type?: 'email' | 'signup' }): Promise<AuthActionResult> {
+    const { email, token, type = 'email' } = params;
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: token.trim(),
+        type: type as 'email' | 'signup'
+      });
+
+      if (error) {
+        // Fallback ke custom Gmail OTP endpoint jika Kevin mengimplementasikannya di API
+        try {
+          const res = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim(), otp: token.trim() })
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.session || json.success) {
+              return { success: true, session: true, role: this.role ?? 'owner' };
+            }
+          }
+        } catch {
+          // endpoint custom belum aktif
+        }
+
+        return {
+          success: false,
+          error: error.message || 'Kode OTP tidak valid atau telah kedaluwarsa.'
+        };
+      }
+
+      if (data.user) {
+        await Promise.all([
+          this.loadProfile(data.user.id),
+          this.loadTenant(data.user.id)
+        ]);
+      }
+
+      return {
+        success: true,
+        session: !!data.session,
+        role: this.role ?? 'owner'
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Gagal memverifikasi kode OTP.'
+      };
+    }
+  }
+
+  async resendOtp(
+    emailOrParams: string | { email: string; type?: 'signup' | 'email' }
+  ): Promise<{ success: boolean; error?: string }> {
+    const emailRaw = typeof emailOrParams === 'string' ? emailOrParams : emailOrParams.email;
+    const type = typeof emailOrParams === 'string' ? 'signup' : emailOrParams.type ?? 'signup';
+    const email = typeof emailRaw === 'string' ? emailRaw.trim() : '';
+    if (!email) {
+      return { success: false, error: 'Email tidak boleh kosong.' };
+    }
+    try {
+      const { error } = await supabase.auth.resend({
+        type: (type === 'email' ? 'email_change' : 'signup') as 'signup' | 'email_change',
+        email
+      });
+
+      if (error) {
+        // Fallback ke custom Gmail OTP endpoint
+        try {
+          const res = await fetch('/api/auth/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          if (res.ok) return { success: true };
+        } catch {
+          // endpoint custom belum aktif
+        }
+
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Gagal mengirim ulang kode OTP.' };
+    }
   }
 
   async signOut(): Promise<void> {
