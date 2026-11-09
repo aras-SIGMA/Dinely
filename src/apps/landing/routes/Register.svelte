@@ -462,6 +462,7 @@
               required
               autocomplete="name"
               placeholder="Contoh: Nia Kurniawati"
+              maxlength="100"
               bind:value={fullName}
               class="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:border-transparent transition-all"
             />
@@ -478,6 +479,7 @@
               required
               autocomplete="tel"
               placeholder="Contoh: 081234567890"
+              maxlength="20"
               bind:value={phone}
               class="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:border-transparent transition-all"
             />
@@ -496,6 +498,7 @@
             required
             autocomplete="organization"
             placeholder="Contoh: Dapur Bu Nia"
+            maxlength="100"
             value={businessName}
             oninput={handleBusinessNameInput}
             class="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:border-transparent transition-all"
