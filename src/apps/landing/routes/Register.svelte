@@ -58,8 +58,8 @@
     otpError = '';
     const cleanToken = otpCode.trim().replace(/\D/g, '');
 
-    if (cleanToken.length !== 6 || isVerifyingOtp) {
-      otpError = 'Harap masukkan 6 digit kode angka verifikasi.';
+    if (cleanToken.length < 6 || cleanToken.length > 8 || isVerifyingOtp) {
+      otpError = 'Harap masukkan 6 sampai 8 digit kode angka verifikasi.';
       return;
     }
 
@@ -275,7 +275,7 @@
     </div>
 
     {#if currentStep === 'otp'}
-      <!-- OTP Step Card: Verifikasi 6-Digit Gmail OTP -->
+      <!-- OTP Step Card: Verifikasi Kode Email Gmail OTP -->
       <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-9 shadow-xl shadow-slate-200/50">
         <div class="text-center sm:text-left">
           <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 border border-brand-200/80">
@@ -285,7 +285,7 @@
             Verifikasi Kode Akun Toko
           </h1>
           <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Kami telah mengirimkan 6 digit kode OTP ke alamat Gmail <strong class="text-slate-900 font-semibold">{registeredEmail}</strong>. Masukkan kode di bawah untuk mengaktifkan toko Anda.
+            Kami telah mengirimkan kode OTP ke alamat Gmail <strong class="text-slate-900 font-semibold">{registeredEmail}</strong>. Masukkan kode di bawah untuk mengaktifkan toko Anda.
           </p>
         </div>
 
@@ -324,7 +324,7 @@
         <form onsubmit={handleVerifyOtp} class="mt-6 space-y-5" novalidate>
           <div>
             <label for="otpCode" class="block text-xs font-semibold text-slate-700 mb-2 text-center sm:text-left">
-              Kode OTP 6 Digit <span class="text-red-500">*</span>
+              Kode OTP <span class="text-red-500">*</span>
             </label>
             <input
               id="otpCode"
@@ -332,13 +332,13 @@
               type="text"
               inputmode="numeric"
               pattern="[0-9]*"
-              maxlength="6"
+              maxlength="8"
               autocomplete="one-time-code"
               placeholder="000000"
               value={otpCode}
               oninput={(e) => {
                 const target = e.target as HTMLInputElement;
-                otpCode = target.value.replace(/\D/g, '').slice(0, 6);
+                otpCode = target.value.replace(/\D/g, '').slice(0, 8);
               }}
               class="h-14 w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 text-center font-mono text-2xl sm:text-3xl font-extrabold tracking-[0.4em] sm:tracking-[0.6em] text-slate-900 placeholder:text-slate-300 placeholder:tracking-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:bg-white focus-visible:border-transparent transition-all"
             />
@@ -353,7 +353,7 @@
               size="lg"
               full
               loading={isVerifyingOtp}
-              disabled={isVerifyingOtp || otpCode.trim().length !== 6}
+              disabled={isVerifyingOtp || otpCode.trim().length < 6 || otpCode.trim().length > 8}
             >
               {isVerifyingOtp ? 'Memverifikasi Kode...' : 'Verifikasi & Aktifkan Toko'}
             </Button>
