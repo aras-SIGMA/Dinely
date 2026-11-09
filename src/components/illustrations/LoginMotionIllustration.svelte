@@ -26,11 +26,11 @@
       <!-- Glass Badge Gradient -->
       <linearGradient id="brand-badge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#FFFFFF" />
-        <stop offset="100%" stop-color="#FFF7ED" />
+        <stop offset="100%" stop-color="#FFFBF7" />
       </linearGradient>
 
       <filter id="badge-glow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.22" />
+        <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#0F172A" flood-opacity="0.18" />
       </filter>
     </defs>
 
@@ -46,36 +46,50 @@
       <path d="M-8 -2 Q-15 -12 -7 -22 Q0 -32 -5 -44" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.6" class="steam-wave delay-500" />
     </g>
 
-    <!-- 4. FLOATING ORDER PILL BADGE (MEJA 04 • QRIS LUNAS) -->
-    <g class="float-badge" transform="translate(255, 55)" filter="url(#badge-glow)">
-      <!-- Pill Container -->
-      <rect x="0" y="0" width="180" height="60" rx="18" fill="url(#brand-badge-grad)" stroke="#FFFFFF" stroke-width="2.5" />
-      <!-- Specular shine line -->
-      <line x1="16" y1="2" x2="164" y2="2" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.9" />
+    <!-- 4. FLOATING ORDER PILL BADGE (MEJA 04 • QRIS LUNAS - POLISHED DESIGN) -->
+    <g class="float-badge" transform="translate(244, 48)" filter="url(#badge-glow)">
+      <!-- Card Container: 216 x 66 with clean rounded corners -->
+      <rect x="0" y="0" width="216" height="66" rx="18" fill="url(#brand-badge-grad)" stroke="#FFFFFF" stroke-width="2" />
+      <!-- Specular shine line on top rim -->
+      <line x1="16" y1="2" x2="200" y2="2" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.9" />
 
-      <!-- Live Pulsing Green Dot -->
-      <circle cx="22" cy="22" r="5" fill="#10B981" class="pulse-dot" />
-      <circle cx="22" cy="22" r="9" stroke="#10B981" stroke-width="1.5" fill="none" opacity="0.5" class="pulse-ring" />
+      <!-- Row 1: Live Status Dot + Table Name + Pill Badges -->
+      <circle cx="22" cy="22" r="4.5" fill="#10B981" class="pulse-dot" />
+      <circle cx="22" cy="22" r="8.5" stroke="#10B981" stroke-width="1.2" fill="none" opacity="0.45" class="pulse-ring" />
 
-      <!-- Table Info -->
-      <text x="36" y="25" font-family="system-ui, sans-serif" font-size="11" font-weight="800" fill="#0F172A" letter-spacing="0.5">MEJA 04 • BARU</text>
+      <!-- Table Name -->
+      <text x="35" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800" fill="#0F172A" letter-spacing="0.3">Meja 04</text>
 
-      <!-- Badge Pill: QRIS Lunas -->
-      <rect x="114" y="12" width="56" height="20" rx="10" fill="#DCFCE7" stroke="#86EFAC" stroke-width="1" />
-      <text x="142" y="26" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#15803D" text-anchor="middle">QRIS Lunas</text>
+      <!-- Pill 1: Baru -->
+      <rect x="88" y="14" width="34" height="16" rx="8" fill="#F1F5F9" />
+      <text x="105" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" font-weight="700" fill="#475569" text-anchor="middle">Baru</text>
 
-      <!-- Subtext: Total Amount -->
-      <text x="22" y="46" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#64748B">Total Masuk:</text>
-      <text x="94" y="46" font-family="monospace, monospace" font-size="11" font-weight="900" fill="#EA580C">Rp 39.000</text>
+      <!-- Pill 2: QRIS Lunas -->
+      <rect x="132" y="12" width="70" height="20" rx="10" fill="#DCFCE7" stroke="#86EFAC" stroke-width="1" />
+      <text x="167" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="800" fill="#15803D" text-anchor="middle">QRIS Lunas</text>
+
+      <!-- Divider Hairline -->
+      <line x1="16" y1="38" x2="200" y2="38" stroke="#F1F5F9" stroke-width="1" stroke-linecap="round" />
+
+      <!-- Row 2: Total Amount & Status -->
+      <text x="20" y="53" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#64748B">Total Masuk:</text>
+      <text x="84" y="53" font-family="monospace, monospace" font-size="11.5" font-weight="900" fill="#EA580C">Rp 39.000</text>
+      
+      <!-- Right Status Summary -->
+      <text x="198" y="53" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#10B981" text-anchor="end">2 Menu Siap</text>
     </g>
 
     <!-- 5. FLOATING MINI ACCENTS & SPARKLES -->
-    <g class="float-slow" transform="translate(75, 105)">
-      <circle cx="0" cy="0" r="14" fill="#FFFFFF" fill-opacity="0.9" filter="url(#badge-glow)" />
-      <path d="M-4 -5 L-4 5 M-6 -5 L-2 -5 M4 -5 Q6 -1 4 5" stroke="#F97316" stroke-width="2" stroke-linecap="round" fill="none" />
+    <g class="float-slow" transform="translate(75, 95)" filter="url(#badge-glow)">
+      <rect x="-16" y="-16" width="32" height="32" rx="10" fill="#FFFFFF" stroke="#FFF7ED" stroke-width="1.5" />
+      <path d="M-5 3 C-5 -2 -2 -6 0 -6 C2 -6 5 -2 5 3 Z" fill="#F97316" opacity="0.15" />
+      <path d="M-6 3 L6 3 M-2 -7 L2 -7" stroke="#F97316" stroke-width="1.6" stroke-linecap="round" />
+      <path d="M-5 3 C-5 -1 -2 -5 0 -5 C2 -5 5 -1 5 3" stroke="#F97316" stroke-width="1.6" stroke-linecap="round" fill="none" />
+      <circle cx="0" cy="5.5" r="1.3" fill="#EA580C" />
+      <circle cx="9" cy="-9" r="3" fill="#EF4444" stroke="#FFFFFF" stroke-width="1" />
     </g>
 
-    <g transform="translate(425, 135)" class="pulse-sparkle">
+    <g transform="translate(435, 125)" class="pulse-sparkle">
       <path d="M0 -8 Q0 0 8 0 Q0 0 0 8 Q0 0 -8 0 Q0 0 0 -8 Z" fill="#FEF08A" />
     </g>
     <g transform="translate(155, 65)" class="pulse-sparkle delay-700">
@@ -108,10 +122,10 @@
   /* 2. Floating Bobbing Animation for Order Card */
   @keyframes floatBob {
     0%, 100% {
-      transform: translate(255px, 55px);
+      transform: translate(244px, 48px);
     }
     50% {
-      transform: translate(255px, 45px);
+      transform: translate(244px, 38px);
     }
   }
 
@@ -121,10 +135,10 @@
 
   @keyframes floatSlow {
     0%, 100% {
-      transform: translate(75px, 105px);
+      transform: translate(75px, 95px);
     }
     50% {
-      transform: translate(75px, 97px);
+      transform: translate(75px, 87px);
     }
   }
 
