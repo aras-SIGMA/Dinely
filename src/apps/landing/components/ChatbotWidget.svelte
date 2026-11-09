@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import { chatbotStore, QUICK_PROMPTS, type UiChatMessage } from '@/stores/chatbot.svelte';
+  import LinkaMascot from '@/components/ui/LinkaMascot.svelte';
 
   let inputMessage = $state('');
   let messagesContainer = $state<HTMLDivElement | null>(null);
@@ -61,30 +62,23 @@
     aria-label={chatbotStore.isOpen ? 'Tutup obrolan dengan Linka' : 'Buka obrolan dengan Linka, asisten AI RestoLink'}
     aria-expanded={chatbotStore.isOpen}
     aria-haspopup="dialog"
-    class="group relative flex items-center gap-2.5 rounded-full bg-slate-900 px-4 py-3.5 text-white shadow-xl ring-4 ring-white/80 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl active:scale-95 sm:px-5"
+    class="group relative flex items-center gap-2.5 rounded-full bg-slate-900 px-4 py-3 text-white shadow-xl ring-4 ring-white/80 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl active:scale-95 sm:px-5 sm:py-3.5"
   >
     <!-- Avatar / Icon -->
-    <div class="relative flex size-6 items-center justify-center">
+    <div class="relative flex size-7 items-center justify-center">
       {#if chatbotStore.isOpen}
         <!-- X icon when open -->
         <svg class="size-5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
       {:else}
-        <!-- Sparkle / Chat icon when closed -->
-        <svg class="size-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-          />
-        </svg>
+        <!-- Crabby Linka Mascot Avatar -->
+        <LinkaMascot variant="avatar" size="xs" animated={true} />
 
         <!-- Unread / Active beacon indicator -->
         <span class="absolute -right-1 -top-1 flex size-2.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full size-2.5 bg-brand-500"></span>
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full size-2.5 bg-emerald-500"></span>
         </span>
       {/if}
     </div>
@@ -107,9 +101,9 @@
     <!-- Header -->
     <header class="flex items-center justify-between border-b border-slate-100 bg-slate-900 px-5 py-3.5 text-white">
       <div class="flex items-center gap-3">
-        <div class="relative flex size-9 items-center justify-center rounded-xl bg-brand-600 text-white font-bold text-sm shadow-xs select-none" aria-hidden="true">
-          <span>L</span>
-          <span class="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-slate-900 bg-emerald-500"></span>
+        <div class="relative flex size-10 items-center justify-center rounded-2xl bg-slate-800 border border-slate-700/80 p-0.5 shadow-xs select-none" aria-hidden="true">
+          <LinkaMascot variant="happy" size="sm" animated={true} />
+          <span class="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-slate-900 bg-emerald-500" title="Online"></span>
         </div>
 
         <div>
@@ -118,7 +112,7 @@
             <span class="rounded bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300 border border-brand-500/30">AI</span>
           </h2>
           <p class="text-[10px] text-slate-300">
-            Online &bull; Asisten Virtual RestoLink
+            Online &bull; Maskot Koki &amp; Asisten RestoLink
           </p>
         </div>
       </div>
@@ -164,9 +158,9 @@
       {#each chatbotStore.messages as msg (msg.id)}
         {#if msg.sender === 'assistant'}
           <!-- Bubble Assistant (Left-aligned) -->
-          <div class="flex items-start gap-2.5 max-w-[85%]">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-xs shadow-2xs mt-0.5 select-none" aria-hidden="true">
-              L
+          <div class="flex items-start gap-2 max-w-[85%]">
+            <div class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-orange-100/90 border border-orange-200 p-0.5 shadow-2xs mt-0.5 select-none" aria-hidden="true">
+              <LinkaMascot variant="avatar" size="xs" />
             </div>
             <div
               class="rounded-2xl rounded-tl-xs px-3.5 py-2.5 text-xs leading-relaxed shadow-2xs {msg.isError
@@ -192,15 +186,15 @@
 
       <!-- Typing Indicator -->
       {#if chatbotStore.loading}
-        <div class="flex items-start gap-2.5 max-w-[85%]">
-          <div class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-xs shadow-2xs mt-0.5 select-none" aria-hidden="true">
-            L
+        <div class="flex items-start gap-2 max-w-[85%]">
+          <div class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-orange-100/90 border border-orange-200 p-0.5 shadow-2xs mt-0.5 select-none" aria-hidden="true">
+            <LinkaMascot variant="thinking" size="xs" animated={true} />
           </div>
-          <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-xs border border-slate-200 bg-white px-4 py-3 shadow-2xs">
-            <span class="size-1.5 rounded-full bg-slate-400 animate-bounce"></span>
-            <span class="size-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.15s]"></span>
-            <span class="size-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.3s]"></span>
-            <span class="ml-1 text-[11px] text-slate-400">Linka sedang mengetik...</span>
+          <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-xs border border-slate-200 bg-white px-3.5 py-2.5 shadow-2xs">
+            <span class="size-1.5 rounded-full bg-brand-500 animate-bounce"></span>
+            <span class="size-1.5 rounded-full bg-brand-500 animate-bounce [animation-delay:0.15s]"></span>
+            <span class="size-1.5 rounded-full bg-brand-500 animate-bounce [animation-delay:0.3s]"></span>
+            <span class="ml-1 text-[11px] font-medium text-slate-500">Linka sedang meracik jawaban...</span>
           </div>
         </div>
       {/if}
@@ -208,6 +202,22 @@
       <!-- Quick Prompt Chips (Ditampilkan jika percakapan masih di awal) -->
       {#if chatbotStore.messages.length <= 1 && !chatbotStore.loading}
         <div class="pt-2">
+          <!-- Mascot Hero Card -->
+          <div class="mb-3 rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50/80 via-white to-orange-50/50 p-3 shadow-2xs flex items-center gap-3">
+            <div class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-white border border-brand-200/60 p-1 shadow-xs">
+              <LinkaMascot variant="waving" size="md" animated={true} />
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-900">Crabby Linka</span>
+                <span class="rounded bg-brand-500/10 px-1.5 py-0.5 text-[9px] font-bold text-brand-700">Kepiting Purba</span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug mt-0.5">
+                Maskot &amp; asisten koki pintar RestoLink. Ada yang bisa Linka bantu?
+              </p>
+            </div>
+          </div>
+
           <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
             Pertanyaan Populer untuk Linka:
           </p>

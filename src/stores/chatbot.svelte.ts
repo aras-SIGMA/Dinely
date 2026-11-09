@@ -17,12 +17,12 @@ export interface UiChatMessage {
   isError?: boolean;
 }
 
-const STORAGE_KEY = 'restolink_chat_messages_v2';
+const STORAGE_KEY = 'restolink_chat_messages_v3';
 
 const INITIAL_GREETING: UiChatMessage = {
   id: 'greeting-default',
   sender: 'assistant',
-  text: 'Halo! 👋 Saya Linka, asisten virtual resmi RestoLink. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
+  text: 'Halo! 🦀 Saya Linka, maskot & asisten virtual resmi RestoLink. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
   timestamp: new Date().toISOString()
 };
 
@@ -89,7 +89,7 @@ class ChatbotStore {
       {
         id: `greeting-${Date.now()}`,
         sender: 'assistant',
-        text: 'Halo kembali! Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar RestoLink yang bisa saya bantu?',
+        text: 'Halo kembali! 🦀 Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar RestoLink yang bisa saya bantu?',
         timestamp: new Date().toISOString()
       }
     ];
