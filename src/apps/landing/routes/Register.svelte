@@ -341,13 +341,14 @@
     </div>
   </nav>
 
-  <!-- CENTER CONTENT GRID (CationGate Layout: Col-6 Visual + Col-6 Form) -->
-  <div class="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto z-10 relative pt-4 lg:pt-8">
-    <!-- SISI KIRI (Col-6): Dynamic Step Typography & Glassmorphic Preview -->
-    <div class="hidden lg:flex lg:col-span-6 items-center justify-between relative pl-4 pr-6">
-      <div class="z-10 w-[54%] pr-2 text-left space-y-4">
+  <!-- CENTER CONTENT GRID (CationGate Layout: Col-7 Visual + Col-5 Form) -->
+  <div class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto z-10 relative pt-4 lg:pt-8">
+    <!-- SISI KIRI (Col-7): Dynamic Step Typography & Highlighted Glassmorphic Preview -->
+    <div class="hidden lg:flex lg:col-span-7 xl:col-span-7 items-center justify-between relative pl-4 pr-2">
+      <!-- Headline & Subtitle -->
+      <div class="z-10 w-[50%] xl:w-[48%] text-left space-y-4">
         {#if step === 1}
-          <h2 class="text-5xl lg:text-7xl font-black text-white tracking-tight leading-[0.98] drop-shadow-md">
+          <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Data <br />
             <span class="text-amber-200 drop-shadow-sm">Restoran</span>
           </h2>
@@ -355,7 +356,7 @@
             {stepVisuals[1].desc}
           </p>
         {:else if step === 2}
-          <h2 class="text-5xl lg:text-7xl font-black text-white tracking-tight leading-[0.98] drop-shadow-md">
+          <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Akun <br />
             <span class="text-amber-200 drop-shadow-sm">Pemilik</span>
           </h2>
@@ -363,7 +364,7 @@
             {stepVisuals[2].desc}
           </p>
         {:else if step === 3}
-          <h2 class="text-5xl lg:text-7xl font-black text-white tracking-tight leading-[0.98] drop-shadow-md">
+          <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Konfirmasi <br />
             <span class="text-amber-200 drop-shadow-sm">Akhir</span>
           </h2>
@@ -371,7 +372,7 @@
             {stepVisuals[3].desc}
           </p>
         {:else}
-          <h2 class="text-5xl lg:text-7xl font-black text-white tracking-tight leading-[0.98] drop-shadow-md">
+          <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Verifikasi <br />
             <span class="text-amber-200 drop-shadow-sm">Email OTP</span>
           </h2>
@@ -381,51 +382,64 @@
         {/if}
       </div>
 
-      <!-- Right Visual Component: Live Glassmorphic Subdomain & Access Mockup -->
-      <div class="z-10 w-[46%] flex items-center justify-center relative">
-        <div class="w-full max-w-72 rounded-2xl border border-white/30 bg-white/15 backdrop-blur-md p-4 text-white shadow-2xl space-y-3.5">
-          <div class="flex items-center justify-between border-b border-white/20 pb-2">
-            <div class="flex items-center gap-1.5">
-              <span class="size-2 rounded-full bg-rose-400"></span>
-              <span class="size-2 rounded-full bg-amber-400"></span>
-              <span class="size-2 rounded-full bg-emerald-400"></span>
-            </div>
-            <span class="font-mono text-[10px] text-white/80 font-semibold tracking-wider uppercase">Live Preview</span>
-          </div>
+      <!-- Right Visual Component: Live Highlighted Glassmorphic Preview (Shifted to the right) -->
+      <div class="z-10 w-[50%] xl:w-[52%] flex items-center justify-end relative pl-4 lg:pl-6 translate-x-2 lg:translate-x-6 xl:translate-x-10">
+        <div class="relative group w-full max-w-72">
+          <!-- Ambient Glow behind Glass Card for Separation from Orange Wave -->
+          <div class="absolute -inset-1.5 rounded-3xl bg-white/25 blur-xl opacity-75 pointer-events-none" aria-hidden="true"></div>
 
-          <!-- Browser Address Simulator -->
-          <div class="rounded-xl bg-white/20 border border-white/25 px-2.5 py-1.5 text-xs font-mono flex items-center gap-1.5 truncate">
-            <span class="text-emerald-300">https://</span>
-            <span class="font-bold text-amber-200 truncate">{subdomain || 'nama-resto'}</span>
-            <span class="text-white/80">.restolink.site</span>
-          </div>
+          <!-- Glassmorphic Card Container -->
+          <div class="relative w-full rounded-2xl border border-white/60 bg-gradient-to-b from-white/30 via-white/20 to-white/10 backdrop-blur-2xl p-4.5 text-white shadow-[0_20px_50px_rgba(0,0,0,0.28),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(0,0,0,0.12)] space-y-3.5 transition-all duration-300">
+            <!-- Top Specular Highlight Edge -->
+            <div class="absolute inset-x-4 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none"></div>
 
-          <!-- Live Feature Checklist -->
-          <div class="space-y-1.5 text-xs text-white/90">
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-300 font-bold">✓</span>
-              <span>Website Menu Instan</span>
+            <!-- Card Header -->
+            <div class="flex items-center justify-between border-b border-white/25 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-rose-400"></span>
+                <span class="size-2 rounded-full bg-amber-400"></span>
+                <span class="size-2 rounded-full bg-emerald-400"></span>
+              </div>
+              <span class="font-mono text-[10px] text-white/90 font-bold tracking-wider uppercase drop-shadow-sm">Live Preview</span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-300 font-bold">✓</span>
-              <span>Pemesanan QR Meja Mandiri</span>
+
+            <!-- Browser Address Simulator with High-Contrast Dark-Glass Interior -->
+            <div class="rounded-xl bg-slate-950/40 border border-white/30 px-3 py-2 text-xs font-mono flex items-center gap-1.5 shadow-inner">
+              <svg class="size-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span class="text-emerald-300">https://</span>
+              <span class="font-bold text-amber-200 truncate">{subdomain || 'nama-resto'}</span>
+              <span class="text-white/80">.restolink.site</span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-emerald-300 font-bold">✓</span>
-              <span>Rekap Keuangan 0% Komisi</span>
+
+            <!-- Live Feature Checklist with Defined Badges -->
+            <div class="space-y-2 pt-0.5 text-xs text-white">
+              <div class="flex items-center gap-2">
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
+                <span class="font-medium drop-shadow-sm">Website Menu Instan</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
+                <span class="font-medium drop-shadow-sm">Pemesanan QR Meja Mandiri</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="flex size-4 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-300 font-bold text-[10px] border border-emerald-400/40">✓</span>
+                <span class="font-medium drop-shadow-sm">Rekap Keuangan 0% Komisi</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SISI KANAN (Col-6): Multi-step Form Card (Clean & Focused) -->
-    <div class="lg:col-span-6 flex flex-col justify-center px-1 sm:px-6 lg:px-10 z-10">
+    <!-- SISI KANAN (Col-5): Multi-step Form Card (Clean & Focused) -->
+    <div class="lg:col-span-5 xl:col-span-5 flex flex-col justify-center px-1 sm:px-6 lg:px-4 z-10">
       <div class="w-full max-w-115 mx-auto bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-900/5 lg:shadow-none lg:border-none lg:p-0">
         <!-- Card Header -->
         <div class="mb-5 sm:mb-6 text-left">
           <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-            Mulai Digitalisasi Resto
+            Mulai Digitalisasi Resto Anda
           </h1>
           <p class="mt-1.5 text-xs sm:text-sm text-slate-500 font-medium">
             Daftarkan restoran kamu dan mulai kelola menu mandiri dengan RestoLink.
