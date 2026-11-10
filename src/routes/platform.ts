@@ -4,6 +4,7 @@ import { guardAdminRoute, guardGuestOnlyRoute, guardOwnerRoute } from '@/lib/gua
 export const platformRoutes: Routes = {
   '/': () => import('@/apps/landing/routes/Home.svelte'),
   '/fitur': () => import('@/apps/landing/routes/Features.svelte'),
+  '/hardware': () => import('@/apps/landing/routes/Hardware.svelte'),
   '/tentang-kami': () => import('@/apps/landing/routes/About.svelte'),
   '/hubungi-kami': () => import('@/apps/landing/routes/Contact.svelte'),
 

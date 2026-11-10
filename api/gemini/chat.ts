@@ -140,8 +140,13 @@ export function buildGeminiPayload(message: string, history?: ChatMessage[]) {
       parts: [{ text: RESTOLINK_SYSTEM_PROMPT }],
     },
     generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 1500,
+      temperature: 0.3,
+      maxOutputTokens: 600,
+      // Turunkan level "thinking" agar balasan lebih cepat (latensi rendah).
+      // Ref: https://ai.google.dev/api/generate-content#GenerationConfig
+      thinkingConfig: {
+        thinkingLevel: 'LOW',
+      },
     },
   };
 }

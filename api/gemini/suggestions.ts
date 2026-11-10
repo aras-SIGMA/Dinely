@@ -106,7 +106,12 @@ Hasilkan 3 pertanyaan lanjutan dalam format JSON: {"suggestions": ["...", "...",
         generationConfig: {
           temperature: 0.5,
           maxOutputTokens: 200,
-          responseMimeType: 'application/json'
+          responseMimeType: 'application/json',
+          // Saran lanjutan tidak butuh penalaran dalam; matikan thinking agar cepat.
+          // Ref: https://ai.google.dev/api/generate-content#GenerationConfig
+          thinkingConfig: {
+            thinkingLevel: 'MINIMAL'
+          }
         }
       }),
       signal: AbortSignal.timeout(6000)
