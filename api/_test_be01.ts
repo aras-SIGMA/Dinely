@@ -178,7 +178,7 @@ async function runTests() {
     [validTenantId]: {
       id: validTenantId,
       owner_id: 'owner-uuid-123',
-      business_name: 'Warung Enak RestoLink',
+      business_name: 'Warung Enak Dinely',
       subdomain: 'warungenak',
       status: 'active',
       contact_phone: '081234567890',

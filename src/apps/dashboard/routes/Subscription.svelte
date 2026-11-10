@@ -184,7 +184,7 @@
 
         <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500">
           <div>
-            Subdomain: <code class="font-mono font-semibold text-slate-700">{tenant?.subdomain}.restolink.site</code>
+            Subdomain: <code class="font-mono font-semibold text-slate-700">{tenant?.subdomain}.dinely.site</code>
           </div>
           {#if tenant?.subscription_ends_at}
             <div>
@@ -270,7 +270,7 @@
                 <svg class="size-4 shrink-0 text-emerald-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Subdomain Mandiri <code>namatoko.restolink.site</code></span>
+                <span>Subdomain Mandiri <code>namatoko.dinely.site</code></span>
               </li>
               <li class="flex items-start gap-2">
                 <svg class="size-4 shrink-0 text-emerald-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

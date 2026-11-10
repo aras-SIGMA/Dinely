@@ -1,6 +1,6 @@
-# RestoLink — Dokumen Konteks Produk (untuk AI Coding Assistant)
+# Dinely — Dokumen Konteks Produk (untuk AI Coding Assistant)
 
-Folder ini berisi seluruh konteks produk **RestoLink**, platform website & pengelolaan pesanan terpusat untuk UMKM kuliner, yang diturunkan dari *Proposal Lomba GTNIC 2026 (Tim Kepiting Purba)*.
+Folder ini berisi seluruh konteks produk **Dinely**, platform website & pengelolaan pesanan terpusat untuk UMKM kuliner, yang diturunkan dari *Proposal Lomba GTNIC 2026 (Tim Kepiting Purba)*.
 
 Dokumen ini dipecah menjadi beberapa file agar setiap AI assistant (atau developer) yang mengerjakan modul tertentu bisa membaca bagian yang relevan tanpa harus memuat seluruh konteks sekaligus.
 
@@ -30,4 +30,4 @@ Dokumen ini adalah **turunan interpretatif** dari proposal lomba (yang sifatnya 
 
 ## Ringkasan Satu Paragraf
 
-RestoLink adalah platform web **multi-tenant** yang memungkinkan UMKM kuliner (skala mikro/kecil/menengah) memiliki website menu digital sendiri (via subdomain) tanpa perlu membangun website sendiri, sekaligus mengelola menu, harga, ketersediaan, dan pesanan dari satu dashboard. Versi untuk lomba (MVP) mencakup: registrasi pemilik → pemilihan paket → pembayaran via Midtrans → aktivasi tenant & subdomain → pengelolaan kategori/menu → website publik tenant → alur pemesanan sederhana → dashboard admin platform. Stack: Vite + Svelte + TypeScript (frontend), Supabase (DB, Auth, RLS), Cloudinary (gambar), Midtrans (pembayaran), Vercel (hosting + wildcard subdomain), Gemini API (chatbot — hanya di landing page utama platform, bukan di website tenant).
+Dinely adalah platform web **multi-tenant** yang memungkinkan UMKM kuliner (skala mikro/kecil/menengah) memiliki website menu digital sendiri (via subdomain) tanpa perlu membangun website sendiri, sekaligus mengelola menu, harga, ketersediaan, dan pesanan dari satu dashboard. Versi untuk lomba (MVP) mencakup: registrasi pemilik → pemilihan paket → pembayaran via Midtrans → aktivasi tenant & subdomain → pengelolaan kategori/menu → website publik tenant → alur pemesanan sederhana → dashboard admin platform. Stack: Vite + Svelte + TypeScript (frontend), Supabase (DB, Auth, RLS), Cloudinary (gambar), Midtrans (pembayaran), Vercel (hosting + wildcard subdomain), Gemini API (chatbot — hanya di landing page utama platform, bukan di website tenant).

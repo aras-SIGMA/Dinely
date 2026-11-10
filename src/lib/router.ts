@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Router Instance
+ * DINELY - Router Instance
  * ============================================================================
  * Instansiasi router tunggal sv-router untuk platform utama dan situs tenant.
  * Mengekspos state reaktif pathname dan fungsi navigasi.

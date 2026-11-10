@@ -44,7 +44,7 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   1. Pengalihan storage dari Cloudflare R2 ke Cloudinary (kuota gratis 25 GB tanpa kartu kredit). Package `@aws-sdk/*` dicopot.
   2. Implementasi CTE murni anti-OID caching di RPC `create_guest_order`.
   3. Mengunci `order_items.subtotal` sebagai `GENERATED ALWAYS AS (price_snapshot * quantity) STORED`.
-  4. Penyusunan 10 test case QA di `docs/qa/restolink_db_test_cases.md`.
+  4. Penyusunan 10 test case QA di `docs/qa/dinely_db_test_cases.md`.
 * **Hasil Verifikasi**:
   - Eksekusi 10 skenario SQL di Supabase SQL Editor lulus 100%.
   - `npm run check`: 0 error, 0 warning.
@@ -454,10 +454,10 @@ Dokumen ini adalah rekam jejak resmi pekerjaan, keputusan arsitektur, dan hasil 
   - `supabase/seed.sql`
 * **Keputusan Teknis**:
   1. **Akun Pengguna Awal**:
-     - Super Admin Platform: `admin@restolink.site` (`password123`, role: `platform_admin`).
+     - Super Admin Platform: `admin@dinely.site` (`password123`, role: `platform_admin`).
      - Tenant Owner: `owner@dapur-nia.com` (`password123`, role: `owner`).
   2. **Tenant Kuliner Resmi Demo Juri**:
-     - Usaha: *Dapur Bu Nia* (Subdomain: `dapur-nia.restolink.site`, status `active`, paket `Mikro` Rp 49.000).
+     - Usaha: *Dapur Bu Nia* (Subdomain: `dapur-nia.dinely.site`, status `active`, paket `Mikro` Rp 49.000).
      - Profil lengkap: logo HD, deskripsi autentik, alamat Depok, kontak WhatsApp aktif, brand primary `#ea580c`.
   3. **Katalog & Menu Lengkap**:
      - 3 Kategori terstruktur: `Makanan Utama`, `Camilan & Gorengan`, `Minuman Segar`.

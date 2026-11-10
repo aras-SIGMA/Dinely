@@ -13,8 +13,8 @@
       // Jika di subdomain lokal (contoh: toko.localhost:5173), arahkan ke localhost:5173
       if (url.hostname.includes('.localhost')) {
         url.hostname = 'localhost';
-      } else if (url.hostname.endsWith('.restolink.site')) {
-        url.hostname = 'restolink.site';
+      } else if (url.hostname.endsWith('.dinely.site')) {
+        url.hostname = 'dinely.site';
       }
       window.location.href = url.origin + '/';
     }
@@ -27,8 +27,8 @@
       url.searchParams.delete('t');
       if (url.hostname.includes('.localhost')) {
         url.hostname = 'localhost';
-      } else if (url.hostname.endsWith('.restolink.site')) {
-        url.hostname = 'restolink.site';
+      } else if (url.hostname.endsWith('.dinely.site')) {
+        url.hostname = 'dinely.site';
       }
       window.location.href = url.origin + '/daftar';
     }
@@ -57,9 +57,9 @@
 
   <p class="mt-3 max-w-md text-sm text-slate-600 sm:text-base">
     {#if slug}
-      Alamat website usaha kuliner <code class="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-800">{slug}</code> belum terdaftar di RestoLink atau status berlangganannya sedang tidak aktif.
+      Alamat website usaha kuliner <code class="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-800">{slug}</code> belum terdaftar di Dinely atau status berlangganannya sedang tidak aktif.
     {:else}
-      Alamat website usaha kuliner ini belum terdaftar di RestoLink atau status layanannya sedang tidak aktif.
+      Alamat website usaha kuliner ini belum terdaftar di Dinely atau status layanannya sedang tidak aktif.
     {/if}
   </p>
 
@@ -69,7 +69,7 @@
       onclick={goToPlatform}
       class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 w-full sm:w-auto"
     >
-      Buka Beranda RestoLink
+      Buka Beranda Dinely
     </button>
 
     <button

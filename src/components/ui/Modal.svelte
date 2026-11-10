@@ -47,7 +47,7 @@
         <button
           type="button"
           onclick={close}
-          class="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          class="rounded-md p-2.5 -mr-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           aria-label="Tutup"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" class="size-5" aria-hidden="true">

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Client Cloudinary Uploader (FS-10 / Milestone 5)
+ * DINELY - Client Cloudinary Uploader (FS-10 / Milestone 5)
  * ============================================================================
  * Mengunggah gambar menu dan logo resto langsung ke Cloudinary API
  * dengan alur signature berbatas waktu dari serverless backend.

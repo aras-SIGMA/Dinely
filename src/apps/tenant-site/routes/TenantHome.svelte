@@ -109,7 +109,7 @@
     {/if}
 
     <!-- Header Profil Usaha Kuliner (FE-11) -->
-    <header class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
+    <header class="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:p-8">
       <div class="flex items-start gap-4 sm:gap-5">
         <!-- Logo Resto atau Inisial Brand -->
         {#if tenant.logo_url}
@@ -148,7 +148,7 @@
           </div>
 
           <p class="mt-1 text-xs text-slate-500">
-            <code class="rounded bg-slate-100 px-1.5 py-0.5">{tenant.subdomain}.restolink.site</code>
+            <code class="rounded bg-slate-100 px-1.5 py-0.5">{tenant.subdomain}.dinely.site</code>
           </p>
 
           {#if tenant.description}
@@ -188,7 +188,7 @@
 
     <!-- Card Layanan Informasi & Tanya Usaha (Customer Service WhatsApp - FE-11) -->
     {#if waInquiryLink || tenant.contact_phone}
-      <section class="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6 shadow-xs sm:p-7">
+      <section class="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 shadow-xs sm:p-7">
         <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div class="max-w-xl">
             <div class="flex items-center gap-2">

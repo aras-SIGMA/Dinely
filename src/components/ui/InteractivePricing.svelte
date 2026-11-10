@@ -116,7 +116,7 @@
     {
       title: 'Etalase & Menu Digital',
       rows: [
-        { label: 'Website Subdomain Mandiri (*.restolink.site)', mikro: true, kecil: true, menengah: true },
+        { label: 'Website Subdomain Mandiri (*.dinely.site)', mikro: true, kecil: true, menengah: true },
         { label: 'Jumlah Menu & Kategori', mikro: 'Tanpa Batas', kecil: 'Tanpa Batas', menengah: 'Tanpa Batas' },
         { label: 'Optimasi Foto WebP Otomatis', mikro: true, kecil: true, menengah: true },
         { label: 'Kendali Stok Menu Instan (Tersedia / Habis)', mikro: true, kecil: true, menengah: true },
@@ -155,8 +155,35 @@
 
   let billingCycle = $state<'monthly' | 'annual'>('monthly');
   let activeTab = $state<'pricing' | 'comparison'>('pricing');
+  let hasClickedAnnual = $state(false);
   let isRolling = $state(false);
   let rollDirection = $state<'up' | 'down'>('up');
+
+  // Mobile comparison: short plan labels for the sticky scroll hint
+  const mobilePlanLabels: Record<string, string> = {
+    mikro: 'Mikro',
+    kecil: 'Kecil',
+    menengah: 'Menengah'
+  };
+
+  // Aggregate coverage per plan for the mobile inline badge
+  const planCoverage = $derived.by(() => {
+    const totals: Record<string, { covered: number; total: number }> = {};
+    plans.forEach((p) => {
+      totals[p.id] = { covered: 0, total: 0 };
+    });
+    comparisonGroups.forEach((group) => {
+      group.rows.forEach((row) => {
+        plans.forEach((p) => {
+          const value = row[p.id as 'mikro' | 'kecil' | 'menengah'];
+          if (value === undefined) return;
+          totals[p.id].total += 1;
+          if (value === true || typeof value === 'string') totals[p.id].covered += 1;
+        });
+      });
+    });
+    return totals;
+  });
 
   let monthlyBtnEl = $state<HTMLButtonElement | null>(null);
   let annualBtnEl = $state<HTMLButtonElement | null>(null);
@@ -205,6 +232,9 @@
   }
 
   function handleCycleChange(next: 'monthly' | 'annual') {
+    if (next === 'annual') {
+      hasClickedAnnual = true;
+    }
     if (billingCycle === next) return;
     rollDirection = next === 'annual' ? 'up' : 'down';
     isRolling = true;
@@ -212,6 +242,10 @@
     setTimeout(() => {
       isRolling = false;
     }, 320);
+
+    setTimeout(() => {
+      updatePill();
+    }, 10);
 
     if (next === 'annual' && typeof window !== 'undefined') {
       const rect = annualBtnEl?.getBoundingClientRect();
@@ -310,14 +344,16 @@
               : 'text-slate-600 hover:text-slate-950'}"
           >
             <span>Tagihan Tahunan</span>
-            <span
-              class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-colors {billingCycle ===
-              'annual'
-                ? 'bg-brand-500 text-white'
-                : 'bg-brand-50 text-brand-700 border border-brand-200/80'}"
-            >
-              Hemat {annualDiscount}%
-            </span>
+            {#if hasClickedAnnual}
+              <span
+                class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-all duration-300 {billingCycle ===
+                'annual'
+                  ? 'bg-brand-500 text-white'
+                  : 'bg-brand-50 text-brand-700 border border-brand-200/80'}"
+              >
+                Hemat {annualDiscount}%
+              </span>
+            {/if}
           </button>
         </div>
       </div>
@@ -362,7 +398,7 @@
     <!-- Main Content: Pricing Cards View -->
     {#if !showComparison || activeTab === 'pricing'}
       <div
-        class="mt-14 grid max-w-7xl mx-auto grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+        class="mt-14 grid max-w-7xl mx-auto grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 animate-tab-appear"
       >
         {#each plans as plan, index (plan.id)}
           {@const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice}
@@ -535,30 +571,51 @@
     {:else}
       <!-- Comparison Table View -->
       <div
-        class="mt-12 max-w-5xl mx-auto overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm"
+        class="mt-8 sm:mt-12 max-w-5xl mx-auto animate-tab-appear rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-sm"
       >
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-[620px] border-collapse text-left text-xs sm:text-sm">
-            <caption class="sr-only">Tabel Perbandingan Fitur Paket RestoLink</caption>
+        <!-- Mobile Horizontal Scroll Hint (sticky under navbar) -->
+        <div
+          class="sticky top-[68px] z-30 flex sm:hidden items-center gap-3 px-3 py-2 bg-white/95 backdrop-blur border-b border-slate-200 rounded-t-2xl"
+        >
+          <span class="flex items-center gap-1 shrink-0 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+            <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7l-4 5 4 5M16 7l4 5-4 5M12 4v16" />
+            </svg>
+            Geser
+          </span>
+          {#each plans as plan}
+            <span
+              class="min-w-0 flex-1 truncate text-center text-[10px] font-bold rounded-full px-1.5 py-1 {plan.popular
+                ? 'bg-brand-100 text-brand-700'
+                : 'bg-slate-100 text-slate-600'}"
+            >
+              {mobilePlanLabels[plan.id] ?? plan.name}
+            </span>
+          {/each}
+        </div>
+
+        <div class="overflow-x-auto overscroll-x-contain rounded-b-2xl">
+          <table class="w-full min-w-[520px] sm:min-w-[620px] border-collapse text-left text-xs sm:text-sm">
+            <caption class="sr-only">Tabel Perbandingan Fitur Paket Dinely</caption>
             <thead>
               <tr class="border-b border-slate-200 bg-slate-50/70">
                 <th
                   scope="col"
-                  class="sticky left-0 z-10 bg-slate-50/70 px-6 py-5 font-bold text-xs uppercase tracking-wider text-slate-500"
+                  class="sticky left-0 z-20 w-[42%] sm:w-auto bg-slate-50 px-3 sm:px-6 py-3.5 sm:py-5 font-bold text-[10px] sm:text-xs uppercase tracking-wider text-slate-500 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.10)]"
                 >
-                  Fitur &amp; Kemampuan
+                  Fitur
                 </th>
                 {#each plans as plan}
                   {@const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice}
                   <th
                     scope="col"
-                    class="px-5 py-5 text-center min-w-[150px] {plan.popular
+                    class="px-2 sm:px-5 py-3 sm:py-5 text-center min-w-[92px] sm:min-w-[150px] {plan.popular
                       ? 'bg-brand-50/40 text-brand-700 font-bold'
                       : 'text-slate-800 font-semibold'}"
                   >
-                    <div class="space-y-1">
-                      <div class="text-sm font-bold">{plan.name}</div>
-                      <div class="font-display text-lg font-black text-slate-950 overflow-hidden">
+                    <div class="space-y-0.5 sm:space-y-1">
+                      <div class="text-[11px] sm:text-sm font-bold leading-tight">{plan.name}</div>
+                      <div class="font-display text-[13px] sm:text-lg font-black text-slate-950 overflow-hidden">
                         {#key price}
                           <span
                             class="inline-block transition-transform duration-250 {isRolling
@@ -571,9 +628,15 @@
                           </span>
                         {/key}
                       </div>
-                      <div class="text-[11px] text-slate-400 font-normal">
+                      <div class="text-[9px] sm:text-[11px] text-slate-400 font-normal">
                         /{billingCycle === 'annual' ? 'tahun' : 'bulan'}
                       </div>
+                      <!-- Mobile coverage summary -->
+                      {#if planCoverage[plan.id]}
+                        <div class="sm:hidden mt-0.5 text-[9px] font-semibold text-slate-500">
+                          {planCoverage[plan.id].covered}/{planCoverage[plan.id].total} fitur
+                        </div>
+                      {/if}
                     </div>
                   </th>
                 {/each}
@@ -585,7 +648,7 @@
                   <th
                     colspan="4"
                     scope="colgroup"
-                    class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-700 border-t border-slate-200"
+                    class="sticky left-0 px-3 sm:px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-brand-700 border-t border-slate-200"
                   >
                     {group.title}
                   </th>
@@ -594,16 +657,16 @@
                   <tr class="border-t border-slate-100 transition-colors hover:bg-slate-50/70">
                     <th
                       scope="row"
-                      class="sticky left-0 z-10 bg-white px-6 py-3.5 font-medium text-slate-800"
+                      class="sticky left-0 z-20 bg-white px-3 sm:px-6 py-2.5 sm:py-3.5 text-[11px] sm:text-xs font-medium text-slate-800 w-[42%] sm:w-auto shadow-[2px_0_6px_-2px_rgba(0,0,0,0.10)]"
                     >
                       {row.label}
                     </th>
 
                     <!-- Paket Mikro -->
-                    <td class="px-5 py-3.5 text-center bg-brand-50/20 font-medium text-brand-900">
+                    <td class="px-2 sm:px-5 py-2.5 sm:py-3.5 text-center bg-brand-50/20 font-medium text-brand-900 text-xs sm:text-sm">
                       {#if row.mikro === true}
                         <svg
-                          class="size-4.5 mx-auto text-emerald-600"
+                          class="size-4 sm:size-4.5 mx-auto text-emerald-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -620,10 +683,10 @@
                     </td>
 
                     <!-- Paket Kecil -->
-                    <td class="px-5 py-3.5 text-center text-slate-600">
+                    <td class="px-2 sm:px-5 py-2.5 sm:py-3.5 text-center text-slate-600 text-xs sm:text-sm">
                       {#if row.kecil === true}
                         <svg
-                          class="size-4.5 mx-auto text-slate-600"
+                          class="size-4 sm:size-4.5 mx-auto text-slate-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -640,10 +703,10 @@
                     </td>
 
                     <!-- Paket Menengah -->
-                    <td class="px-5 py-3.5 text-center text-slate-600">
+                    <td class="px-2 sm:px-5 py-2.5 sm:py-3.5 text-center text-slate-600 text-xs sm:text-sm">
                       {#if row.menengah === true}
                         <svg
-                          class="size-4.5 mx-auto text-slate-600"
+                          class="size-4 sm:size-4.5 mx-auto text-slate-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -676,3 +739,43 @@
     </div>
   </div>
 </section>
+
+<style>
+  @keyframes tabAppear {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-tab-appear {
+    animation: tabAppear 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Slim, unobtrusive horizontal scrollbar for the mobile comparison table */
+  .overflow-x-auto {
+    scrollbar-width: thin;
+  }
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 5px;
+  }
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.5);
+    border-radius: 9999px;
+  }
+
+  /* Fade cue on the right edge to signal more columns on mobile */
+  @media (max-width: 639px) {
+    .overflow-x-auto {
+      mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+    }
+  }
+</style>

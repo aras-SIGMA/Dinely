@@ -127,10 +127,10 @@ async function runTests() {
 
   // Mock state untuk Supabase Auth & DB
   const mockUsers: Record<string, any> = {
-    'token-owner-1': { id: 'user-owner-1', email: 'owner1@restolink.site' },
-    'token-owner-2': { id: 'user-owner-2', email: 'owner2@restolink.site' },
-    'token-no-tenant': { id: 'user-lonely', email: 'lonely@restolink.site' },
-    'token-admin': { id: 'user-admin-1', email: 'admin@restolink.site' },
+    'token-owner-1': { id: 'user-owner-1', email: 'owner1@dinely.site' },
+    'token-owner-2': { id: 'user-owner-2', email: 'owner2@dinely.site' },
+    'token-no-tenant': { id: 'user-lonely', email: 'lonely@dinely.site' },
+    'token-admin': { id: 'user-admin-1', email: 'admin@dinely.site' },
   };
 
   const mockProfiles: Record<string, any> = {

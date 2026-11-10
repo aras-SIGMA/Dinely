@@ -384,7 +384,7 @@
                       type="button"
                       aria-label="Kurangi kuantitas {item.name}"
                       onclick={() => cartStore.decrement(item.id)}
-                      class="flex size-7 items-center justify-center rounded-lg bg-white text-slate-700 shadow-2xs transition hover:bg-slate-100 active:scale-90"
+                      class="flex size-9 items-center justify-center rounded-lg bg-white text-slate-700 shadow-2xs transition hover:bg-slate-100 active:scale-90"
                     >
                       <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
@@ -399,7 +399,7 @@
                       type="button"
                       aria-label="Tambah kuantitas {item.name}"
                       onclick={() => cartStore.increment(item.id)}
-                      class="flex size-7 items-center justify-center rounded-lg text-white shadow-2xs transition active:scale-90"
+                      class="flex size-9 items-center justify-center rounded-lg text-white shadow-2xs transition active:scale-90"
                       style="background-color: var(--brand-primary, {primaryColor});"
                     >
                       <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

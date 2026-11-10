@@ -1,6 +1,6 @@
-# 🗺️ Roadmap Milestone RestoLink (MVP Lomba GTNIC 2026)
+# 🗺️ Roadmap Milestone Dinely (MVP Lomba GTNIC 2026)
 
-Dokumen ini adalah panduan kerja teknis seluruh tim RestoLink untuk menyelesaikan MVP dalam waktu **< 2 minggu (14 hari)**.
+Dokumen ini adalah panduan kerja teknis seluruh tim Dinely untuk menyelesaikan MVP dalam waktu **< 2 minggu (14 hari)**.
 
 ---
 
@@ -56,7 +56,7 @@ Dokumen ini adalah panduan kerja teknis seluruh tim RestoLink untuk menyelesaika
 * **Tujuan**: Menyelesaikan resolusi tenant secara dinamis di sisi browser berdasarkan hostname URL.
 * **Langkah Konkret**:
   1. Validasi hostname runtime di `src/lib/tenant-resolver.ts`:
-     * Mendukung `slug.restolink.site` (produksi).
+     * Mendukung `slug.dinely.site` (produksi).
      * Mendukung `slug.localhost:5173` (lokal).
      * Menolak `reserved subdomains` (`www`, `admin`, `api`, `app`, `auth`, `mail`, dll).
   2. Implementasi query view `public_tenants` saat subdomain terdeteksi.
@@ -161,7 +161,7 @@ Dokumen ini adalah panduan kerja teknis seluruh tim RestoLink untuk menyelesaika
   3. Chatbot Gemini AI (`api/gemini/chat.ts`): Widget bantuan interaktif khusus di landing page utama.
 * **Kriteria Selesai (AC)**:
   * Admin platform dapat memantau seluruh tenant terdaftar.
-  * Chatbot hanya muncul di domain platform dan mampu menjawab pertanyaan FAQ seputar RestoLink.
+  * Chatbot hanya muncul di domain platform dan mampu menjawab pertanyaan FAQ seputar Dinely.
 
 ---
 

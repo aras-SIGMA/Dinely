@@ -16,7 +16,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undef
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
-    '[RestoLink] Variabel VITE_SUPABASE_URL atau VITE_SUPABASE_ANON_KEY belum diisi di file .env. ' +
+    '[Dinely] Variabel VITE_SUPABASE_URL atau VITE_SUPABASE_ANON_KEY belum diisi di file .env. ' +
     'Silakan salin .env.example menjadi .env dan isi kredensial Supabase Anda.'
   );
 }

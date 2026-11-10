@@ -212,7 +212,7 @@
 </script>
 
 <svelte:head>
-  <title>Masuk - RestoLink Platform</title>
+  <title>Masuk - Dinely Platform</title>
 </svelte:head>
 
 <main class="min-h-screen w-full bg-white text-slate-950 overflow-x-hidden relative flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-brand-500 selection:text-white">
@@ -246,7 +246,7 @@
       <a
         href="/"
         class="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-white/85 transition-all group drop-shadow-sm cursor-pointer"
-        title="Kembali ke Beranda RestoLink"
+        title="Kembali ke Beranda Dinely"
       >
         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -262,8 +262,8 @@
     >
       <Logo iconOnly size="sm" class="drop-shadow-sm transition-transform group-hover:rotate-6" />
       <div class="text-xl sm:text-2xl font-black tracking-tight font-sans select-none flex items-center">
-        <span class="text-slate-950">Resto</span>
-        <span class="text-brand-500">Link</span>
+        <span class="text-slate-950">Dine</span>
+        <span class="text-brand-500">ly</span>
       </div>
     </a>
 
@@ -391,7 +391,7 @@
                   <button
                     type="button"
                     onclick={() => (showPassword = !showPassword)}
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer p-0.5 rounded"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer p-2 rounded"
                     aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   >
                     {#if showPassword}
@@ -571,7 +571,7 @@
 
   <!-- BOTTOM FOOTER -->
   <footer class="w-full text-center text-xs text-slate-400 py-2 relative z-10">
-    <p>&copy; {new Date().getFullYear()} RestoLink Platform. Hak Cipta Dilindungi.</p>
+    <p>&copy; {new Date().getFullYear()} Dinely Platform. Hak Cipta Dilindungi.</p>
   </footer>
 </main>
 
@@ -583,11 +583,11 @@
 >
   <div class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
     <p>
-      Untuk menjaga keamanan data transaksi dan akun usaha kuliner Anda, pemulihan kata sandi dilakukan melalui verifikasi tim operasional RestoLink.
+      Untuk menjaga keamanan data transaksi dan akun usaha kuliner Anda, pemulihan kata sandi dilakukan melalui verifikasi tim operasional Dinely.
     </p>
 
     <div class="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-1.5 font-mono text-xs text-slate-800">
-      <p><strong>Email Layanan:</strong> support@restolink.site</p>
+      <p><strong>Email Layanan:</strong> support@dinely.site</p>
       <p><strong>WhatsApp Bantuan:</strong> +62 812-3456-7890</p>
       <p class="text-[11px] text-slate-500 font-sans mt-2">
         Sertakan nama usaha, alamat email terdaftar, dan nama subdomain resto Anda saat mengirim permintaan pemulihan.

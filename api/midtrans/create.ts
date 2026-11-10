@@ -211,7 +211,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const rawPhone = tenant.contact_whatsapp || tenant.contact_phone || '';
     const cleanPhone = rawPhone.replace(/[^0-9+]/g, '').slice(0, 19) || undefined;
     const rawFullName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
-    const customerName = (rawFullName || tenant.business_name || 'Owner RestoLink')
+    const customerName = (rawFullName || tenant.business_name || 'Owner Dinely')
       .trim()
       .slice(0, 50);
 
@@ -225,7 +225,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           id: pkg.id,
           price: Math.round(amount),
           quantity: 1,
-          name: `RestoLink ${pkg.name} (${billing_cycle})`.slice(0, 50),
+          name: `Dinely ${pkg.name} (${billing_cycle})`.slice(0, 50),
         },
       ],
       customer_details: {

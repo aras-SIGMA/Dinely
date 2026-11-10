@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Reactive Cart Store (FS-11 / Milestone 6)
+ * DINELY - Reactive Cart Store (FS-11 / Milestone 6)
  * ============================================================================
  * Mengelola keranjang belanja pembeli (guest) berbasis Svelte 5 Runes.
  *

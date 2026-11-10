@@ -87,7 +87,7 @@
     if (window.location.hostname.includes('localhost')) {
       return `${window.location.origin}/?tenant=${tenant.subdomain}`;
     }
-    return `https://${tenant.subdomain}.restolink.site`;
+    return `https://${tenant.subdomain}.dinely.site`;
   });
 
   async function copyStoreLink() {
@@ -168,11 +168,11 @@
         <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0 flex-1">
-              <h2 class="truncate text-sm font-bold text-slate-900" title={tenant?.business_name ?? 'RestoLink Usaha'}>
-                {tenant?.business_name ?? 'RestoLink Usaha'}
+              <h2 class="truncate text-sm font-bold text-slate-900" title={tenant?.business_name ?? 'Dinely Usaha'}>
+                {tenant?.business_name ?? 'Dinely Usaha'}
               </h2>
               <p class="truncate text-xs text-slate-500">
-                {tenant?.subdomain ? `${tenant.subdomain}.restolink.site` : 'Subdomain belum diatur'}
+                {tenant?.subdomain ? `${tenant.subdomain}.dinely.site` : 'Subdomain belum diatur'}
               </p>
             </div>
             <Badge tone={tenantStatusTone} label={tenantStatusLabel} />
@@ -195,7 +195,7 @@
               <button
                 type="button"
                 onclick={copyStoreLink}
-                class="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                class="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                 title="Salin tautan toko"
                 aria-label="Salin tautan toko"
               >
@@ -257,7 +257,7 @@
         <button
           type="button"
           onclick={signOut}
-          class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 focus:outline-hidden"
+          class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 focus:outline-hidden"
           title="Keluar dari akun"
           aria-label="Keluar dari akun"
         >

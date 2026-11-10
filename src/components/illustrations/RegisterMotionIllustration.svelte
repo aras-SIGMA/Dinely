@@ -73,7 +73,7 @@
       <text x="78" y="25" font-family="monospace, monospace" font-size="10.5" font-weight="800" fill="#EA580C">
         {subdomain.length > 13 ? subdomain.slice(0, 12) + '…' : subdomain || 'nama-resto'}
       </text>
-      <text x="42" y="38" font-family="system-ui, sans-serif" font-size="9" font-weight="600" fill="#64748B">.restolink.site • Online</text>
+      <text x="42" y="38" font-family="system-ui, sans-serif" font-size="9" font-weight="600" fill="#64748B">.dinely.site • Online</text>
 
       <!-- Live Online Pulsing Dot -->
       <circle cx="202" cy="25" r="4" fill="#10B981" class="pulse-reg-dot" />

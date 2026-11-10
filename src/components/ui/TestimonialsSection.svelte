@@ -19,7 +19,7 @@
     {
       id: 'nia',
       quote:
-        'Semenjak beralih ke RestoLink, pesanan tamu langsung masuk antrean tanpa ada nota kertas terselip lagi. Pelanggan juga senang scan QR langsung dari meja tanpa instal aplikasi.',
+        'Semenjak beralih ke Dinely, pesanan tamu langsung masuk antrean tanpa ada nota kertas terselip lagi. Pelanggan juga senang scan QR langsung dari meja tanpa instal aplikasi.',
       name: 'Nia Rahmawati',
       role: 'Pemilik Usaha',
       company: 'Dapur Nia (Depok)',
@@ -48,7 +48,7 @@
     {
       id: 'hendra',
       quote:
-        'Yang paling terasa itu 0% potongan komisi. Di aplikasi lain margin habis 20–25%, di RestoLink keuntungan penjualan 100% tetap masuk utuh ke kas resto.',
+        'Yang paling terasa itu 0% potongan komisi. Di aplikasi lain margin habis 20–25%, di Dinely keuntungan penjualan 100% tetap masuk utuh ke kas resto.',
       name: 'Hendra Setiawan',
       role: 'Owner',
       company: 'Sate Maranggi Pak De (Bogor)',
@@ -110,7 +110,7 @@
 
 {#snippet testimonialCard(item: Testimonial)}
   <figure
-    class="group w-full max-w-[320px] rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/[0.02] transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-md"
+    class="group w-full max-w-full sm:max-w-[320px] rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm shadow-slate-900/[0.02] transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-md"
   >
     <blockquote class="text-xs sm:text-sm leading-relaxed text-slate-700">
       &ldquo;{item.quote}&rdquo;
@@ -193,7 +193,7 @@
       class="mt-12 sm:mt-16 flex h-[620px] justify-center gap-5 sm:gap-6 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]"
     >
       <!-- Column 1 -->
-      <InfiniteSlider direction="vertical" speed={30} class="w-full max-w-[320px]">
+      <InfiniteSlider direction="vertical" speed={30} class="w-full max-w-full sm:max-w-[320px]">
         {#each firstColumn as item (item.id)}
           {@render testimonialCard(item)}
         {/each}

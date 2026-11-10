@@ -247,7 +247,7 @@
                 <td class="px-4 py-3">
                   <p class="font-medium text-slate-900">{tx.tenant?.business_name || 'Resto Terhapus'}</p>
                   {#if tx.tenant?.subdomain}
-                    <p class="font-mono text-[11px] text-slate-400">{tx.tenant.subdomain}.restolink.site</p>
+                    <p class="font-mono text-[11px] text-slate-400">{tx.tenant.subdomain}.dinely.site</p>
                   {/if}
                 </td>
 

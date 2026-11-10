@@ -4,12 +4,12 @@
 </script>
 
 <svelte:head>
-  <title>404 - Halaman Tidak Ditemukan | RestoLink</title>
+  <title>404 - Halaman Tidak Ditemukan | Dinely</title>
 </svelte:head>
 
 <div class="flex min-h-screen flex-col justify-between bg-slate-50 text-slate-900 px-4 py-12 sm:px-6">
   <div class="mx-auto flex w-full max-w-md flex-col items-center justify-center text-center my-auto">
-    <a href="/" class="mb-8" aria-label="RestoLink Beranda">
+    <a href="/" class="mb-8" aria-label="Dinely Beranda">
       <Logo size="md" />
     </a>
 
@@ -28,7 +28,7 @@
     </h1>
 
     <p class="mt-3 max-w-sm text-xs leading-relaxed text-slate-600 sm:text-sm">
-      Tautan yang Anda tuju mungkin salah ketik, sudah dipindahkan, atau tidak lagi aktif di platform RestoLink.
+      Tautan yang Anda tuju mungkin salah ketik, sudah dipindahkan, atau tidak lagi aktif di platform Dinely.
     </p>
 
     <div class="mt-8 flex w-full max-w-xs flex-col gap-3">
@@ -36,12 +36,12 @@
         <Button size="lg" full>Kembali ke Beranda</Button>
       </a>
       <a href="/fitur" class="w-full">
-        <Button size="lg" variant="secondary" full>Lihat Fitur RestoLink</Button>
+        <Button size="lg" variant="secondary" full>Lihat Fitur Dinely</Button>
       </a>
     </div>
   </div>
 
   <footer class="mt-8 text-center text-xs text-slate-400">
-    &copy; 2026 RestoLink Platform. Hak Cipta Dilindungi.
+    &copy; 2026 Dinely Platform. Hak Cipta Dilindungi.
   </footer>
 </div>

@@ -1,4 +1,4 @@
-# User Flows — RestoLink
+# User Flows — Dinely
 
 > Mengacu ke tabel di `03_DATABASE_SCHEMA.md` dan arsitektur di `02_ARCHITECTURE.md`. Status/enum yang disebut di sini konsisten dengan skema database.
 
@@ -6,7 +6,7 @@
 
 ## 1. Alur Pemilik Usaha: Registrasi → Aktivasi Website
 
-1. Pemilik membuka landing page RestoLink, menjelajahi fitur & paket.
+1. Pemilik membuka landing page Dinely, menjelajahi fitur & paket.
 2. Pemilik memilih paket (Mikro / Kecil / Menengah) **sebelum** mendaftar.
 3. Pemilik mengisi formulir registrasi akun + data usaha, termasuk nama subdomain yang diinginkan.
    - Sistem harus validasi real-time: subdomain belum dipakai tenant lain, format valid, bukan reserved word (lihat `03_DATABASE_SCHEMA.md` bag. 3).
@@ -16,7 +16,7 @@
 5. **(Server-side, async)** Midtrans mengirim notifikasi → server validasi → update `transactions.status` dan `tenants.status` menjadi `active`/`trial` (lihat `02_ARCHITECTURE.md` bag. 5 untuk detail keamanan).
 6. Setelah pembayaran terverifikasi, website & fitur paket diaktifkan — subdomain tenant mulai bisa diakses publik.
 7. Pemilik menambahkan kategori & menu beserta harga dan foto (diupload ke Cloudinary, dikompresi WebP).
-8. Pemilik membagikan alamat website (`{subdomain}.restolink.site`) ke pelanggan.
+8. Pemilik membagikan alamat website (`{subdomain}.dinely.site`) ke pelanggan.
 9. Pemilik melihat pesanan masuk & memperbarui statusnya.
 10. Pemilik memperbarui menu, harga, dan ketersediaan saat diperlukan — perubahan harus langsung tercermin di website publik (NFR-07).
 
@@ -30,7 +30,7 @@
 
 ## 2. Alur Pembeli: Kunjungi Website → Pesan
 
-1. Pembeli membuka website usaha (`{subdomain}.restolink.site`).
+1. Pembeli membuka website usaha (`{subdomain}.dinely.site`).
 2. Sistem resolve tenant via subdomain (lihat `02_ARCHITECTURE.md` bag. 4) — tampilkan skeleton loading selama proses ini.
 3. Pembeli melihat profil & menu (dikelompokkan per kategori).
 4. Pembeli memeriksa harga & ketersediaan (menu dengan `is_available = false` ditandai jelas, idealnya tidak bisa ditambah ke keranjang).
@@ -68,7 +68,7 @@ Ini elaborasi dari `02_ARCHITECTURE.md` bag. 5, ditulis sebagai step pengguna + 
 | 1 | Pemilik | Memilih paket (di halaman pricing/registrasi) |
 | 2 | Sistem (server) | Membuat baris `transactions` (`status: pending`), meminta Snap token/redirect URL ke Midtrans |
 | 3 | Pemilik | Diarahkan ke halaman pembayaran Midtrans, menyelesaikan pembayaran |
-| 4 | Midtrans | Memproses pembayaran, lalu mengirim **notifikasi webhook** ke endpoint server RestoLink |
+| 4 | Midtrans | Memproses pembayaran, lalu mengirim **notifikasi webhook** ke endpoint server Dinely |
 | 5 | Sistem (server) | Validasi signature notifikasi, cocokkan `midtrans_order_id`, update `transactions.status` sesuai status resmi Midtrans |
 | 6 | Sistem (server) | Jika `settlement`/`capture` → update `tenants.status = 'active'` (atau `'trial'` bila trial), set `current_package_id` |
 | 7 | Pemilik | Melihat website aktif & bisa mulai isi menu |

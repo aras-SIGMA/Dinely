@@ -21,7 +21,7 @@ Status: Disetujui
 Aplikasi dibangun dalam satu repositori terpadu yang memisahkan konteks eksekusi:
 
 ```
-restolink/
+dinely/
 ├── docs/                               # Dokumentasi & Arsip
 │   ├── product/                        # PRD, Architecture, DB Schema (00–05)
 │   └── notulen/                        # Catatan keputusan teknis

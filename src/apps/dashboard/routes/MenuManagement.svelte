@@ -650,7 +650,7 @@
                 <button
                   type="button"
                   onclick={() => openEditMenu(item)}
-                  class="rounded-lg p-1.5 text-slate-500 hover:bg-slate-200/70 hover:text-slate-900"
+                  class="rounded-lg p-2.5 text-slate-500 hover:bg-slate-200/70 hover:text-slate-900"
                   title="Ubah Menu"
                   aria-label="Ubah Menu"
                 >
@@ -662,7 +662,7 @@
                 <button
                   type="button"
                   onclick={() => confirmDeleteMenu(item)}
-                  class="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                  class="rounded-lg p-2.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                   title="Hapus Menu"
                   aria-label="Hapus Menu"
                 >
@@ -951,7 +951,7 @@
               <button
                 type="button"
                 onclick={() => (editingCategory = { ...cat })}
-                class="rounded p-1 text-slate-500 hover:bg-slate-200/70"
+                class="rounded p-2.5 text-slate-500 hover:bg-slate-200/70"
                 title="Ubah nama"
               >
                 <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -961,7 +961,7 @@
               <button
                 type="button"
                 onclick={() => confirmDeleteCategory(cat)}
-                class="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                class="rounded p-2.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                 title="Hapus kategori"
               >
                 <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

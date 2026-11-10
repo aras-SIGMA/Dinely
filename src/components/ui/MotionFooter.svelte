@@ -20,14 +20,14 @@
   };
 
   let {
-    giantText = 'RESTOLINK',
+    giantText = 'DINELY',
     heading = 'Siap Modernisasi UMKM Anda?',
     subtitle = 'Platform penyedia layanan pemesanan QR, manajemen dapur, dan kasir terpadu #1 di Indonesia.',
     primaryCtaText = 'Mulai Sekarang',
     primaryCtaHref = '/daftar',
     secondaryCtaText = 'Hubungi Tim Kami',
     secondaryCtaHref = '/hubungi-kami',
-    copyrightText = '© 2026 RestoLink. Hak Cipta Dilindungi.',
+    copyrightText = '© 2026 Dinely. Hak Cipta Dilindungi.',
     authorName = 'Kepiting Purba — SMK Taruna Bhakti'
   }: Props = $props();
 
@@ -135,15 +135,15 @@
   };
 </script>
 
-<!-- The "Curtain Reveal" Wrapper -->
+<!-- The "Curtain Reveal" Wrapper: relative auto-height on mobile, fixed reveal on desktop -->
 <div
   bind:this={wrapperRef}
-  class="relative h-screen w-full"
+  class="relative min-h-screen w-full md:h-screen"
   style="clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%); -webkit-clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);"
 >
-  <!-- The actual footer stays fixed to viewport underneath everything (Original Light Theme) -->
+  <!-- The actual footer stays fixed to viewport on desktop, relative scroll on mobile -->
   <footer
-    class="cinematic-footer-wrapper fixed bottom-0 left-0 flex h-screen w-full flex-col justify-between overflow-hidden border-t border-slate-200/80 bg-white text-slate-900 select-none shadow-inner"
+    class="cinematic-footer-wrapper relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden border-t border-slate-200/80 bg-white text-slate-900 select-none shadow-inner md:fixed md:bottom-0 md:left-0 md:h-screen md:overflow-hidden"
   >
     <!-- Ambient Light Warm Aurora & Grid Background -->
     <div
@@ -189,7 +189,7 @@
 
     <!-- 2. Main Center Content -->
     <div
-      class="relative z-10 mx-auto mt-24 sm:mt-28 md:mt-32 flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 text-center"
+      class="relative z-10 mx-auto mt-20 sm:mt-28 md:mt-32 flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 text-center"
     >
       <h2
         bind:this={headingRef}
@@ -252,7 +252,7 @@
           <a
             use:magnetic
             href="/fitur"
-            class="footer-glass-pill rounded-full px-4 py-2 text-xs sm:text-sm font-medium hover:text-brand-600"
+            class="footer-glass-pill rounded-full px-4 py-2.5 text-xs sm:text-sm font-medium hover:text-brand-600"
           >
             Fitur Unggulan
           </a>
@@ -296,34 +296,28 @@
         <!-- Social Channels -->
         <div class="mt-1 flex items-center justify-center gap-2.5">
           <!-- Instagram -->
-          <a
-            use:magnetic
-            href="https://instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
-            aria-label="Instagram RestoLink"
+          <span
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 cursor-default"
+            aria-label="Instagram Dinely"
+            role="img"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
               <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
             </svg>
-          </a>
+          </span>
 
           <!-- TikTok -->
-          <a
-            use:magnetic
-            href="https://tiktok.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
-            aria-label="TikTok RestoLink"
+          <span
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 cursor-default"
+            aria-label="TikTok Dinely"
+            role="img"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/>
             </svg>
-          </a>
+          </span>
 
           <!-- YouTube -->
           <a
@@ -331,8 +325,8 @@
             href="https://youtube.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
-            aria-label="YouTube RestoLink"
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
+            aria-label="YouTube Dinely"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -387,7 +381,7 @@
   .cinematic-footer-wrapper {
     -webkit-font-smoothing: antialiased;
 
-    /* Theme Dynamic Variables - RestoLink Light Theme */
+    /* Theme Dynamic Variables - Dinely Light Theme */
     --pill-bg-1: #ffffff;
     --pill-bg-2: #f8fafc;
     --pill-shadow: rgba(15, 23, 42, 0.04);

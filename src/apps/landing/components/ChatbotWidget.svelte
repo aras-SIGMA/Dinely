@@ -15,7 +15,7 @@
   );
 
   const handoffWhatsApp = buildSupportWhatsAppLink(
-    'Halo tim RestoLink, saya butuh bantuan lanjutan terkait layanan RestoLink dari asisten Linka.'
+    'Halo tim Dinely, saya butuh bantuan lanjutan terkait layanan Dinely dari asisten Linka.'
   );
 
   // Scroll otomatis ke bawah setiap kali ada pesan baru
@@ -82,7 +82,7 @@
   <button
     type="button"
     onclick={() => chatbotStore.toggle()}
-    aria-label={chatbotStore.isOpen ? 'Tutup obrolan dengan Linka' : 'Buka obrolan dengan Linka, asisten AI RestoLink'}
+    aria-label={chatbotStore.isOpen ? 'Tutup obrolan dengan Linka' : 'Buka obrolan dengan Linka, asisten AI Dinely'}
     aria-expanded={chatbotStore.isOpen}
     aria-haspopup="dialog"
     class="group relative flex size-14 items-center justify-center rounded-full bg-brand-500 text-white shadow-xl ring-4 ring-white/80 transition-all duration-200 hover:bg-brand-600 hover:shadow-2xl active:scale-95"
@@ -127,7 +127,7 @@
             <span class="rounded-md bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-bold text-brand-700 border border-brand-500/20">AI</span>
           </h2>
           <p class="text-[11px] text-slate-500">
-            Maskot Koki &amp; Asisten RestoLink
+            Maskot Koki &amp; Asisten Dinely
           </p>
         </div>
       </div>
@@ -139,7 +139,7 @@
           onclick={() => chatbotStore.clear()}
           aria-label="Bersihkan riwayat percakapan dengan Linka"
           title="Reset percakapan"
-          class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+          class="rounded-lg p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -156,7 +156,7 @@
           type="button"
           onclick={() => chatbotStore.close()}
           aria-label="Tutup jendela obrolan Linka"
-          class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+          class="rounded-lg p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -251,7 +251,7 @@
             <div class="flex-1 min-w-0">
               <p class="text-[11px] font-bold text-amber-900">Butuh bantuan tim langsung?</p>
               <p class="mt-0.5 text-[11px] text-amber-800 leading-snug">
-                Hubungi tim dukungan RestoLink untuk pertanyaan yang belum terjawab.
+                Hubungi tim dukungan Dinely untuk pertanyaan yang belum terjawab.
               </p>
               <div class="mt-2 flex flex-wrap gap-1.5">
                 <a
@@ -294,7 +294,7 @@
                 <span class="rounded bg-brand-500/10 px-1.5 py-0.5 text-[9px] font-bold text-brand-700">Asisten AI</span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug mt-0.5">
-                Maskot &amp; asisten koki pintar RestoLink. Ada yang bisa Linka bantu?
+                Maskot &amp; asisten koki pintar Dinely. Ada yang bisa Linka bantu?
               </p>
             </div>
           </div>
@@ -337,7 +337,7 @@
           disabled={chatbotStore.loading}
           type="text"
           maxlength="1000"
-          placeholder="Tanya Linka seputar RestoLink..."
+          placeholder="Tanya Linka seputar Dinely..."
           aria-label="Ketik pesan untuk Linka"
           class="flex-1 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 shadow-xs transition focus:border-brand-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60"
         />
@@ -355,7 +355,7 @@
       </form>
 
       <p class="mt-1.5 text-center text-[10px] text-slate-400">
-        Didukung model resmi Gemini AI untuk panduan layanan RestoLink.
+        Didukung model resmi Gemini AI untuk panduan layanan Dinely.
       </p>
     </footer>
   </div>

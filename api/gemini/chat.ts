@@ -1,7 +1,7 @@
 import type { ApiRequest, ApiResponse } from '../_types';
 import { HttpError } from '../_lib/auth';
 import { parseJsonBody, sendJson } from '../_lib/http';
-import { buildRestoLinkSystemPrompt } from './knowledge';
+import { buildDinelySystemPrompt } from './knowledge';
 
 export interface ChatMessage {
   role?: string;
@@ -17,10 +17,10 @@ export interface ChatRequestPayload {
   stream?: boolean;
 }
 
-export const RESTOLINK_SYSTEM_PROMPT = buildRestoLinkSystemPrompt();
+export const DINELY_SYSTEM_PROMPT = buildDinelySystemPrompt();
 
 export const FALLBACK_REPLY_QUOTA =
-  'Maaf, Linka (asisten AI RestoLink) saat ini sedang mengalami lonjakan permintaan atau batas kuota layanan sementara. Silakan tinjau informasi fitur dan paket langganan langsung pada menu Fitur dan Harga di halaman ini, atau hubungi tim dukungan kami.';
+  'Maaf, Linka (asisten AI Dinely) saat ini sedang mengalami lonjakan permintaan atau batas kuota layanan sementara. Silakan tinjau informasi fitur dan paket langganan langsung pada menu Fitur dan Harga di halaman ini, atau hubungi tim dukungan kami.';
 
 export const FALLBACK_REPLY_GENERIC =
   'Maaf, terjadi kendala saat memproses jawaban asisten AI. Silakan coba kirim kembali pertanyaan Anda beberapa saat lagi.';
@@ -137,7 +137,7 @@ export function buildGeminiPayload(message: string, history?: ChatMessage[]) {
   return {
     contents,
     systemInstruction: {
-      parts: [{ text: RESTOLINK_SYSTEM_PROMPT }],
+      parts: [{ text: DINELY_SYSTEM_PROMPT }],
     },
     generationConfig: {
       temperature: 0.3,

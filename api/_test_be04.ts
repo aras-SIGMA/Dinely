@@ -1,7 +1,7 @@
 import handler, {
   buildGeminiPayload,
   formatHistory,
-  RESTOLINK_SYSTEM_PROMPT,
+  DINELY_SYSTEM_PROMPT,
   FALLBACK_REPLY_QUOTA,
   FALLBACK_REPLY_GENERIC,
 } from './gemini/chat';
@@ -144,7 +144,7 @@ async function runTests() {
     const req = {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: { message: 'Halo RestoLink' },
+      body: { message: 'Halo Dinely' },
     } as unknown as ApiRequest;
     const { res, getData } = createMockRes();
     await handler(req, res);
@@ -177,7 +177,7 @@ async function runTests() {
               content: {
                 parts: [
                   {
-                    text: 'Halo! RestoLink adalah platform pusat kendali UMKM kuliner.',
+                    text: 'Halo! Dinely adalah platform pusat kendali UMKM kuliner.',
                   },
                 ],
               },
@@ -190,7 +190,7 @@ async function runTests() {
     const req = {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: { message: 'Apa itu RestoLink?' },
+      body: { message: 'Apa itu Dinely?' },
     } as unknown as ApiRequest;
 
     const { res, getData } = createMockRes();
@@ -199,10 +199,10 @@ async function runTests() {
 
     assert(
       statusCode === 200 &&
-      jsonBody?.reply === 'Halo! RestoLink adalah platform pusat kendali UMKM kuliner.' &&
+      jsonBody?.reply === 'Halo! Dinely adalah platform pusat kendali UMKM kuliner.' &&
       capturedUrl.includes('gemini-3.5-flash') &&
       capturedUrl.includes('key=mock-gemini-api-key-12345') &&
-      capturedBody?.contents?.[0]?.parts?.[0]?.text === 'Apa itu RestoLink?',
+      capturedBody?.contents?.[0]?.parts?.[0]?.text === 'Apa itu Dinely?',
       'TC-06: Request normal berhasil memproksi ke Gemini dengan balasan reply terstruktur',
       { statusCode, jsonBody, capturedUrl }
     );
@@ -212,7 +212,7 @@ async function runTests() {
   {
     const history = [
       { role: 'user', text: 'Halo' },
-      { role: 'model', text: 'Halo! Ada yang bisa saya bantu seputar RestoLink?' },
+      { role: 'model', text: 'Halo! Ada yang bisa saya bantu seputar Dinely?' },
       { sender: 'user', text: 'Berapa harga paket mikro?' },
       { sender: 'bot', text: 'Paket mikro Rp 49.000 per bulan.' },
     ];
@@ -361,11 +361,11 @@ async function runTests() {
 
   // TC-13: System prompt memuat seluruh klausul wajib (fitur, paket Rp 49.000, cara daftar, penolakan off-topic)
   {
-    const prompt = RESTOLINK_SYSTEM_PROMPT;
+    const prompt = DINELY_SYSTEM_PROMPT;
     const hasFitur = prompt.includes('subdomain unik') && prompt.includes('QR Code');
     const hasPaket = prompt.includes('49.000') && prompt.includes('Paket Mikro');
     const hasDaftar = prompt.includes('Daftar') && prompt.includes('Dashboard');
-    const hasOfftopic = prompt.includes('di luar topik RestoLink') && prompt.includes('tolak dengan sopan');
+    const hasOfftopic = prompt.includes('di luar topik Dinely') && prompt.includes('tolak dengan sopan');
 
     assert(
       hasFitur && hasPaket && hasDaftar && hasOfftopic,
@@ -497,12 +497,12 @@ async function runTests() {
 
   // TC-16: Streaming SSE dengan pemisah CRLF (\r\n\r\n) harus mengalirkan delta teks (regression: parser)
   {
-    const deltaText = 'RestoLink adalah platform menu digital untuk UMKM kuliner.';
+    const deltaText = 'Dinely adalah platform menu digital untuk UMKM kuliner.';
     global.fetch = (async () => ({
       ok: true,
       status: 200,
       body: streamFromChunks([
-        `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: 'RestoLink adalah ' }] } }] })}\r\n\r\n`,
+        `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: 'Dinely adalah ' }] } }] })}\r\n\r\n`,
         `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: 'platform menu digital ' }] } }] })}\r\n\r\n`,
         `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: 'untuk UMKM kuliner.' }] } }] })}\r\n\r\n`,
       ]),
@@ -511,7 +511,7 @@ async function runTests() {
     const req = {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: { message: 'Apa itu RestoLink?', stream: true },
+      body: { message: 'Apa itu Dinely?', stream: true },
     } as unknown as ApiRequest;
 
     const { res, getWritten } = createSseMockRes();

@@ -1,6 +1,6 @@
 # Laporan Perubahan Dokumentasi (Migrasi Cloudflare ke Cloudinary)
 
-Dokumen ini mencatat seluruh perubahan teks dari **Cloudflare / Cloudflare R2** menjadi **Cloudinary** di dokumen spesifikasi produk dan analisis backend RestoLink.
+Dokumen ini mencatat seluruh perubahan teks dari **Cloudflare / Cloudflare R2** menjadi **Cloudinary** di dokumen spesifikasi produk dan analisis backend Dinely.
 
 ---
 

@@ -9,7 +9,7 @@
 
 ## 1. Ringkasan Eksekutif
 
-Dokumen ini mendokumentasikan seluruh pekerjaan implementasi, perbaikan bug, dan penguatan keamanan (hardening) arsitektur backend serverless RestoLink pada direktori `api/**`, mencakup modul:
+Dokumen ini mendokumentasikan seluruh pekerjaan implementasi, perbaikan bug, dan penguatan keamanan (hardening) arsitektur backend serverless Dinely pada direktori `api/**`, mencakup modul:
 1. **BE-01**: Pembuatan Transaksi & Integrasi Midtrans Snap (`api/midtrans/create.ts`).
 2. **BE-02**: Penanganan Notifikasi Webhook Pembayaran Midtrans (`api/midtrans/webhook.ts`).
 3. **Core Libraries & Test Runner**: Supabase Admin/Client, JWT Authenticator, HTTP Helpers, dan Unit Test Automation (`api/_test_be01.ts` dan `api/_test_be02.ts`).
@@ -100,7 +100,7 @@ Eksekusi perintah `npm run test:api` menghasilkan **28/28 test lulus (100% PASS)
 ## 6. Riwayat Commit Git
 
 Seluruh perubahan telah dikomit dan disinkronkan ke remote repository:
-- **Repository**: `https://github.com/aras-SIGMA/Restolink.git`
+- **Repository**: `https://github.com/aras-SIGMA/Dinely.git`
 - **Branch**: `feature/backend-api-services`
 - **Daftar Commit**:
   - `9b118d5`: `fix(backend): hardening BE-02 webhook atomicity, recovery E1 E2 edge cases, dan regression tests`

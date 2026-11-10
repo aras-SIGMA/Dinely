@@ -231,7 +231,7 @@
   {#if ordersStore.selectedOrder}
     {@const sel = ordersStore.selectedOrder}
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
-      <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div class="flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h3 class="text-lg font-bold text-slate-900">Rincian Pesanan {formatCode(sel.order_code)}</h3>
@@ -241,7 +241,7 @@
             type="button"
             onclick={closeDetail}
             aria-label="Tutup rincian pesanan"
-            class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            class="rounded-lg p-2.5 -mr-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -311,9 +311,9 @@
     {@const tenant = authStore.tenant}
     <div id="thermal-receipt-58mm" class="hidden font-mono text-[11px] leading-tight text-black" aria-hidden="true">
       <div class="text-center">
-        <p class="text-sm font-bold uppercase">{tenant?.business_name || 'RESTOLINK'}</p>
+        <p class="text-sm font-bold uppercase">{tenant?.business_name || 'DINELY'}</p>
         {#if tenant?.subdomain}
-          <p class="text-[10px]">{tenant.subdomain}.restolink.site</p>
+          <p class="text-[10px]">{tenant.subdomain}.dinely.site</p>
         {/if}
         {#if tenant?.contact_whatsapp || tenant?.contact_phone}
           <p class="text-[10px]">Telp: {tenant.contact_whatsapp || tenant.contact_phone}</p>
@@ -361,7 +361,7 @@
 
       <div class="text-center text-[10px]">
         <p>Terima Kasih Atas Pesanan Anda</p>
-        <p class="text-[8px] text-black">Powered by RestoLink</p>
+        <p class="text-[8px] text-black">Powered by Dinely</p>
         <div class="h-8"></div>
       </div>
     </div>

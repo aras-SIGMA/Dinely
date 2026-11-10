@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 003_ORDER_RPC.SQL
+-- DINELY - 003_ORDER_RPC.SQL
 -- Stored Procedure & RPC untuk Pemesanan Guest yang Aman
 -- Menghitung total harga di server Postgres (mencegah manipulasi harga dari client)
 -- ==============================================================================

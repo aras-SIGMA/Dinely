@@ -1,4 +1,4 @@
-# Arsitektur Teknis — RestoLink
+# Arsitektur Teknis — Dinely
 
 > Baca `01_PRD.md` dulu untuk konteks produk. Dokumen ini fokus ke *bagaimana* sistem dibangun.
 
@@ -14,7 +14,7 @@
 | Isolasi Data | **Supabase Row Level Security (RLS)** | Memastikan satu tenant tidak bisa akses data tenant lain |
 | Penyimpanan Gambar | **Cloudinary** (format WebP) | Logo usaha, foto menu — dikompresi sebelum upload untuk hemat storage |
 | Payment Gateway | **Midtrans** | Pembayaran paket langganan (bukan pembayaran pesanan pembeli) |
-| Hosting & Domain | **Vercel** (dengan wildcard subdomain) | Deployment aplikasi + routing `*.restolink.site` |
+| Hosting & Domain | **Vercel** (dengan wildcard subdomain) | Deployment aplikasi + routing `*.dinely.site` |
 | Chatbot AI | **Google Gemini API** | Hanya di landing page utama platform |
 
 > Catatan penting: frontend **tidak memakai server-side rendering** (bukan Next.js dsb.), sehingga resolusi tenant berdasarkan subdomain dilakukan **di sisi klien saat runtime** — lihat Bagian 4.
@@ -26,7 +26,7 @@
 Proposal menyebutkan platform terdiri dari **tiga bagian** yang dibangun dalam satu proyek Vite:
 
 ### 2.1 Landing Page Utama Platform
-- Halaman pemasaran RestoLink: beranda, fitur, harga, pendaftaran.
+- Halaman pemasaran Dinely: beranda, fitur, harga, pendaftaran.
 - Pakai routing berbasis Svelte → **setiap halaman punya URL/rute sendiri** seperti website multi-halaman biasa (bukan SPA tunggal).
 - Alasan: agar mesin pencari bisa mengindeks tiap halaman secara terpisah (SEO untuk marketing).
 - Satu-satunya tempat chatbot AI (Gemini) muncul.
@@ -39,12 +39,12 @@ Proposal menyebutkan platform terdiri dari **tiga bagian** yang dibangun dalam s
   - Dashboard Admin Platform (akses lintas-tenant, role khusus)
 
 ### 2.3 Website Publik Tenant
-- Halaman menu digital tiap usaha, diakses lewat subdomain masing-masing (`{slug}.restolink.site`).
+- Halaman menu digital tiap usaha, diakses lewat subdomain masing-masing (`{slug}.dinely.site`).
 - **Diselesaikan secara runtime di client** berdasarkan subdomain yang diakses (lihat Bagian 4) — bukan hasil build terpisah per tenant.
 - Satu kode frontend yang sama melayani **semua** tenant.
 
 ```
-restolink/                      (satu Vite project)
+dinely/                      (satu Vite project)
 ├── apps / src/
 │   ├── landing/                 # 2.1 — multi-page marketing site
 │   ├── dashboard/                # 2.2 — SPA, protected routes
@@ -71,12 +71,12 @@ Karena satu aplikasi front-end yang sama bisa melayani seluruh tenant tanpa perl
 
 ## 4. Resolusi Tenant Berdasarkan Subdomain (Client-Side)
 
-Ini adalah bagian arsitektur paling kritis dan unik dari RestoLink — implementasikan persis sesuai alur berikut:
+Ini adalah bagian arsitektur paling kritis dan unik dari Dinely — implementasikan persis sesuai alur berikut:
 
 ```
-1. Aplikasi dimuat di browser pembeli, mis. URL = https://dapur-nia.restolink.site
+1. Aplikasi dimuat di browser pembeli, mis. URL = https://dapur-nia.dinely.site
 2. Baca hostname dari browser: window.location.hostname
-   → "dapur-nia.restolink.site"
+   → "dapur-nia.dinely.site"
 3. Ekstrak bagian subdomain sebagai slug tenant:
    → slug = "dapur-nia"
 4. Query ke Supabase: cari baris pada tabel `tenants`
@@ -94,7 +94,7 @@ Ini adalah bagian arsitektur paling kritis dan unik dari RestoLink — implement
 
 ### Catatan implementasi penting
 
-- **Domain wildcard** (`*.restolink.site`) dikonfigurasi di level proyek Vercel, terlepas dari framework frontend yang dipakai.
+- **Domain wildcard** (`*.dinely.site`) dikonfigurasi di level proyek Vercel, terlepas dari framework frontend yang dipakai.
 - Resolusi ini **tidak bisa** mengandalkan middleware server (seperti di Next.js) karena arsitektur ini murni client-rendered via Vite — jangan desain solusi yang butuh server-side middleware untuk membaca subdomain.
 - RLS di Supabase adalah **garis pertahanan terakhir** — jangan andalkan filter di frontend saja sebagai satu-satunya proteksi data antar-tenant. Bahkan jika ada bug di `tenant-resolver.ts`, query ke Supabase harus tetap gagal/kosong untuk data yang bukan milik tenant yang diminta.
 - Untuk lingkungan development lokal, siapkan strategi testing subdomain (mis. `*.localhost` atau `/etc/hosts` mapping) karena `window.location.hostname` tidak akan berupa subdomain asli saat development biasa.
@@ -109,7 +109,7 @@ Prinsip yang **wajib** dipegang: **aktivasi tenant/paket hanya boleh terjadi dar
 [Client] Pemilik pilih paket
       → [Server] buat transaksi Midtrans, simpan status "pending"
       → [Midtrans] proses pembayaran (Snap/redirect, sesuai metode)
-      → [Midtrans] kirim webhook/notifikasi ke endpoint server RestoLink
+      → [Midtrans] kirim webhook/notifikasi ke endpoint server Dinely
       → [Server] validasi signature & status notifikasi dari Midtrans
       → [Server] jika valid & status settlement/capture → update transaksi
          → aktifkan paket & tenant di database

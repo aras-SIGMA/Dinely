@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Owner Orders Store (FS-13 / Milestone 7)
+ * DINELY - Owner Orders Store (FS-13 / Milestone 7)
  * ============================================================================
  * Mengelola antrean pesanan masuk, pembaruan status bertahap,
  * dan sinkronisasi real-time via polling 15 detik di Dashboard Pemilik Usaha.

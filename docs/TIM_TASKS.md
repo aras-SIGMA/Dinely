@@ -1,6 +1,6 @@
-# 👥 Master Task List Tim RestoLink (M2 s/d M9)
+# 👥 Master Task List Tim Dinely (M2 s/d M9)
 
-Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullstack, Backend Developer, dan Frontend Developer) untuk menyelesaikan implementasi MVP secara paralel tanpa konflik Git.
+Dokumen ini adalah panduan kerja teknis seluruh anggota tim Dinely (PM/Fullstack, Backend Developer, dan Frontend Developer) untuk menyelesaikan implementasi MVP secara paralel tanpa konflik Git.
 
 ---
 
@@ -28,7 +28,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 
 ### 1. PM & Fullstack
 * **Milestone 2: Subdomain Resolver Engine**
-  - [x] **FS-01**: Parser hostname runtime (`src/lib/tenant-resolver.ts`, `src/lib/host.ts`) untuk domain produksi `*.restolink.site`, lokal `*.localhost:5173`, dan dev query `?tenant=slug`.
+  - [x] **FS-01**: Parser hostname runtime (`src/lib/tenant-resolver.ts`, `src/lib/host.ts`) untuk domain produksi `*.dinely.site`, lokal `*.localhost:5173`, dan dev query `?tenant=slug`.
   - [x] **FS-02**: Store reaktif `src/stores/tenant.svelte.ts` untuk query view Supabase `public_tenants`.
   - [x] **FS-03**: Shell layout `src/apps/tenant-site/TenantShell.svelte` dengan dynamic theming CSS variable (`--brand-primary`) dan skeleton loader.
   - [x] **FS-04**: Root dispatcher di `src/App.svelte` penentu perutean Platform vs Tenant Site.
@@ -82,7 +82,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
 * **Milestone 8: Chatbot AI Proxy**
   - [x] **BE-04**: Endpoint `api/gemini/chat.ts`
     - Request proxy ke Google Gemini API menggunakan `GEMINI_API_KEY`.
-    - System prompt restriksi: hanya menjawab seputar produk RestoLink (fitur, paket, cara daftar).
+    - System prompt restriksi: hanya menjawab seputar produk Dinely (fitur, paket, cara daftar).
     - Error fallback jika kuota habis atau pertanyaan di luar topik.
 * **Milestone 9: Audit Keamanan Backend**
   - [x] **BE-05**: Verifikasi tidak ada secret key (`SUPABASE_SERVICE_ROLE_KEY`, `MIDTRANS_SERVER_KEY`, `CLOUDINARY_API_SECRET`, `GEMINI_API_KEY`) yang bocor ke bundle client frontend.
@@ -95,7 +95,7 @@ Dokumen ini adalah panduan kerja teknis seluruh anggota tim RestoLink (PM/Fullst
   - [x] **FE-02**: Slicing halaman `Home.svelte` (Hero section, 3 langkah mudah UMKM, value proposition, CTA).
   - [x] **FE-03**: Slicing halaman `Features.svelte` (Menu digital, QR Code, Manajemen pesanan).
   - [x] **FE-04**: Slicing halaman `Pricing.svelte` (Paket Mikro aktif Rp 49.000 + badge trial 30 hari; Paket Kecil & Menengah berlabel "Segera Hadir").
-  - [x] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.restolink.site`, email, password).
+  - [x] **FE-05**: Slicing halaman `Register.svelte` (Nama pemilik, nama resto, live subdomain preview `namatoko.dinely.site`, email, password).
     - *Catatan Integrasi:* Gunakan debounce 300–400ms saat memanggil `checkSubdomainAvailability` (`src/lib/subdomain-validator.ts`) pada input form agar tidak membebani query RPC Supabase per keystroke. Gunakan `authStore.signUp` (`src/stores/auth.svelte.ts`) untuk submit registrasi.
   - [x] **FE-06**: Slicing halaman `Login.svelte` (Input email, password, error display, forgot password stub).
 * **Milestone 4, 5, 7: Dashboard Pemilik Usaha UI**

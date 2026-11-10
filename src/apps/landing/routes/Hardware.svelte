@@ -55,8 +55,8 @@
           name: 'Smartphone',
           units: '1 unit',
           role: 'Pusat Operasional Toko',
-          description: 'Menerima notifikasi pesanan masuk seketika, mengubah status menu (Ready/Habis), dan melihat rekap penjualan harian. Mendukung Android & iOS.',
-          connectivity: 'Internet 4G / WiFi',
+          description: 'Terima notifikasi order, ubah status menu, dan pantau rekap harian. Android & iOS.',
+          connectivity: '4G / WiFi',
           icon: 'smartphone'
         }
       ]
@@ -76,8 +76,8 @@
           number: 1,
           name: 'Tablet / Laptop Kasir',
           units: '1 unit',
-          role: 'Pusat POS & Kasir Meja Depan',
-          description: 'Layar tetap di kasir untuk memproses pembayaran tunai/non-tunai, mengonfirmasi pesanan QR meja, dan mengatur antrean pesanan masuk.',
+          role: 'Pusat POS & Kasir',
+          description: 'Proses pembayaran, konfirmasi order QR, dan atur antrean pesanan masuk.',
           connectivity: 'WiFi + Bluetooth / USB',
           icon: 'tablet'
         },
@@ -86,8 +86,8 @@
           number: 2,
           name: 'Thermal Receipt Printer',
           units: '1 unit',
-          role: 'Cetak Bukti Pembayaran Tamu',
-          description: 'Printer kasir ukuran 58mm atau 80mm untuk mencetak struk transaksi pelanggan dan nomor antrean pesanan secara otomatis.',
+          role: 'Cetak Struk Tamu',
+          description: 'Printer 58mm atau 80mm untuk struk transaksi dan nomor antrean otomatis.',
           connectivity: 'Bluetooth / USB / WiFi',
           icon: 'printer'
         },
@@ -96,9 +96,9 @@
           number: 3,
           name: 'Smartphone Staf',
           units: '1–2 unit',
-          role: 'Penerima Pesanan & Dapur / Barista',
-          description: 'Ponsel yang dipegang juru masak atau barista untuk melihat antrean tiket pesanan yang harus disiapkan tanpa perlu saling berteriak.',
-          connectivity: 'WiFi Lokal Toko',
+          role: 'Penerima Order & Dapur',
+          description: 'Ponsel juru masak atau barista untuk melihat tiket pesanan tanpa komunikasi manual.',
+          connectivity: 'WiFi Toko',
           icon: 'smartphone'
         },
         {
@@ -106,9 +106,9 @@
           number: 4,
           name: 'Smartphone Pemilik',
           units: '1 unit',
-          role: 'Monitoring Pemilik dari Jauh',
-          description: 'Akses khusus pemilik untuk memantau performa penjualan, omset harian, stok habis, dan histori order secara real-time dari luar gerai.',
-          connectivity: 'Internet Seluler / WiFi',
+          role: 'Monitoring Pemilik',
+          description: 'Pantau omset harian, stok habis, dan histori order real-time dari mana saja.',
+          connectivity: 'Seluler / WiFi',
           icon: 'smartphone'
         },
         {
@@ -117,8 +117,8 @@
           name: 'Router WiFi',
           units: '1 unit',
           role: 'Jaringan Lokal Stabil',
-          description: 'Memastikan seluruh perangkat kasir, printer, dan staf terhubung ke jaringan internet yang stabil tanpa gangguan sinyal.',
-          connectivity: 'Koneksi Provider Internet (Indihome/Biznet/dsb)',
+          description: 'Menjaga kasir, printer, dan staf tetap tersambung ke internet tanpa gangguan.',
+          connectivity: 'Indihome / Biznet / dsb',
           icon: 'wifi'
         }
       ]
@@ -139,28 +139,28 @@
           name: 'POS Station Kasir',
           units: '1–2 unit',
           role: 'Terminal Kasir Utama',
-          description: 'Perangkat all-in-one POS touch screen atau PC kasir berkecepatan tinggi untuk antrean checkout ramai dan split bill pembayaran.',
-          connectivity: 'LAN Ethernet / Dual-band WiFi',
+          description: 'POS touch screen atau PC kasir untuk antrean ramai dan split bill.',
+          connectivity: 'LAN / Dual-band WiFi',
           icon: 'pos'
         },
         {
           id: 'mn-2',
           number: 2,
-          name: 'Thermal Receipt Printer 80mm',
+          name: 'Thermal Printer 80mm',
           units: '1 unit',
-          role: 'Printer Struk Kasir Auto-Cutter',
-          description: 'Printer kasir 80mm tugas berat dengan pemotong kertas otomatis untuk kecepatan layanan di loket pembayaran.',
-          connectivity: 'USB / LAN / RJ11 Cash Drawer',
+          role: 'Printer Struk Auto-Cutter',
+          description: 'Printer 80mm tugas berat dengan pemotong otomatis untuk layanan cepat.',
+          connectivity: 'USB / LAN / RJ11',
           icon: 'printer'
         },
         {
           id: 'mn-3',
           number: 3,
-          name: 'Kitchen Display System (KDS) / Printer Dapur',
+          name: 'Kitchen Display / Printer Dapur',
           units: '1–2 unit',
-          role: 'Layar / Printer Dapur Masakan',
-          description: 'Layar monitor tahan panas/minyak atau printer dot matrix/thermal dapur berbunyi keras untuk antrean koki makanan berat.',
-          connectivity: 'LAN Ethernet / WiFi 5GHz',
+          role: 'Layar / Printer Dapur',
+          description: 'Monitor tahan panas/minyak atau printer dapur untuk antrean koki.',
+          connectivity: 'LAN / WiFi 5GHz',
           icon: 'kds'
         },
         {
@@ -168,8 +168,8 @@
           number: 4,
           name: 'Bar Display / Bar Printer',
           units: '1 unit',
-          role: 'Terminal Khusus Bar & Minuman',
-          description: 'Terminal khusus bartender agar pesanan minuman langsung diproses seketika tanpa tercampur dengan antrean dapur makanan.',
+          role: 'Terminal Bar & Minuman',
+          description: 'Terminal bartender agar order minuman tidak tercampur antrean dapur.',
           connectivity: 'LAN / WiFi',
           icon: 'kds',
           optional: true
@@ -179,19 +179,19 @@
           number: 5,
           name: 'Tablet Waiter',
           units: '2–4 unit',
-          role: 'Order Taking Portabel Pramusaji',
-          description: 'Tablet ringan yang dibawa waiter keliling meja untuk mencatat order tamu, input preferensi menu/alergi, dan cek ketersediaan stok.',
-          connectivity: 'WiFi Dual-Band Ringan',
+          role: 'Order Taking Pramusaji',
+          description: 'Tablet keliling meja untuk catat order tamu dan cek ketersediaan stok.',
+          connectivity: 'WiFi Dual-Band',
           icon: 'tablet'
         },
         {
           id: 'mn-6',
           number: 6,
-          name: 'Smartphone / Tablet Gudang + Barcode Scanner',
+          name: 'Tablet Gudang + Barcode',
           units: '1 unit',
-          role: 'Inventori Bahan & Stok Opname',
-          description: 'Perangkat staf gudang/logistik untuk scan barcode bahan baku masuk, penyesuaian stok berkala, dan verifikasi bahan kadaluarsa.',
-          connectivity: 'WiFi + Bluetooth Scanner',
+          role: 'Inventori & Stok Opname',
+          description: 'Scan barcode bahan masuk, penyesuaian stok, dan verifikasi kadaluarsa.',
+          connectivity: 'WiFi + Bluetooth',
           icon: 'scanner'
         },
         {
@@ -199,19 +199,19 @@
           number: 7,
           name: 'PC / Laptop Manajer',
           units: '1 unit',
-          role: 'Back Office & Analisis Bisnis',
-          description: 'Komputer manajemen untuk analisis laba-rugi, ekspor laporan penjualan, penentuan skema diskon/promosi, dan pengaturan hak akses staf.',
-          connectivity: 'LAN / WiFi Keamanan Tingkat Tinggi',
+          role: 'Back Office & Analisis',
+          description: 'Analisis laba-rugi, ekspor laporan, atur promo, dan hak akses staf.',
+          connectivity: 'LAN / WiFi',
           icon: 'pc'
         },
         {
           id: 'mn-8',
           number: 8,
-          name: 'Router Dual-Band + Access Point',
+          name: 'Router Dual-Band + AP',
           units: '1 set',
-          role: 'Infrastruktur Jaringan Terisolasi',
-          description: 'Sistem router bisnis dengan pemisahan VLAN: SSID privat khusus perangkat kasir & POS agar tidak terganggu bandwidth WiFi publik pelanggan.',
-          connectivity: 'Multi-SSID + Gigabit Ethernet LAN',
+          role: 'Infrastruktur Jaringan',
+          description: 'Router bisnis dengan VLAN untuk pisahkan WiFi kasir dan pelanggan.',
+          connectivity: 'Multi-SSID + Gigabit LAN',
           icon: 'wifi'
         }
       ]
@@ -267,10 +267,10 @@
 </script>
 
 <svelte:head>
-  <title>Kebutuhan Perangkat Keras (Hardware) — RestoLink</title>
+  <title>Kebutuhan Perangkat Keras (Hardware) — Dinely</title>
   <meta
     name="description"
-    content="Panduan kebutuhan perangkat keras RestoLink untuk Usaha Mikro, Kecil, dan Menengah. Cukup mulai dengan smartphone atau gunakan POS modern."
+    content="Panduan kebutuhan perangkat keras Dinely untuk Usaha Mikro, Kecil, dan Menengah. Cukup mulai dengan smartphone atau gunakan POS modern."
   />
 </svelte:head>
 
@@ -427,7 +427,7 @@
 
           <!-- Hardware Cards Grid -->
           <div class="mt-10">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
               <h3 class="text-xl font-extrabold tracking-tight text-slate-950">
                 Daftar Perangkat Yang Dibutuhkan ({currentTier.hardwareList.length} Item)
               </h3>
@@ -492,17 +492,17 @@
                       </span>
                     </div>
 
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5">
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
                       {item.description}
                     </p>
                   </div>
 
                   <!-- Footer Connectivity -->
-                  <div class="flex items-center gap-2 border-t border-slate-200/70 pt-3.5 text-[11px] text-slate-500 font-medium">
+                  <div class="flex items-center gap-2 border-t border-slate-200/70 pt-3 text-[11px] text-slate-500 font-medium">
                     <svg class="size-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span>Konektivitas: {item.connectivity}</span>
+                    <span class="truncate">{item.connectivity}</span>
                   </div>
                 </div>
               {/each}

@@ -208,7 +208,7 @@
 </script>
 
 <svelte:head>
-  <title>Daftar Resto - RestoLink Platform</title>
+  <title>Daftar Resto - Dinely Platform</title>
 </svelte:head>
 
 <main class="min-h-screen w-full bg-white text-slate-950 overflow-x-hidden relative flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-brand-500 selection:text-white">
@@ -242,7 +242,7 @@
       <a
         href="/"
         class="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-white/85 transition-all group drop-shadow-sm cursor-pointer"
-        title="Kembali ke Beranda RestoLink"
+        title="Kembali ke Beranda Dinely"
       >
         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -258,8 +258,8 @@
     >
       <Logo iconOnly size="sm" class="drop-shadow-sm transition-transform group-hover:rotate-6" />
       <div class="text-xl sm:text-2xl font-black tracking-tight font-sans select-none flex items-center">
-        <span class="text-slate-950">Resto</span>
-        <span style="color: {stepVisuals[step].color};" class="transition-colors duration-500">Link</span>
+        <span class="text-slate-950">Dine</span>
+        <span style="color: {stepVisuals[step].color};" class="transition-colors duration-500">ly</span>
       </div>
     </a>
 
@@ -323,7 +323,7 @@
             Mulai Digitalisasi Resto Anda
           </h1>
           <p class="mt-1.5 text-xs sm:text-sm text-slate-500 font-medium">
-            Daftarkan restoran kamu dan mulai kelola menu mandiri dengan RestoLink.
+            Daftarkan restoran kamu dan mulai kelola menu mandiri dengan Dinely.
           </p>
         </div>
 
@@ -371,7 +371,7 @@
                 <label for="subdomain" class="text-[11px] font-bold text-slate-700">
                   Pilihan Subdomain Toko <span class="text-rose-500">*</span>
                 </label>
-                <span class="text-[11px] text-slate-400 font-mono">.restolink.site</span>
+                <span class="text-[11px] text-slate-400 font-mono">.dinely.site</span>
               </div>
 
               <div class="relative flex items-center">
@@ -383,21 +383,21 @@
                   placeholder="dapur-bu-nia"
                   value={subdomain}
                   oninput={handleSubdomainInput}
-                  class="h-10 sm:h-11 w-full pl-3.5 pr-28 rounded-xl border bg-white text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all {subdomainStatus === 'invalid'
+                  class="h-10 sm:h-11 w-full pl-3.5 pr-24 sm:pr-28 rounded-xl border bg-white text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all {subdomainStatus === 'invalid'
                     ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                     : subdomainStatus === 'valid'
                     ? 'border-emerald-500 bg-emerald-50/20 focus:border-emerald-600'
                     : 'border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10'}"
                 />
                 <span class="absolute right-3 text-xs font-mono font-semibold text-slate-400 pointer-events-none select-none">
-                  .restolink.site
+                  .dinely.site
                 </span>
               </div>
 
               <!-- Live Status Pill -->
               <div class="flex items-center justify-between pt-0.5 text-[11px]">
                 <span class="font-mono text-slate-500 truncate text-[11px]">
-                  https://<strong class="text-brand-600">{subdomain || 'nama-resto'}</strong>.restolink.site
+                  https://<strong class="text-brand-600">{subdomain || 'nama-resto'}</strong>.dinely.site
                 </span>
                 <div>
                   {#if isCheckingSubdomain}
@@ -599,7 +599,7 @@
           <div class="text-left animate-in fade-in duration-200">
             <div class="divide-y divide-slate-100 border-y border-slate-100 text-xs mb-4">
               <!-- Restoran -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Restoran</span>
                 <div>
                   <p class="font-bold text-slate-900">{businessName || '-'}</p>
@@ -608,22 +608,22 @@
               </div>
 
               <!-- Subdomain -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Subdomain</span>
                 <p class="font-medium text-slate-700">
                   <span class="font-bold text-brand-600 font-mono">{subdomain}</span>
-                  <span class="font-mono text-slate-500">.restolink.site</span>
+                  <span class="font-mono text-slate-500">.dinely.site</span>
                 </p>
               </div>
 
               <!-- Email -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Email</span>
                 <p class="font-medium text-slate-700 break-all">{email}</p>
               </div>
 
               <!-- Pemilik -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Pemilik</span>
                 <div>
                   <p class="font-medium text-slate-800">{fullName}</p>
@@ -718,6 +718,6 @@
 
   <!-- BOTTOM FOOTER -->
   <footer class="w-full text-center text-xs text-slate-400 py-2 relative z-10">
-    <p>&copy; {new Date().getFullYear()} RestoLink Platform. Hak Cipta Dilindungi.</p>
+    <p>&copy; {new Date().getFullYear()} Dinely Platform. Hak Cipta Dilindungi.</p>
   </footer>
 </main>

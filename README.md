@@ -1,4 +1,4 @@
-﻿# RestoLink
+﻿# Dinely
 
 > Platform web multi-tenant untuk UMKM kuliner: website menu digital mandiri per-tenant via subdomain dinamis, dashboard pengelolaan terpusat, dan alur pemesanan sederhana.
 
@@ -53,14 +53,14 @@ Untuk menguji website tenant secara lokal di browser, akses melalui subdomain lo
 Proyek ini menggunakan arsitektur **Single Unified Repo** yang memisahkan Frontend dan Backend:
 
 ```
-restolink/
+dinely/
 ├── docs/                      # Dokumentasi PRD, arsitektur, & notulen keputusan
 │   ├── product/               # PRD, user flows, database schema, & feature spec
 │   └── notulen/               # Catatan keputusan teknis tim
 │
 ├── src/                       # FRONTEND (Svelte 5 + Tailwind v4 + sv-router)
 │   ├── apps/
-│   │   ├── landing/           # Website publik RestoLink (Beranda, Fitur, Harga)
+│   │   ├── landing/           # Website publik Dinely (Beranda, Fitur, Harga)
 │   │   ├── dashboard/         # Dashboard Pemilik Usaha (Kelola Menu, Pesanan)
 │   │   ├── admin/             # Dashboard Admin Platform (Audit, Override)
 │   │   └── tenant-site/       # Website Menu Publik Tenant (Katalog, Checkout)

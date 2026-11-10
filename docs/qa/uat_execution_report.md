@@ -1,6 +1,6 @@
-# 🧪 Laporan Eksekusi User Acceptance Testing (UAT) — RestoLink MVP
+# 🧪 Laporan Eksekusi User Acceptance Testing (UAT) — Dinely MVP
 
-Dokumen ini adalah rekam jejak resmi eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md` untuk verifikasi kesiapan sistem RestoLink menyambut kompetisi lomba GTNIC 2026.
+Dokumen ini adalah rekam jejak resmi eksekusi 7 skenario UAT dari `docs/product/04_USER_FLOWS.md` untuk verifikasi kesiapan sistem Dinely menyambut kompetisi lomba GTNIC 2026.
 
 ---
 
@@ -10,7 +10,7 @@ Dokumen ini adalah rekam jejak resmi eksekusi 7 skenario UAT dari `docs/product/
 | :--- | :--- | :--- | :--- | :---: |
 | **UAT-01** | Registrasi Pemilik, Pembayaran Midtrans, & Aktivasi Otomatis | `authStore`, `api/midtrans/*`, RLS, Webhook Engine | Pemilik baru mendaftar → bayar via Midtrans Sandbox → webhook memvalidasi signature SHA-512 → tenant langsung berstatus `active` (+30 hari) tanpa intervensi manual. | **PASS** |
 | **UAT-02** | Pengelolaan Menu & Sinkronisasi Ketersediaan Real-Time | `MenuManagement.svelte`, `menu_items`, `public_tenants` | Pemilik mengubah harga / toggle `is_available` → perubahan langsung tercermin di sisi pembeli; menu non-aktif otomatis ditolak saat checkout. | **PASS** |
-| **UAT-03** | Penemuan Menu & Layanan Pelanggan via Subdomain Mandiri | `tenant-resolver.ts`, `tenantStore`, `TenantHome.svelte` | Pembeli membuka `{subdomain}.restolink.site` / `?tenant=slug` → profil resto, alamat, logo, status buka, dan tombol WhatsApp CS ter-render instan tanpa login. | **PASS** |
+| **UAT-03** | Penemuan Menu & Layanan Pelanggan via Subdomain Mandiri | `tenant-resolver.ts`, `tenantStore`, `TenantHome.svelte` | Pembeli membuka `{subdomain}.dinely.site` / `?tenant=slug` → profil resto, alamat, logo, status buka, dan tombol WhatsApp CS ter-render instan tanpa login. | **PASS** |
 | **UAT-04** | Pemesanan Guest, Pelacakan Status, & Manajemen Dapur | `cartStore`, RPC `create_guest_order`, `ordersStore` | Pembeli pesan makanan (maks 99 item) → order terbit dengan `order_code` unik → masuk ke antrean dapur dashboard pemilik → status dapat diubah bertahap (`baru → diproses → selesai`). | **PASS** |
 | **UAT-05** | Penegakan Isolasi Multi-Tenant Lintas Akun (*Cross-Tenant RLS*) | PostgreSQL RLS (`is_tenant_owner`) | Akun Pemilik Toko A diblokir total saat mencoba membaca atau mengubah data kategori, menu, pesanan, dan transaksi milik Toko B. | **PASS** |
 | **UAT-06** | Ketahanan Transaksi Gagal / Pending di Midtrans Sandbox | Webhook `api/midtrans/webhook.ts` & DB Trigger | Notifikasi transaksi pending, expired, atau denied tidak mengaktifkan tenant (`tenants.status` tetap `pending`). Tenant hanya aktif pada status `settlement`/`capture`. | **PASS** |
@@ -41,7 +41,7 @@ Dokumen ini adalah rekam jejak resmi eksekusi 7 skenario UAT dari `docs/product/
 - **Langkah Pengujian**:
   1. Pemilik login ke `/dashboard/menu`.
   2. Ubah ketersediaan menu "Sop Iga Sapi" menjadi `is_available = false`.
-  3. Pembeli mengakses website toko `dapur-nia.restolink.site`.
+  3. Pembeli mengakses website toko `dapur-nia.dinely.site`.
   4. Menu Sop Iga menampilkan badge "Habis" dan tombol pemesanan dinonaktifkan di `cartStore`.
   5. Pengujian serangan bypass: pembeli mencoba inject payload manual menu yang habis ke RPC `create_guest_order`.
 - **Hasil Verifikasi**:
@@ -119,11 +119,11 @@ Dokumen ini adalah rekam jejak resmi eksekusi 7 skenario UAT dari `docs/product/
 - **Hasil Verifikasi**:
   - Sistem menampilkan komponen `src/apps/tenant-site/routes/NotFound.svelte` dengan pesan ramah: "Usaha Kuliner Tidak Ditemukan atau Belum Aktif".
   - Tidak ada kebocoran error stack trace atau data tenant lain.
-  - Tombol CTA mengarahkan kembali ke landing page utama RestoLink.
+  - Tombol CTA mengarahkan kembali ke landing page utama Dinely.
   - **Verdict**: ✅ **LULUS (100%)**
 
 ---
 
 ## 🏆 Kesimpulan UAT
 Seluruh **7 Skenario UAT Lomba** telah diuji dan dinyatakan **100% LULUS (PASS)**.
-Sistem RestoLink MVP memenuhi seluruh kriteria fungsional, performa, integritas multi-tenant, serta standar keamanan kompetisi GTNIC 2026.
+Sistem Dinely MVP memenuhi seluruh kriteria fungsional, performa, integritas multi-tenant, serta standar keamanan kompetisi GTNIC 2026.

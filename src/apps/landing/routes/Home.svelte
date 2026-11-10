@@ -56,7 +56,7 @@
     prefersReducedMotion ? 1 : Math.min(1, Math.max(0, heroProgress / 0.28))
   );
   const stageTranslateY = $derived(
-    prefersReducedMotion ? 0 : (1 - stageRise) * 110
+    prefersReducedMotion ? 0 : (1 - stageRise) * 115
   );
 
   // Spread and untwist progress: 0.28 -> 0.78 (leaves 0.78 -> 1.00 completely static & held)
@@ -102,7 +102,7 @@
       a: 'Sama sekali tidak. Anda bisa mendaftar dan langsung menggunakan seluruh fitur Paket Mikro gratis selama 30 hari tanpa perlu memasukkan informasi kartu kredit atau pembayaran apa pun.'
     },
     {
-      q: 'Apakah RestoLink mengambil potongan komisi dari setiap pesanan pelanggan?',
+      q: 'Apakah Dinely mengambil potongan komisi dari setiap pesanan pelanggan?',
       a: 'Tidak ada potongan komisi (0%). Semua uang pembayaran dari pelanggan adalah 100% milik usaha Anda, berbeda dari aplikasi ojek online yang memotong 20% atau lebih.'
     },
     {
@@ -111,7 +111,7 @@
     },
     {
       q: 'Apakah saya bisa mengganti nama subdomain usaha setelah terdaftar?',
-      a: 'Nama subdomain dipilih saat pertama kali mendaftar. Jika ada kebutuhan perubahan khusus, Anda dapat menghubungi tim bantuan RestoLink untuk asistensi.'
+      a: 'Nama subdomain dipilih saat pertama kali mendaftar. Jika ada kebutuhan perubahan khusus, Anda dapat menghubungi tim bantuan Dinely untuk asistensi.'
     },
     {
       q: 'Apakah ada kontrak jangka panjang atau denda jika berhenti berlangganan?',
@@ -213,7 +213,7 @@
 
         <!-- B. THE CENTERPIECE SHOWCASE STAGE (Rises & untwists directly on marquee baseline) -->
         <div
-          class="absolute bottom-[44px] sm:bottom-[48px] inset-x-0 z-10 w-full flex flex-col items-center justify-end overflow-visible pt-6 pb-0 pointer-events-auto transition-transform duration-75 ease-out"
+          class="absolute bottom-[72px] sm:bottom-[60px] inset-x-0 z-10 w-full flex flex-col items-center justify-end overflow-visible pt-4 pb-0 pointer-events-auto transition-transform duration-75 ease-out"
           style="transform: translateY({stageTranslateY}%); will-change: transform;"
         >
           <!-- ADAPTIVE VIEWPORT SCALER -->
@@ -376,7 +376,23 @@
             </div>
 
           <!-- MOBILE SWIPEABLE STACK VIEW (Visible only on < 1024px) -->
-          <div class="relative z-10 flex lg:hidden flex-col items-center justify-center w-full pb-8 mb-0">
+          <div class="relative z-10 flex lg:hidden flex-col items-center justify-center w-full pb-12 mb-0">
+            <!-- Mobile Swipe Navigation Tabs & Hint -->
+            <div class="mb-2 flex items-center justify-center gap-1.5 z-20">
+              {#each mobileMockupMeta as meta, idx}
+                <button
+                  type="button"
+                  onclick={() => (activeMobileCard = idx)}
+                  class="rounded-full px-3 py-1 text-[11px] font-bold transition-all cursor-pointer shadow-sm {activeMobileCard === idx
+                    ? 'bg-slate-900 text-white ring-1 ring-slate-900'
+                    : 'bg-white/95 backdrop-blur text-slate-700 hover:bg-white border border-slate-200'}"
+                >
+                  {meta.tag}
+                </button>
+              {/each}
+            </div>
+            <span class="mb-3 text-[10px] font-medium text-slate-500">Geser (swipe) layar untuk berganti</span>
+
             <!-- Swipe Deck Container -->
             <div
               class="relative w-[245px] sm:w-[265px] h-[435px] sm:h-[465px] flex items-center justify-center touch-pan-y"
@@ -389,7 +405,7 @@
               <div
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 0
                   ? 'z-30 scale-100 rotate-0 opacity-100'
-                  : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
+                  : 'z-10 scale-90 -rotate-6 -translate-x-6 opacity-40 pointer-events-none'}"
               >
                 <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
                   <!-- iPhone 12 Top Bezel & Notch -->
@@ -407,12 +423,12 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1">
                       <span class="text-emerald-600">●</span>
-                      <span class="truncate">dapur-nia.restolink.site</span>
+                      <span class="truncate">dapur-nia.dinely.site</span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA KATALOG MENU TAMU]</span>
                       <p class="mt-1 text-[10px] text-slate-500">
                         Foto menu WebP, harga promo, dan tombol pesan
@@ -428,8 +444,8 @@
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 1
                   ? 'z-30 scale-100 rotate-0 opacity-100'
                   : activeMobileCard === 0
-                    ? 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'
-                    : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
+                    ? 'z-10 scale-90 rotate-6 translate-x-6 opacity-40 pointer-events-none'
+                    : 'z-10 scale-90 -rotate-6 -translate-x-6 opacity-40 pointer-events-none'}"
               >
                 <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
                   <!-- iPhone 12 Top Bezel & Notch -->
@@ -447,12 +463,12 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div class="rounded-lg bg-slate-900 text-white px-2.5 py-1 text-[10px] font-bold flex items-center justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-900 text-white px-2 py-1 text-[9px] sm:text-[10px] font-bold flex items-center justify-between">
                       <span>Meja 04</span>
                       <span class="size-1.5 rounded-full bg-emerald-400"></span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA STANDEE QR MEJA]</span>
                       <p class="mt-1 text-[10px] text-slate-600">
                         Scan kamera langsung tanpa instal aplikasi
@@ -467,7 +483,7 @@
               <div
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 2
                   ? 'z-30 scale-100 rotate-0 opacity-100'
-                  : 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'}"
+                  : 'z-10 scale-90 rotate-6 translate-x-6 opacity-40 pointer-events-none'}"
               >
                 <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
                   <!-- iPhone 12 Top Bezel & Notch -->
@@ -485,12 +501,12 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-800 flex items-center justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] sm:text-[10px] font-bold text-slate-800 flex items-center justify-between">
                       <span>Layar Dapur</span>
                       <span class="text-[9px] text-brand-600">Live</span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA ANTREAN DAPUR]</span>
                       <p class="mt-1 text-[10px] text-slate-500">
                         Tiket order masuk realtime dan alur status
@@ -501,22 +517,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Mobile Swipe Navigation Tabs -->
-            <div class="mt-4 flex items-center justify-center gap-2">
-              {#each mobileMockupMeta as meta, idx}
-                <button
-                  type="button"
-                  onclick={() => (activeMobileCard = idx)}
-                  class="rounded-full px-3 py-1 text-xs font-bold transition-all cursor-pointer {activeMobileCard === idx
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}"
-                >
-                  {meta.tag}
-                </button>
-              {/each}
-            </div>
-            <span class="mt-1.5 text-[10px] text-slate-400">Geser (swipe) layar untuk berganti mockup</span>
           </div>
         </div>
       </div>
@@ -574,7 +574,7 @@
       <!-- ======================================================================= -->
       <section
         id="masalah-umkm"
-        class="relative z-20 w-full border-t border-slate-200/90 bg-slate-50 shadow-[0_-30px_70px_rgba(0,0,0,0.25)] py-16 sm:py-24 overflow-hidden"
+        class="relative z-20 w-full border-t border-slate-200/90 bg-slate-50 shadow-[0_-30px_70px_rgba(0,0,0,0.25)] pt-24 pb-16 sm:py-24 overflow-hidden"
       >
         <!-- 54px Architectural Grid with Radial Mask (from smooth-scroll component) -->
         <div class="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,#cbd5e135_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e135_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)]"></div>
@@ -722,7 +722,7 @@
                 <!-- Visual Comparison Gauge -->
                 <div class="mt-4 rounded-xl border border-slate-200/80 bg-slate-50 p-2.5 flex items-center justify-between text-xs font-semibold">
                   <span class="text-slate-500 line-through">Ojol: 20% - 25%</span>
-                  <span class="text-emerald-600 font-bold">RestoLink: Rp 0</span>
+                  <span class="text-emerald-600 font-bold">Dinely: Rp 0</span>
                 </div>
 
                 <p class="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">

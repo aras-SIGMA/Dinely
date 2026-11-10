@@ -1,6 +1,6 @@
-# Instruksi Refactoring Skema Database & RLS — RestoLink (Supabase PostgreSQL)
+# Instruksi Refactoring Skema Database & RLS — Dinely (Supabase PostgreSQL)
 
-Dokumen ini berisi spesifikasi teknis dan daftar periksa (*checklist*) perbaikan skema database, kebijakan Row Level Security (RLS), serta fungsi RPC PostgreSQL untuk **RestoLink**. Gunakan instruksi di bawah ini secara berurutan untuk memperbarui file migrasi SQL.
+Dokumen ini berisi spesifikasi teknis dan daftar periksa (*checklist*) perbaikan skema database, kebijakan Row Level Security (RLS), serta fungsi RPC PostgreSQL untuk **Dinely**. Gunakan instruksi di bawah ini secara berurutan untuk memperbarui file migrasi SQL.
 
 ## 1. Perbaikan Kebijakan Row Level Security (RLS) & Hak Akses View
 
