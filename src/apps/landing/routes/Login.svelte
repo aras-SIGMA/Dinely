@@ -230,8 +230,8 @@
     >
       <Logo iconOnly size="sm" class="drop-shadow-sm transition-transform group-hover:rotate-6" />
       <div class="text-xl sm:text-2xl font-black tracking-tight font-sans select-none flex items-center">
-        <span class="text-slate-950">Resto</span>
-        <span class="text-brand-500">Link</span>
+        <span class="text-slate-950">Dine</span>
+        <span class="text-brand-500">ly</span>
       </div>
     </a>
 
