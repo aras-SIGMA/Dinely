@@ -8,7 +8,6 @@
   } from '@/lib/subdomain-validator';
   import { router } from '@/lib/router';
   import Logo from '@/components/ui/Logo.svelte';
-  import OtpInput from '@/components/ui/OtpInput.svelte';
   import RegisterMotionIllustration from '@/components/illustrations/RegisterMotionIllustration.svelte';
 
   // Form Fields
@@ -20,9 +19,9 @@
   let email = $state('');
   let password = $state('');
 
-  // Step Management (1: Restoran, 2: Pemilik, 3: Konfirmasi, 4: OTP)
-  let step = $state<1 | 2 | 3 | 4>(1);
-  let maxReachedStep = $state<1 | 2 | 3 | 4>(1);
+  // Step Management (1: Restoran, 2: Pemilik, 3: Konfirmasi)
+  let step = $state<1 | 2 | 3>(1);
+  let maxReachedStep = $state<1 | 2 | 3>(1);
 
   // UI States
   let isSubdomainManuallyEdited = $state(false);
@@ -33,14 +32,6 @@
   let isSubmitting = $state(false);
   let formError = $state('');
 
-  // OTP States
-  let otpCode = $state('');
-  let isVerifyingOtp = $state(false);
-  let otpErrorMessage = $state('');
-  let otpSuccessNotice = $state('');
-  let resendCountdown = $state(0);
-  let countdownTimer: ReturnType<typeof setInterval> | null = null;
-
   // Debounce Timer Reference
   let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -48,8 +39,7 @@
   const stepVisuals = {
     1: { title: 'Restoran', color: '#f97316', desc: 'Mulai buat website dan portal menu digital resto Anda.' },
     2: { title: 'Pemilik', color: '#ea580c', desc: 'Amankan hak akses administrator dan autentikasi toko Anda.' },
-    3: { title: 'Konfirmasi', color: '#c2410c', desc: 'Verifikasi kelengkapan data sebelum aktivasi akun resto.' },
-    4: { title: 'Verifikasi OTP', color: '#f97316', desc: 'Satu langkah lagi untuk mengaktifkan subdomain resto Anda.' }
+    3: { title: 'Konfirmasi', color: '#c2410c', desc: 'Verifikasi kelengkapan data sebelum pendaftaran akun resto.' }
   };
 
   // Password strength calculation (0 to 4)
@@ -76,17 +66,6 @@
     email.trim().includes('@') &&
     password.length >= 8
   );
-
-  function startCountdown(seconds = 60) {
-    if (countdownTimer) clearInterval(countdownTimer);
-    resendCountdown = seconds;
-    countdownTimer = setInterval(() => {
-      resendCountdown -= 1;
-      if (resendCountdown <= 0) {
-        if (countdownTimer) clearInterval(countdownTimer);
-      }
-    }, 1000);
-  }
 
   // Auto-slugify Subdomain when Business Name changes
   function handleBusinessNameInput(e: Event) {
@@ -182,8 +161,8 @@
     if (maxReachedStep < 3) maxReachedStep = 3;
   }
 
-  // Trigger Registration & Send OTP
-  async function handleSendRegistrationOtp() {
+  // Trigger Registration & Redirect to Login for OTP
+  async function handleRegister() {
     formError = '';
     isSubmitting = true;
 
@@ -199,13 +178,10 @@
 
       if (result.success) {
         if (result.session) {
-          router.navigate('/dashboard');
-        } else {
-          step = 4;
-          if (maxReachedStep < 4) maxReachedStep = 4;
-          startCountdown(60);
-          otpSuccessNotice = 'Pendaftaran tersimpan! Masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+          await authStore.signOut();
         }
+        // Navigasi ke halaman masuk agar user input password dan verifikasi OTP setelah klik Masuk
+        router.navigate(`/masuk?email=${encodeURIComponent(email.trim())}&registered=true`);
       } else {
         formError = result.error || 'Gagal mendaftarkan toko. Silakan periksa kembali formulir Anda.';
       }
@@ -213,49 +189,6 @@
       formError = err instanceof Error ? err.message : 'Terjadi kendala jaringan. Silakan coba lagi.';
     } finally {
       isSubmitting = false;
-    }
-  }
-
-  // Handle Verify OTP
-  async function handleVerifyOtp(codeToVerify?: string) {
-    const token = (codeToVerify || otpCode).replace(/\D/g, '');
-    if (token.length < 6 || token.length > 8 || isVerifyingOtp) return;
-
-    isVerifyingOtp = true;
-    otpErrorMessage = '';
-
-    try {
-      const result = await authStore.verifyOtp({
-        email: email.trim(),
-        token: token.trim(),
-        type: 'signup'
-      });
-
-      if (result.success) {
-        router.navigate('/dashboard');
-      } else {
-        otpErrorMessage = result.error || 'Kode OTP tidak valid atau telah kedaluwarsa.';
-      }
-    } catch (err: unknown) {
-      otpErrorMessage = err instanceof Error ? err.message : 'Gagal memverifikasi OTP. Silakan coba lagi.';
-    } finally {
-      isVerifyingOtp = false;
-    }
-  }
-
-  // Handle Resend OTP
-  async function handleResendOtp() {
-    if (resendCountdown > 0 || !email) return;
-
-    otpErrorMessage = '';
-    otpSuccessNotice = '';
-
-    const res = await authStore.resendOtp({ email: email.trim(), type: 'signup' });
-    if (res.success) {
-      otpSuccessNotice = 'Kode OTP baru telah dikirimkan ke kotak masuk email Anda.';
-      startCountdown(60);
-    } else {
-      otpErrorMessage = res.error || 'Gagal mengirim ulang kode OTP.';
     }
   }
 
@@ -270,7 +203,6 @@
   });
 
   onDestroy(() => {
-    if (countdownTimer) clearInterval(countdownTimer);
     if (debounceTimeout) clearTimeout(debounceTimeout);
   });
 </script>
@@ -365,21 +297,13 @@
           <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[2].desc}
           </p>
-        {:else if step === 3}
+        {:else}
           <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
             Konfirmasi <br />
             <span class="text-white drop-shadow-md">Akhir</span>
           </h2>
           <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
             {stepVisuals[3].desc}
-          </p>
-        {:else}
-          <h2 class="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.02] drop-shadow-md">
-            Verifikasi <br />
-            <span class="text-white drop-shadow-md">Email OTP</span>
-          </h2>
-          <p class="text-xs lg:text-sm text-white font-medium leading-relaxed max-w-xs drop-shadow-xs">
-            {stepVisuals[4].desc}
           </p>
         {/if}
       </div>
@@ -721,7 +645,7 @@
 
               <button
                 type="button"
-                onclick={handleSendRegistrationOtp}
+                onclick={handleRegister}
                 disabled={isSubmitting}
                 class="h-10 sm:h-11 rounded-xl bg-brand-500 hover:bg-brand-600 px-6 text-xs font-bold text-white shadow-md shadow-brand-500/20 cursor-pointer transition-all inline-flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
               >
@@ -732,112 +656,12 @@
                   </svg>
                   <span>Mendaftarkan...</span>
                 {:else}
-                  <span>Kirim Kode OTP</span>
+                  <span>Daftarkan Resto</span>
                   <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 {/if}
               </button>
-            </div>
-          </div>
-
-        <!-- ==================== STEP 4: VERIFIKASI OTP ==================== -->
-        {:else if step === 4}
-          <div class="space-y-5 text-left animate-in fade-in duration-200">
-            <!-- Back to Step 3 -->
-            <button
-              type="button"
-              onclick={() => goToStep(3)}
-              class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-600 transition-colors cursor-pointer"
-            >
-              <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>Ubah Data Pendaftaran</span>
-            </button>
-
-            <!-- OTP Header -->
-            <div class="space-y-1.5">
-              <div class="size-11 rounded-2xl bg-brand-50 border border-brand-200/60 flex items-center justify-center text-brand-600 mb-2">
-                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-                Verifikasi Pendaftaran Resto
-              </h2>
-              <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                Satu langkah lagi untuk mengaktifkan subdomain <strong class="text-brand-600 font-mono">{subdomain}.dinely.site</strong>. Masukkan 6 digit kode OTP yang kami kirimkan ke email:
-                <strong class="text-slate-800 block mt-0.5">{email}</strong>
-              </p>
-            </div>
-
-            <!-- Notice Banners -->
-            {#if otpSuccessNotice}
-              <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 flex items-center gap-2.5">
-                <svg class="size-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{otpSuccessNotice}</span>
-              </div>
-            {/if}
-
-            {#if otpErrorMessage}
-              <div class="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-800 flex items-center gap-2.5">
-                <svg class="size-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{otpErrorMessage}</span>
-              </div>
-            {/if}
-
-            <!-- 6 Digit OTP Component -->
-            <div class="py-2">
-              <OtpInput
-                bind:value={otpCode}
-                disabled={isVerifyingOtp}
-                hasError={!!otpErrorMessage}
-                oncomplete={(code) => handleVerifyOtp(code)}
-              />
-            </div>
-
-            <!-- Action Button -->
-            <div class="space-y-3">
-              <button
-                type="button"
-                disabled={isVerifyingOtp || otpCode.length < 6 || otpCode.length > 8}
-                onclick={() => handleVerifyOtp()}
-                class="w-full h-11 sm:h-12 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {#if isVerifyingOtp}
-                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                  <span>Mengaktifkan Toko...</span>
-                {:else}
-                  <span>Verifikasi & Aktifkan Toko</span>
-                  <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                {/if}
-              </button>
-
-              <!-- Resend Countdown -->
-              <div class="text-center text-xs text-slate-500 font-medium">
-                {#if resendCountdown > 0}
-                  <span>Kirim ulang kode dalam <strong class="font-mono text-brand-600 font-bold">{resendCountdown}s</strong></span>
-                {:else}
-                  <span>Belum menerima kode OTP?</span>
-                  <button
-                    type="button"
-                    onclick={handleResendOtp}
-                    class="font-bold text-brand-600 hover:text-brand-700 hover:underline ml-1 cursor-pointer"
-                  >
-                    Kirim Ulang Kode OTP
-                  </button>
-                {/if}
-              </div>
             </div>
           </div>
         {/if}
@@ -846,53 +670,51 @@
   </div>
 
   <!-- CATIONGATE-STYLE BOTTOM FLOATING STEPPER PILL BAR (Desktop lg+) -->
-  {#if step <= 3}
-    <div class="hidden lg:flex justify-center z-20 relative pb-2 w-full max-w-7xl mx-auto">
-      <div class="inline-flex items-center gap-2 bg-[#F1F3F6] p-1.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-slate-200/80">
-        <!-- 01 Restoran -->
-        <button
-          type="button"
-          onclick={() => goToStep(1)}
-          class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer {step === 1
-            ? 'bg-brand-500 text-white shadow-xs'
-            : 'text-slate-600 hover:text-slate-950 hover:bg-white/70'}"
-        >
-          <span class="font-black text-xs">01</span>
-          <span class="text-[12px]">Restoran</span>
-        </button>
+  <div class="hidden lg:flex justify-center z-20 relative pb-2 w-full max-w-7xl mx-auto">
+    <div class="inline-flex items-center gap-2 bg-[#F1F3F6] p-1.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-slate-200/80">
+      <!-- 01 Restoran -->
+      <button
+        type="button"
+        onclick={() => goToStep(1)}
+        class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer {step === 1
+          ? 'bg-brand-500 text-white shadow-xs'
+          : 'text-slate-600 hover:text-slate-950 hover:bg-white/70'}"
+      >
+        <span class="font-black text-xs">01</span>
+        <span class="text-[12px]">Restoran</span>
+      </button>
 
-        <!-- 02 Pemilik -->
-        <button
-          type="button"
-          disabled={maxReachedStep < 2}
-          onclick={() => maxReachedStep >= 2 && goToStep(2)}
-          class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 {step === 2
-            ? 'bg-brand-500 text-white shadow-xs cursor-pointer'
-            : maxReachedStep >= 2
-            ? 'text-slate-600 hover:text-slate-950 hover:bg-white/70 cursor-pointer'
-            : 'text-slate-400 opacity-50 cursor-not-allowed'}"
-        >
-          <span class="font-black text-xs">02</span>
-          <span class="text-[12px]">Pemilik</span>
-        </button>
+      <!-- 02 Pemilik -->
+      <button
+        type="button"
+        disabled={maxReachedStep < 2}
+        onclick={() => maxReachedStep >= 2 && goToStep(2)}
+        class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 {step === 2
+          ? 'bg-brand-500 text-white shadow-xs cursor-pointer'
+          : maxReachedStep >= 2
+          ? 'text-slate-600 hover:text-slate-950 hover:bg-white/70 cursor-pointer'
+          : 'text-slate-400 opacity-50 cursor-not-allowed'}"
+      >
+        <span class="font-black text-xs">02</span>
+        <span class="text-[12px]">Pemilik</span>
+      </button>
 
-        <!-- 03 Konfirmasi -->
-        <button
-          type="button"
-          disabled={maxReachedStep < 3}
-          onclick={() => maxReachedStep >= 3 && goToStep(3)}
-          class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 {step === 3
-            ? 'bg-brand-500 text-white shadow-xs cursor-pointer'
-            : maxReachedStep >= 3
-            ? 'text-slate-600 hover:text-slate-950 hover:bg-white/70 cursor-pointer'
-            : 'text-slate-400 opacity-50 cursor-not-allowed'}"
-        >
-          <span class="font-black text-xs">03</span>
-          <span class="text-[12px]">Konfirmasi</span>
-        </button>
-      </div>
+      <!-- 03 Konfirmasi -->
+      <button
+        type="button"
+        disabled={maxReachedStep < 3}
+        onclick={() => maxReachedStep >= 3 && goToStep(3)}
+        class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 {step === 3
+          ? 'bg-brand-500 text-white shadow-xs cursor-pointer'
+          : maxReachedStep >= 3
+          ? 'text-slate-600 hover:text-slate-950 hover:bg-white/70 cursor-pointer'
+          : 'text-slate-400 opacity-50 cursor-not-allowed'}"
+      >
+        <span class="font-black text-xs">03</span>
+        <span class="text-[12px]">Konfirmasi</span>
+      </button>
     </div>
-  {/if}
+  </div>
 
   <!-- BOTTOM FOOTER -->
   <footer class="w-full text-center text-xs text-slate-400 py-2 relative z-10">

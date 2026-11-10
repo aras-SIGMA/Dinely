@@ -19,10 +19,12 @@
   let showPassword = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state('');
+  let registeredNotice = $state('');
   let isForgotPasswordModalOpen = $state(false);
 
   // OTP States
   let otpCode = $state('');
+  let otpType = $state<'email' | 'signup'>('email');
   let isVerifyingOtp = $state(false);
   let otpErrorMessage = $state('');
   let otpSuccessNotice = $state('');
@@ -55,38 +57,41 @@
     isSubmitting = true;
 
     try {
-      const result = await authStore.signIn({
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const isFromRegistration = registeredNotice !== '' || params?.get('registered') === 'true';
+
+      // Pas abis mencet tombol "Masuk", jika akun baru registrasi langsung tampilkan verifikasi OTP signup
+      if (isFromRegistration) {
+        otpType = 'signup';
+        step = 'otp';
+        startCountdown(60);
+        otpErrorMessage = '';
+        otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        return;
+      }
+
+      // Validasi kredensial password & kirim kode OTP login (2FA Karantina)
+      const result = await authStore.loginWith2FA({
         email: email.trim(),
         password
       });
 
-      if (result.success) {
+      if (result.success && result.otpRequired) {
         if (rememberMe && typeof localStorage !== 'undefined') {
           localStorage.setItem('restolink_remember_me', 'true');
           localStorage.setItem('restolink_remembered_email', email.trim());
-        } else if (typeof localStorage !== 'undefined') {
-          localStorage.removeItem('restolink_remember_me');
-          localStorage.removeItem('restolink_remembered_email');
         }
 
-        const targetPath = homePathForRole(authStore.role);
-        router.navigate(targetPath as `/${string}`);
-      } else {
-        const errText = result.error?.toLowerCase() || '';
+        otpType = result.otpType || 'email';
+        step = 'otp';
+        startCountdown(60);
+        otpErrorMessage = '';
+        otpSuccessNotice = result.message || 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        return;
+      }
 
-        // Deteksi jika akun membutuhkan verifikasi email / OTP
-        if (errText.includes('email not confirmed') || errText.includes('verify') || errText.includes('otp')) {
-          step = 'otp';
-          startCountdown(60);
-          otpErrorMessage = '';
-          otpSuccessNotice = 'Silakan masukkan 6 digit kode verifikasi yang dikirimkan ke email Anda.';
-        } else if (errText.includes('invalid login credentials')) {
-          errorMessage = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
-        } else if (errText.includes('failed to fetch')) {
-          errorMessage = 'Gagal terhubung ke database. Pastikan koneksi internet Anda aktif.';
-        } else {
-          errorMessage = result.error || 'Gagal masuk. Silakan periksa kredensial Anda.';
-        }
+      if (!result.success) {
+        errorMessage = result.error || 'Gagal masuk. Silakan periksa kredensial Anda.';
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kendala jaringan. Silakan coba lagi.';
@@ -112,10 +117,14 @@
       const result = await authStore.verifyOtp({
         email: email.trim(),
         token: token.trim(),
-        type: 'signup'
+        type: otpType
       });
 
-      if (result.success) {
+      if (result.success && authStore.isAuthenticated) {
+        if (rememberMe && typeof localStorage !== 'undefined') {
+          localStorage.setItem('restolink_remember_me', 'true');
+          localStorage.setItem('restolink_remembered_email', email.trim());
+        }
         const targetPath = homePathForRole(authStore.role);
         router.navigate(targetPath as `/${string}`);
       } else {
@@ -135,7 +144,7 @@
     otpErrorMessage = '';
     otpSuccessNotice = '';
 
-    const res = await authStore.resendOtp({ email: email.trim(), type: 'signup' });
+    const res = await authStore.resendOtp({ email: email.trim(), type: otpType });
     if (res.success) {
       otpSuccessNotice = 'Kode OTP baru telah dikirimkan ke kotak masuk email Anda.';
       startCountdown(60);
@@ -145,9 +154,29 @@
   }
 
   onMount(() => {
-    if (authStore.isAuthenticated) {
+    let params: URLSearchParams | null = null;
+    if (typeof window !== 'undefined') {
+      params = new URLSearchParams(window.location.search);
+    }
+    const isRegistered = params?.get('registered') === 'true';
+
+    if (authStore.isAuthenticated && !isRegistered) {
       const targetPath = homePathForRole(authStore.role);
       router.navigate(targetPath as `/${string}`);
+      return;
+    }
+
+    if (isRegistered && authStore.isAuthenticated) {
+      authStore.signOut();
+    }
+
+    // Jika sedang dalam proses 2FA pending (belum lolos OTP)
+    if (authStore.pending2FAEmail && !authStore.isAuthenticated) {
+      email = authStore.pending2FAEmail;
+      otpType = 'email';
+      step = 'otp';
+      startCountdown(60);
+      otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
     }
 
     if (typeof localStorage !== 'undefined') {
@@ -159,15 +188,18 @@
       }
     }
 
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
+    if (params) {
       const prefillEmail = params.get('email');
       const needOtp = params.get('verify') === 'true';
 
       if (prefillEmail) {
         email = prefillEmail;
       }
-      if (needOtp && prefillEmail) {
+      if (isRegistered) {
+        otpType = 'signup';
+        registeredNotice = 'Pendaftaran resto berhasil! Masukkan kata sandi akun Anda lalu klik Masuk untuk verifikasi kode OTP.';
+      } else if (needOtp && prefillEmail) {
+        otpType = 'signup';
         step = 'otp';
         startCountdown(60);
       }
@@ -279,13 +311,23 @@
               <h1 class="text-2xl sm:text-3xl lg:text-[2.15rem] font-extrabold tracking-tight text-slate-900 leading-tight">
                 Hai, selamat datang <br class="hidden sm:inline" /> kembali
               </h1>
-              <p class="mt-2 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                Baru di Dinely?
-                <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
-                  Daftar sekarang
-                </a>
-              </p>
             </div>
+
+            <!-- Registered Success Notice Banner -->
+            {#if registeredNotice}
+              <div
+                role="status"
+                class="mb-4 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 animate-in fade-in duration-200"
+              >
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1">
+                  <p class="font-bold">Pendaftaran Berhasil</p>
+                  <p class="mt-0.5 text-xs text-emerald-700 font-normal leading-relaxed">{registeredNotice}</p>
+                </div>
+              </div>
+            {/if}
 
             <!-- Error Banner -->
             {#if errorMessage}
@@ -366,8 +408,28 @@
                 </div>
               </div>
 
-              <!-- 3. Submit Button -->
-              <div class="pt-2">
+              <!-- 3. Remember Me & Forgot Password Links -->
+              <div class="pt-0.5 flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    bind:checked={rememberMe}
+                    class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 accent-brand-600 cursor-pointer"
+                  />
+                  <span class="text-xs font-semibold text-slate-600">Ingatkan saya</span>
+                </label>
+
+                <button
+                  type="button"
+                  onclick={() => (isForgotPasswordModalOpen = true)}
+                  class="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors"
+                >
+                  Lupa kata sandi?
+                </button>
+              </div>
+
+              <!-- 4. Submit Button -->
+              <div class="pt-1.5">
                 <button
                   type="submit"
                   disabled={isSubmitting || !isFormValid}
@@ -388,40 +450,16 @@
                 </button>
               </div>
 
-              <!-- 4. Remember Me & Forgot Password Links -->
-              <div class="pt-1 flex items-center justify-between">
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    bind:checked={rememberMe}
-                    class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 accent-brand-600 cursor-pointer"
-                  />
-                  <span class="text-xs font-semibold text-slate-600">Ingatkan saya</span>
-                </label>
-
-                <button
-                  type="button"
-                  onclick={() => (isForgotPasswordModalOpen = true)}
-                  class="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors"
-                >
-                  Lupa kata sandi?
-                </button>
+              <!-- 5. Register Link (Bottom Centered) -->
+              <div class="pt-3 text-center border-t border-slate-100/80">
+                <p class="text-xs sm:text-sm text-slate-500 font-medium">
+                  Baru di RestoLink?
+                  <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
+                    Daftar sekarang
+                  </a>
+                </p>
               </div>
             </form>
-
-            <!-- OTP Verification Manual Toggle Option -->
-            <div class="mt-5 text-center pt-4 border-t border-slate-100">
-              <button
-                type="button"
-                onclick={() => {
-                  step = 'otp';
-                  startCountdown(60);
-                }}
-                class="text-xs text-slate-500 hover:text-brand-600 transition-colors"
-              >
-                Sudah menerima 6 digit kode OTP? <span class="font-bold underline text-brand-600">Verifikasi di sini</span>
-              </button>
-            </div>
           </div>
         {:else}
           <!-- ==================== VIEW 2: VERIFIKASI OTP ==================== -->
@@ -432,6 +470,7 @@
               onclick={() => {
                 step = 'credentials';
                 otpErrorMessage = '';
+                authStore.pending2FAEmail = null;
               }}
               class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-600 transition-colors cursor-pointer"
             >
@@ -490,7 +529,7 @@
             <div class="space-y-3">
               <button
                 type="button"
-                disabled={isVerifyingOtp || otpCode.length < 6}
+                disabled={isVerifyingOtp || otpCode.length < 6 || otpCode.length > 8}
                 onclick={() => handleVerifyOtp()}
                 class="w-full h-11 sm:h-12 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
               >

@@ -182,14 +182,14 @@
       <div class="grid gap-6 sm:grid-cols-2 items-stretch">
         <!-- CARD 1: VISI (Warm Light Tone) -->
         <AnimatedContent distance={30} duration={0.6}>
-          <div class="flex h-full flex-col justify-between rounded-3xl border border-brand-200/90 bg-gradient-to-br from-brand-50/70 via-amber-50/50 to-orange-50/40 p-8 shadow-lg shadow-brand-900/[0.04]">
+          <div class="group relative flex h-full flex-col justify-between rounded-3xl border border-brand-200/90 bg-gradient-to-br from-brand-50/70 via-amber-50/50 to-orange-50/40 p-8 shadow-lg shadow-brand-900/[0.04] transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-300 hover:shadow-2xl hover:shadow-brand-500/15">
             <div>
               <div class="flex items-center justify-between">
-                <span class="inline-flex items-center rounded-full bg-brand-600 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                <span class="inline-flex items-center rounded-full bg-brand-600 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-xs">
                   Visi
                 </span>
-                <div class="flex size-10 items-center justify-center rounded-xl bg-brand-100/80 text-brand-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <div class="flex size-10 items-center justify-center rounded-xl bg-brand-100/80 text-brand-700 transition-all duration-300 group-hover:scale-110 group-hover:bg-brand-200/70">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 transition-transform duration-300 group-hover:rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="12" r="10"/>
                     <circle cx="12" cy="12" r="6"/>
                     <circle cx="12" cy="12" r="2"/>
@@ -197,7 +197,7 @@
                 </div>
               </div>
 
-              <h3 class="mt-6 font-display text-xl sm:text-2xl font-bold text-slate-950">
+              <h3 class="mt-6 font-display text-xl sm:text-2xl font-bold text-slate-950 transition-colors duration-300 group-hover:text-brand-950">
                 Ekosistem Digital Mandiri Tanpa Potongan Komisi
               </h3>
 
@@ -218,21 +218,21 @@
 
         <!-- CARD 2: MISI (Deep Slate Contrast Tone) -->
         <AnimatedContent distance={30} duration={0.6} delay={0.15}>
-          <div class="flex h-full flex-col justify-between rounded-3xl border border-slate-800 bg-slate-950 p-8 text-white shadow-xl shadow-slate-900/10">
+          <div class="group relative flex h-full flex-col justify-between rounded-3xl border border-slate-800 bg-slate-950 p-8 text-white shadow-xl shadow-slate-900/10 transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-700 hover:shadow-2xl hover:shadow-brand-500/10">
             <div>
               <div class="flex items-center justify-between">
-                <span class="inline-flex items-center rounded-full bg-white/15 border border-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                <span class="inline-flex items-center rounded-full bg-white/15 border border-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-xs">
                   Misi
                 </span>
-                <div class="flex size-10 items-center justify-center rounded-xl bg-white/10 text-brand-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <div class="flex size-10 items-center justify-center rounded-xl bg-white/10 text-brand-400 transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20 group-hover:text-brand-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 transition-transform duration-300 group-hover:-rotate-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
                     <line x1="4" x2="4" y1="22" y2="15"/>
                   </svg>
                 </div>
               </div>
 
-              <h3 class="mt-6 font-display text-xl sm:text-2xl font-bold text-white">
+              <h3 class="mt-6 font-display text-xl sm:text-2xl font-bold text-white transition-colors duration-300 group-hover:text-amber-100">
                 Demokratisasi Teknologi Restoran Bintang Lima
               </h3>
 

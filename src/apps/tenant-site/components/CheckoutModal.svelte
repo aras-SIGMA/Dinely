@@ -14,13 +14,11 @@
   let { open, tenantId, primaryColor = '#ea580c', onClose, onSuccess }: Props = $props();
 
   let buyerName = $state('');
-  let buyerContact = $state('');
   let note = $state('');
   let validationError = $state<string | null>(null);
 
   function resetForm() {
     buyerName = '';
-    buyerContact = '';
     note = '';
     validationError = null;
   }
@@ -42,7 +40,7 @@
 
     const form: SubmitOrderForm = {
       buyerName: trimmedName,
-      buyerContact: buyerContact.trim() || null,
+      buyerContact: null,
       note: note.trim() || null
     };
 
@@ -156,24 +154,6 @@
             />
             <p class="mt-1 text-[11px] text-slate-500">
               Nama yang akan dipanggil oleh pelayan atau kasir.
-            </p>
-          </div>
-
-          <!-- Kontak / WhatsApp (Opsional) -->
-          <div>
-            <label for="buyer-contact" class="block text-xs font-bold text-slate-700">
-              Nomor WhatsApp / HP <span class="font-normal text-slate-400">(Opsional)</span>
-            </label>
-            <input
-              id="buyer-contact"
-              type="tel"
-              disabled={guestOrderStore.submitting}
-              bind:value={buyerContact}
-              placeholder="Contoh: 081234567890"
-              class="mt-1.5 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 shadow-2xs transition focus:border-brand-500 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 disabled:bg-slate-100"
-            />
-            <p class="mt-1 text-[11px] text-slate-500">
-              Bermanfaat jika kasir perlu mengonfirmasi ketersediaan atau perubahan menu.
             </p>
           </div>
 
