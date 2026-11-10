@@ -202,6 +202,7 @@
           router.navigate('/dashboard');
         } else {
           step = 4;
+          if (maxReachedStep < 4) maxReachedStep = 4;
           startCountdown(60);
           otpSuccessNotice = 'Pendaftaran tersimpan! Masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
         }

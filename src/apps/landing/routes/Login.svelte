@@ -112,7 +112,7 @@
       const result = await authStore.verifyOtp({
         email: email.trim(),
         token: token.trim(),
-        type: 'email'
+        type: 'signup'
       });
 
       if (result.success) {
