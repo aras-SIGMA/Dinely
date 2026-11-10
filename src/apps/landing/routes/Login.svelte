@@ -50,13 +50,24 @@
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     errorMessage = '';
-    registeredNotice = '';
 
     if (!isFormValid || isSubmitting) return;
 
     isSubmitting = true;
 
     try {
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const isFromRegistration = registeredNotice !== '' || params?.get('registered') === 'true';
+
+      // Pas abis mencet tombol "Masuk", jika akun baru registrasi langsung tampilkan verifikasi OTP
+      if (isFromRegistration) {
+        step = 'otp';
+        startCountdown(60);
+        otpErrorMessage = '';
+        otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        return;
+      }
+
       const result = await authStore.signIn({
         email: email.trim(),
         password
@@ -151,9 +162,20 @@
   }
 
   onMount(() => {
-    if (authStore.isAuthenticated) {
+    let params: URLSearchParams | null = null;
+    if (typeof window !== 'undefined') {
+      params = new URLSearchParams(window.location.search);
+    }
+    const isRegistered = params?.get('registered') === 'true';
+
+    if (authStore.isAuthenticated && !isRegistered) {
       const targetPath = homePathForRole(authStore.role);
       router.navigate(targetPath as `/${string}`);
+      return;
+    }
+
+    if (isRegistered && authStore.isAuthenticated) {
+      authStore.signOut();
     }
 
     if (typeof localStorage !== 'undefined') {
@@ -165,10 +187,8 @@
       }
     }
 
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
+    if (params) {
       const prefillEmail = params.get('email');
-      const isRegistered = params.get('registered') === 'true';
       const needOtp = params.get('verify') === 'true';
 
       if (prefillEmail) {

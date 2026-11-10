@@ -178,11 +178,10 @@
 
       if (result.success) {
         if (result.session) {
-          router.navigate('/dashboard');
-        } else {
-          // Navigasi ke halaman masuk agar user input password dan verifikasi OTP setelah klik Masuk
-          router.navigate(`/masuk?email=${encodeURIComponent(email.trim())}&registered=true`);
+          await authStore.signOut();
         }
+        // Navigasi ke halaman masuk agar user input password dan verifikasi OTP setelah klik Masuk
+        router.navigate(`/masuk?email=${encodeURIComponent(email.trim())}&registered=true`);
       } else {
         formError = result.error || 'Gagal mendaftarkan toko. Silakan periksa kembali formulir Anda.';
       }
