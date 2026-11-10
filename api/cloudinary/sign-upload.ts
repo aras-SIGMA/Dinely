@@ -102,7 +102,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     // Cek Role Pengguna (owner vs platform_admin)
     const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('users')
+      .from('profiles')
       .select('id, role')
       .eq('id', user.id)
       .maybeSingle();
