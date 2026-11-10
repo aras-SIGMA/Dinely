@@ -38,6 +38,13 @@
   function formatCode(code: string): string {
     return code.startsWith('#') ? code : `#${code}`;
   }
+
+  function printReceipt(order: OrderWithItems) {
+    ordersStore.selectOrder(order);
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }
 </script>
 
 <div class="space-y-6">
@@ -166,6 +173,16 @@
                 >
                   Detail
                 </button>
+                <button
+                  type="button"
+                  title="Cetak Struk 58mm"
+                  onclick={() => printReceipt(order)}
+                  class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  <svg class="size-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                </button>
 
                 {#if order.status === 'baru'}
                   <button
@@ -264,11 +281,22 @@
           </div>
         </div>
 
-        <div class="mt-6 flex justify-end">
+        <div class="mt-6 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onclick={() => window.print()}
+            class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 transition"
+          >
+            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Cetak Struk (58mm)</span>
+          </button>
+
           <button
             type="button"
             onclick={closeDetail}
-            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
           >
             Tutup
           </button>
@@ -276,4 +304,95 @@
       </div>
     </div>
   {/if}
+
+  <!-- Template Cetak Struk Kasir Thermal 58mm -->
+  {#if ordersStore.selectedOrder}
+    {@const sel = ordersStore.selectedOrder}
+    {@const tenant = authStore.tenant}
+    <div id="thermal-receipt-58mm" class="hidden font-mono text-[11px] leading-tight text-black" aria-hidden="true">
+      <div class="text-center">
+        <p class="text-sm font-bold uppercase">{tenant?.business_name || 'RESTOLINK'}</p>
+        {#if tenant?.subdomain}
+          <p class="text-[10px]">{tenant.subdomain}.restolink.site</p>
+        {/if}
+        {#if tenant?.contact_whatsapp || tenant?.contact_phone}
+          <p class="text-[10px]">Telp: {tenant.contact_whatsapp || tenant.contact_phone}</p>
+        {/if}
+        <p class="my-1">================================</p>
+      </div>
+
+      <div class="space-y-0.5 text-[10px]">
+        <div class="flex justify-between">
+          <span>No: {formatCode(sel.order_code)}</span>
+          <span>{new Date(sel.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        <p>Tgl: {new Date(sel.created_at).toLocaleDateString('id-ID')}</p>
+        <p>Pelanggan: {sel.buyer_name}</p>
+        {#if sel.buyer_contact}
+          <p>Kontak: {sel.buyer_contact}</p>
+        {/if}
+        <p class="my-1">--------------------------------</p>
+      </div>
+
+      <div class="space-y-1">
+        {#each sel.order_items ?? [] as it}
+          <div>
+            <p class="font-bold break-words">{it.menu_item_name_snapshot}</p>
+            <div class="flex justify-between text-[10px]">
+              <span>{it.quantity} x {formatRupiah(Number(it.price_snapshot))}</span>
+              <span>{formatRupiah(Number(it.subtotal))}</span>
+            </div>
+          </div>
+        {/each}
+        <p class="my-1">--------------------------------</p>
+      </div>
+
+      <div class="space-y-0.5 text-[11px]">
+        <div class="flex justify-between font-bold">
+          <span>TOTAL:</span>
+          <span>{formatRupiah(Number(sel.total_amount))}</span>
+        </div>
+        <p class="text-[9px]">Status: {getOrderStatusLabel(sel.status).toUpperCase()}</p>
+        {#if sel.note}
+          <p class="text-[9px] italic break-words">Catatan: {sel.note}</p>
+        {/if}
+        <p class="my-1 text-center">================================</p>
+      </div>
+
+      <div class="text-center text-[10px]">
+        <p>Terima Kasih Atas Pesanan Anda</p>
+        <p class="text-[8px] text-black">Powered by RestoLink</p>
+        <div class="h-8"></div>
+      </div>
+    </div>
+  {/if}
 </div>
+
+<style>
+  @media print {
+    @page {
+      size: 58mm auto;
+      margin: 0;
+    }
+    :global(body) {
+      background: white !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    :global(body *):not(#thermal-receipt-58mm, #thermal-receipt-58mm *) {
+      display: none !important;
+    }
+    #thermal-receipt-58mm {
+      display: block !important;
+      width: 58mm !important;
+      max-width: 58mm !important;
+      padding: 3mm !important;
+      margin: 0 auto !important;
+      background: white !important;
+      color: black !important;
+    }
+    #thermal-receipt-58mm * {
+      break-inside: avoid;
+    }
+  }
+</style>
