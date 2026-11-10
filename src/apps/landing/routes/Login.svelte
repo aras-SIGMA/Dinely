@@ -19,6 +19,7 @@
   let showPassword = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state('');
+  let registeredNotice = $state('');
   let isForgotPasswordModalOpen = $state(false);
 
   // OTP States
@@ -49,6 +50,7 @@
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     errorMessage = '';
+    registeredNotice = '';
 
     if (!isFormValid || isSubmitting) return;
 
@@ -116,6 +118,10 @@
       });
 
       if (result.success) {
+        if (rememberMe && typeof localStorage !== 'undefined') {
+          localStorage.setItem('restolink_remember_me', 'true');
+          localStorage.setItem('restolink_remembered_email', email.trim());
+        }
         const targetPath = homePathForRole(authStore.role);
         router.navigate(targetPath as `/${string}`);
       } else {
@@ -162,12 +168,15 @@
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const prefillEmail = params.get('email');
+      const isRegistered = params.get('registered') === 'true';
       const needOtp = params.get('verify') === 'true';
 
       if (prefillEmail) {
         email = prefillEmail;
       }
-      if (needOtp && prefillEmail) {
+      if (isRegistered) {
+        registeredNotice = 'Pendaftaran resto berhasil! Masukkan kata sandi akun Anda lalu klik Masuk untuk verifikasi kode OTP.';
+      } else if (needOtp && prefillEmail) {
         step = 'otp';
         startCountdown(60);
       }
@@ -286,6 +295,22 @@
                 </a>
               </p>
             </div>
+
+            <!-- Registered Success Notice Banner -->
+            {#if registeredNotice}
+              <div
+                role="status"
+                class="mb-4 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-semibold text-emerald-800 animate-in fade-in duration-200"
+              >
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1">
+                  <p class="font-bold">Pendaftaran Berhasil</p>
+                  <p class="mt-0.5 text-xs text-emerald-700 font-normal leading-relaxed">{registeredNotice}</p>
+                </div>
+              </div>
+            {/if}
 
             <!-- Error Banner -->
             {#if errorMessage}
@@ -490,7 +515,7 @@
             <div class="space-y-3">
               <button
                 type="button"
-                disabled={isVerifyingOtp || otpCode.length < 6}
+                disabled={isVerifyingOtp || otpCode.length < 6 || otpCode.length > 8}
                 onclick={() => handleVerifyOtp()}
                 class="w-full h-11 sm:h-12 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
               >
