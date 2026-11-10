@@ -83,6 +83,35 @@
       ]
     },
     {
+      label: 'Hardware',
+      href: '/hardware',
+      subMenus: [
+        {
+          title: 'Kebutuhan Perangkat Usaha',
+          items: [
+            {
+              label: 'Usaha Mikro',
+              description: '1 unit Smartphone (Modal Rp0)',
+              icon: 'smartphone',
+              href: '/hardware?tier=mikro'
+            },
+            {
+              label: 'Usaha Kecil',
+              description: 'Tablet, Printer Struk, Staf & WiFi',
+              icon: 'tablet',
+              href: '/hardware?tier=kecil'
+            },
+            {
+              label: 'Usaha Menengah',
+              description: 'POS Station, KDS Dapur, Bar & Waiter',
+              icon: 'pos',
+              href: '/hardware?tier=menengah'
+            }
+          ]
+        }
+      ]
+    },
+    {
       label: 'Tentang Kami',
       href: '/tentang-kami',
       align: 'right',
@@ -131,7 +160,10 @@
     workflow: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg>',
     help: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
     flag: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>',
-    message: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>'
+    message: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>',
+    smartphone: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+    tablet: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+    pos: '<svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
   };
 
   function updateBrowserPath() {
@@ -209,6 +241,17 @@
     hoveredIdx = null;
     openLabel = null;
     isMobileMenuOpen = false;
+  }
+
+  function handleSubmenuClick(href: string) {
+    resetNavInteraction();
+    if (typeof window !== 'undefined' && href.includes('tier=')) {
+      const url = new URL(href, window.location.origin);
+      const tier = url.searchParams.get('tier');
+      if (tier) {
+        window.dispatchEvent(new CustomEvent('restolink:tier-change', { detail: { tier } }));
+      }
+    }
   }
 
   onMount(() => {
@@ -346,7 +389,7 @@
                               <a
                                 href={sub.href}
                                 class="group/sub flex items-start gap-3"
-                                onclick={resetNavInteraction}
+                                onclick={() => handleSubmenuClick(sub.href)}
                               >
                                 <span
                                   class="flex size-9 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-700 transition-colors duration-300 group-hover/sub:border-brand-200 group-hover/sub:bg-brand-50 group-hover/sub:text-brand-700"

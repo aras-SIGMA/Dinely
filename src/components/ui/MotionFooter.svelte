@@ -258,6 +258,13 @@
           </a>
           <a
             use:magnetic
+            href="/hardware"
+            class="footer-glass-pill rounded-full px-4 py-2 text-xs sm:text-sm font-medium hover:text-brand-600"
+          >
+            Hardware
+          </a>
+          <a
+            use:magnetic
             href="/tentang-kami"
             class="footer-glass-pill rounded-full px-4 py-2 text-xs sm:text-sm font-medium hover:text-brand-600"
           >
