@@ -88,7 +88,13 @@
         const errText = result.error?.toLowerCase() || '';
 
         // Deteksi jika akun membutuhkan verifikasi email / OTP
-        if (errText.includes('email not confirmed') || errText.includes('verify') || errText.includes('otp')) {
+        if (
+          errText.includes('email not confirmed') ||
+          errText.includes('not confirmed') ||
+          errText.includes('verify') ||
+          errText.includes('otp') ||
+          errText.includes('confirmation')
+        ) {
           step = 'otp';
           startCountdown(60);
           otpErrorMessage = '';
@@ -453,20 +459,6 @@
                 </button>
               </div>
             </form>
-
-            <!-- OTP Verification Manual Toggle Option -->
-            <div class="mt-5 text-center pt-4 border-t border-slate-100">
-              <button
-                type="button"
-                onclick={() => {
-                  step = 'otp';
-                  startCountdown(60);
-                }}
-                class="text-xs text-slate-500 hover:text-brand-600 transition-colors"
-              >
-                Sudah menerima 6 digit kode OTP? <span class="font-bold underline text-brand-600">Verifikasi di sini</span>
-              </button>
-            </div>
           </div>
         {:else}
           <!-- ==================== VIEW 2: VERIFIKASI OTP ==================== -->
