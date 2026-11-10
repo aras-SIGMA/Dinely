@@ -121,12 +121,6 @@
 
   // State for hiding navbar during fullscreen StoryScroll
   let isStoryScrollActive = $state(false);
-
-  function handleHeroDropdownClick(tier: string) {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('restolink:tier-change', { detail: { tier } }));
-    }
-  }
 </script>
 
 <svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} />
@@ -182,114 +176,14 @@
             Tanpa unduh aplikasi, tanpa potongan komisi 20% ojek online.
           </p>
 
-          <!-- Dual Call to Action Buttons -->
-          <div class="mt-5 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <!-- Call to Action Button -->
+          <div class="mt-5 sm:mt-8 flex items-center justify-center">
             <a href="/daftar" class="w-full sm:w-auto">
               <Button size="lg" full>
                 Mulai Trial 30 Hari Gratis
                 <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </Button>
-            </a>
-            <!-- Interactive Hardware Button with Hover Preview Dropdown -->
-            <div class="relative w-full sm:w-auto group">
-              <a href="/hardware" class="w-full sm:w-auto inline-block">
-                <Button size="lg" variant="secondary" full>
-                  <svg class="size-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span>Kebutuhan Hardware</span>
-                  <svg class="size-3.5 text-slate-400 transition-transform duration-200 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
-                  </svg>
-                </Button>
-              </a>
-
-              <!-- Dropdown Hover Preview Card -->
-              <div
-                class="absolute left-1/2 -translate-x-1/2 top-full pt-2.5 z-40 w-80 max-w-[92vw] transition-all duration-200 pointer-events-none group-hover:pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
-              >
-                <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/15 text-left ring-1 ring-slate-900/5">
-                  <div class="px-2.5 pb-2 pt-1 border-b border-slate-100 flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Skala Usaha</span>
-                    <span class="text-[10px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Preview Alat</span>
-                  </div>
-
-                  <div class="mt-2 space-y-1">
-                    <!-- 1. Mikro -->
-                    <a
-                      href="/hardware?tier=mikro"
-                      onclick={() => handleHeroDropdownClick('mikro')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Mikro</span>
-                          <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">1 HP</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">1 unit Smartphone (Modal Rp0)</p>
-                      </div>
-                    </a>
-
-                    <!-- 2. Kecil -->
-                    <a
-                      href="/hardware?tier=kecil"
-                      onclick={() => handleHeroDropdownClick('kecil')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Kecil</span>
-                          <span class="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">5 Item</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">Tablet, Printer Struk & HP Staf</p>
-                      </div>
-                    </a>
-
-                    <!-- 3. Menengah -->
-                    <a
-                      href="/hardware?tier=menengah"
-                      onclick={() => handleHeroDropdownClick('menengah')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Menengah</span>
-                          <span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">8 Item</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">POS Station, KDS Dapur & Waiter</p>
-                      </div>
-                    </a>
-                  </div>
-
-                  <a
-                    href="/hardware"
-                    class="mt-2 block rounded-xl bg-slate-50 px-3 py-2 text-center text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                  >
-                    Buka Halaman Panduan Lengkap &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-            <a href="#harga" class="w-full sm:w-auto">
-              <Button size="lg" variant="ghost" full>
-                Skema Harga
               </Button>
             </a>
           </div>
