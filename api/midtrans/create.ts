@@ -1,47 +1,308 @@
 import type { ApiRequest, ApiResponse } from '../_types';
+import { randomBytes } from 'node:crypto';
+import { authenticateUser, HttpError } from '../_lib/auth';
+import { parseJsonBody, sendJson } from '../_lib/http';
+import { getSupabaseAdmin } from '../_lib/supabase';
 
-/**
- * ============================================================================
- * ENDPOINT: POST /api/midtrans/create
- * ============================================================================
- * FUNGSI:
- * Membuat transaksi baru di Midtrans Snap dan database Supabase saat pemilik
- * memilih paket langganan di dashboard atau registrasi.
- *
- * VARIABEL LINGKUNGAN (.env) YANG DIGUNAKAN:
- * - MIDTRANS_SERVER_KEY     : Kunci autentikasi server Midtrans
- * - MIDTRANS_IS_PRODUCTION  : 'false' (sandbox) atau 'true' (production)
- * - SUPABASE_URL            : URL project Supabase
- * - SUPABASE_SERVICE_ROLE_KEY: Akses bypass RLS untuk insert tabel transactions
- *
- * PAYLOAD REQUEST YANG DIHARAPKAN DARI FRONTEND:
- * {
- *   "tenant_id": "uuid-tenant",
- *   "package_id": "uuid-package",
- *   "billing_cycle": "monthly" | "6_months" | "yearly"
- * }
- *
- * OUTPUT RESPONSE KE FRONTEND:
- * {
- *   "token": "snap-token-midtrans",
- *   "redirect_url": "https://app.sandbox.midtrans.com/snap/v2/vtweb/..."
- * }
- * ============================================================================
- */
+interface CreateTransactionBody {
+  tenant_id: string;
+  package_id: string;
+  billing_cycle: 'trial' | 'monthly' | '6_months' | 'yearly';
+}
+
+const TRIAL_AMOUNT = 49000;
+
+const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+function isValidUuid(id: string): boolean {
+  return typeof id === 'string' && UUID_REGEX.test(id);
+}
+
+function generateOrderId(subdomain: string): string {
+  const cleanSubdomain = (subdomain || 'resto')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, 10)
+    .toUpperCase();
+  const timePart = Date.now().toString(36).toUpperCase();
+  const randomPart = randomBytes(3).toString('hex').toUpperCase();
+  return `RL-${cleanSubdomain}-${timePart}-${randomPart}`.slice(0, 50);
+}
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Gunakan POST.' });
+    return sendJson(res, 405, { error: 'Method not allowed. Gunakan POST.' });
   }
 
-  // TODO (Milestone 4):
-  // 1. Validasi token session user dari header Authorization (Bearer <jwt>)
-  // 2. Ambil data paket dari tabel packages
-  // 3. Buat order_id unik: `RESTO-${Date.now()}-${tenant_id.slice(0, 4)}`
-  // 4. Request snap token ke API Midtrans: https://app.sandbox.midtrans.com/snap/v1/transactions
-  // 5. Simpan transaksi ke tabel `transactions` dengan status 'pending'
-  // 6. Kembalikan snap token ke client
+  const contentType = req.headers?.['content-type'] || req.headers?.['Content-Type'];
+  if (contentType && !contentType.includes('application/json')) {
+    return sendJson(res, 415, { error: 'Content-Type harus application/json.' });
+  }
 
-  return res.status(501).json({
-    message: 'Endpoint siap diimplementasikan pada Milestone 4 (Pembayaran Midtrans).'
-  });
+  try {
+    // 1. Verifikasi autentikasi user (Owner)
+    const { user } = await authenticateUser(req);
+
+    // 2. Baca payload body
+    const body = await parseJsonBody<CreateTransactionBody>(req);
+    const { tenant_id, package_id, billing_cycle } = body || {};
+
+    if (!tenant_id || !package_id || !billing_cycle) {
+      return sendJson(res, 400, {
+        error: 'Field tenant_id, package_id, dan billing_cycle wajib diisi.',
+      });
+    }
+
+    const validCycles = ['trial', 'monthly', '6_months', 'yearly'];
+    if (!validCycles.includes(billing_cycle)) {
+      return sendJson(res, 400, {
+        error: `billing_cycle tidak valid. Pilihan yang tersedia: ${validCycles.join(', ')}.`,
+      });
+    }
+
+    // Validasi format UUID untuk mencegah DB exception
+    if (!isValidUuid(tenant_id) || !isValidUuid(package_id)) {
+      return sendJson(res, 400, {
+        error: 'Format tenant_id atau package_id tidak valid (harus UUID).',
+      });
+    }
+
+    // 3. Validasi kredensial Midtrans
+    const serverKey = process.env.MIDTRANS_SERVER_KEY;
+    if (!serverKey) {
+      return sendJson(res, 500, {
+        error: 'MIDTRANS_SERVER_KEY belum dikonfigurasi pada server.',
+      });
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // 4. Validasi kepemilikan tenant
+    const { data: tenant, error: tenantError } = await supabaseAdmin
+      .from('tenants')
+      .select('id, owner_id, business_name, subdomain, status, contact_phone, contact_whatsapp')
+      .eq('id', tenant_id)
+      .maybeSingle();
+
+    if (tenantError) {
+      console.error('[BE-01] Database tenant verification error:', tenantError);
+      return sendJson(res, 500, { error: 'Gagal memverifikasi tenant: Terjadi kesalahan internal database.' });
+    }
+
+    if (!tenant) {
+      return sendJson(res, 404, { error: 'Tenant tidak ditemukan.' });
+    }
+
+    if (tenant.owner_id !== user.id) {
+      return sendJson(res, 403, { error: 'Akses ditolak: Usaha kuliner bukan milik akun Anda.' });
+    }
+
+    if (tenant.status === 'suspended') {
+      return sendJson(res, 403, {
+        error: 'Akun usaha kuliner Anda sedang ditangguhkan. Silakan hubungi admin platform.',
+      });
+    }
+
+    // 5. Ambil informasi paket
+    const { data: pkg, error: pkgError } = await supabaseAdmin
+      .from('packages')
+      .select('id, name, tier, price_monthly, price_6_months, price_yearly, is_active')
+      .eq('id', package_id)
+      .maybeSingle();
+
+    if (pkgError) {
+      console.error('[BE-01] Database package verification error:', pkgError);
+      return sendJson(res, 500, { error: 'Gagal memverifikasi paket: Terjadi kesalahan internal database.' });
+    }
+
+    if (!pkg || !pkg.is_active) {
+      return sendJson(res, 404, { error: 'Paket langganan tidak ditemukan atau sudah tidak aktif.' });
+    }
+
+    // 6. Validasi Aturan Siklus Langganan & Pencegahan Penyalahgunaan (Security Controls)
+    if (billing_cycle === 'trial') {
+      // a. Restriksi tier trial (Anti-Price Manipulation: hanya tier mikro yang mendukung trial)
+      if (pkg.tier !== 'mikro') {
+        return sendJson(res, 400, {
+          error: 'Siklus trial (Rp 49.000) hanya berlaku untuk paket Mikro.',
+        });
+      }
+
+      // b. Anti-Trial Abuse: Tolak jika tenant sudah pernah memiliki transaksi trial sukses atau pending
+      const { count: trialCount, error: trialCheckErr } = await supabaseAdmin
+        .from('transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenant.id)
+        .eq('billing_cycle', 'trial')
+        .in('status', ['settlement', 'capture', 'pending']);
+
+      if (trialCheckErr) {
+        console.error('[BE-01] Database trial history check error:', trialCheckErr);
+        return sendJson(res, 500, {
+          error: 'Gagal memverifikasi riwayat transaksi: Terjadi kesalahan internal database.',
+        });
+      }
+
+      if (trialCount && trialCount > 0) {
+        return sendJson(res, 400, {
+          error: 'Tenant sudah pernah menggunakan masa trial sebelumnya atau sedang memiliki transaksi trial aktif. Silakan pilih paket langganan reguler.',
+        });
+      }
+    }
+
+    // c. Throttling Transaksi Pending (Anti-Flooding / DoS: maksimal 3 transaksi pending aktif)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: pendingCount, error: pendingCheckErr } = await supabaseAdmin
+      .from('transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('tenant_id', tenant.id)
+      .eq('status', 'pending')
+      .gte('created_at', oneHourAgo);
+
+    if (!pendingCheckErr && pendingCount !== null && pendingCount >= 3) {
+      return sendJson(res, 429, {
+        error: 'Terlalu banyak transaksi pending (maksimal 3). Selesaikan atau tunggu pembayaran sebelumnya kedaluwarsa.',
+      });
+    }
+
+    // 7. Kalkulasi nominal transaksi
+    let amount: number;
+    if (billing_cycle === 'trial') {
+      amount = TRIAL_AMOUNT;
+    } else if (billing_cycle === 'monthly') {
+      amount = Number(pkg.price_monthly);
+    } else if (billing_cycle === '6_months') {
+      amount = Number(pkg.price_6_months);
+    } else if (billing_cycle === 'yearly') {
+      amount = Number(pkg.price_yearly);
+    } else {
+      amount = 0;
+    }
+
+    if (!amount || amount <= 0 || isNaN(amount)) {
+      return sendJson(res, 400, { error: 'Nominal pembayaran paket tidak valid.' });
+    }
+
+    const isProduction = process.env.MIDTRANS_IS_PRODUCTION === 'true';
+    const midtransSnapUrl = isProduction
+      ? 'https://app.midtrans.com/snap/v1/transactions'
+      : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+
+    const orderId = generateOrderId(tenant.subdomain);
+
+    // 8. Catat transaksi ke database dengan status 'pending' (Atomic Reservation)
+    const { error: insertTxError } = await supabaseAdmin.from('transactions').insert({
+      tenant_id: tenant.id,
+      package_id: pkg.id,
+      billing_cycle,
+      amount: Math.round(amount),
+      midtrans_order_id: orderId,
+      status: 'pending',
+    });
+
+    if (insertTxError) {
+      console.error('[BE-01] Database transaction insert error:', insertTxError);
+      return sendJson(res, 500, {
+        error: 'Gagal mencatat transaksi ke database: Terjadi kesalahan internal database.',
+      });
+    }
+
+    // 8. Sanitasi payload & Request Snap Token ke Midtrans API
+    const authString = Buffer.from(`${serverKey}:`).toString('base64');
+    const rawPhone = tenant.contact_whatsapp || tenant.contact_phone || '';
+    const cleanPhone = rawPhone.replace(/[^0-9+]/g, '').slice(0, 19) || undefined;
+    const rawFullName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
+    const customerName = (rawFullName || tenant.business_name || 'Owner Dinely')
+      .trim()
+      .slice(0, 50);
+
+    const midtransPayload = {
+      transaction_details: {
+        order_id: orderId,
+        gross_amount: Math.round(amount),
+      },
+      item_details: [
+        {
+          id: pkg.id,
+          price: Math.round(amount),
+          quantity: 1,
+          name: `Dinely ${pkg.name} (${billing_cycle})`.slice(0, 50),
+        },
+      ],
+      customer_details: {
+        first_name: customerName,
+        email: user.email || undefined,
+        phone: cleanPhone,
+      },
+    };
+
+    let midtransRes: Response;
+    try {
+      midtransRes = await fetch(midtransSnapUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Basic ${authString}`,
+        },
+        body: JSON.stringify(midtransPayload),
+        signal: AbortSignal.timeout(10000),
+      });
+    } catch (fetchErr: any) {
+      // Rollback status ke failure
+      await supabaseAdmin
+        .from('transactions')
+        .update({ status: 'failure' })
+        .eq('midtrans_order_id', orderId);
+
+      if (fetchErr?.name === 'TimeoutError' || fetchErr?.name === 'AbortError') {
+        return sendJson(res, 504, {
+          error: 'Midtrans Gateway Timeout: Layanan pembayaran tidak merespons dalam 10 detik.',
+        });
+      }
+      return sendJson(res, 502, {
+        error: `Midtrans Network Error: Gagal terhubung ke gateway pembayaran (${fetchErr?.message || 'Upstream Unreachable'}).`,
+      });
+    }
+
+    let midtransData: { token?: string; redirect_url?: string; error_messages?: string[] } = {};
+    try {
+      midtransData = await midtransRes.json();
+    } catch {
+      midtransData = {};
+    }
+
+    if (!midtransRes.ok || !midtransData.token) {
+      // Rollback status ke failure
+      await supabaseAdmin
+        .from('transactions')
+        .update({ status: 'failure' })
+        .eq('midtrans_order_id', orderId);
+
+      const errorMsg = Array.isArray(midtransData.error_messages)
+        ? midtransData.error_messages.join(', ')
+        : `Status HTTP ${midtransRes.status}`;
+      return sendJson(res, 502, {
+        error: `Midtrans Snap Error: ${errorMsg}`,
+      });
+    }
+
+    // 9. Berikan respon sukses berisi snap token & redirect url
+    return sendJson(res, 201, {
+      token: midtransData.token,
+      redirect_url: midtransData.redirect_url,
+      order_id: orderId,
+      amount: Math.round(amount),
+      billing_cycle,
+    });
+  } catch (err: any) {
+    if (err instanceof HttpError) {
+      return sendJson(res, err.statusCode, { error: err.message });
+    }
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Midtrans create handler exception:', err);
+    }
+    return sendJson(res, 500, {
+      error: 'Terjadi kesalahan internal pada server. Silakan coba lagi beberapa saat lagi.',
+    });
+  }
 }

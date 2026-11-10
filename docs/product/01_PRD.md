@@ -1,15 +1,15 @@
-# Product Requirements Document (PRD) — RestoLink
+# Product Requirements Document (PRD) — Dinely
 
-> Sumber: *Proposal Lomba GTNIC 2026 — Perancangan dan Pembuatan Platform RestoLink Berbasis Web*, Tim Kepiting Purba, SMK Taruna Bhakti.
+> Sumber: *Proposal Lomba GTNIC 2026 — Perancangan dan Pembuatan Platform Dinely Berbasis Web*, Tim Kepiting Purba, SMK Taruna Bhakti.
 > Dokumen ini adalah turunan teknis dari proposal tersebut, ditulis agar bisa langsung dipakai sebagai konteks pengembangan.
 
 ---
 
 ## 1. Ringkasan Produk
 
-**RestoLink** adalah platform web multi-tenant yang menjadi "pusat kendali tunggal" bagi UMKM kuliner (kedai makan, kafe kecil, katering rumahan, dsb.) untuk:
+**Dinely** adalah platform web multi-tenant yang menjadi "pusat kendali tunggal" bagi UMKM kuliner (kedai makan, kafe kecil, katering rumahan, dsb.) untuk:
 
-1. Memiliki **website menu digital sendiri** (via subdomain, misal `dapur-nia.restolink.site`) tanpa perlu membangun website dari nol.
+1. Memiliki **website menu digital sendiri** (via subdomain, misal `dapur-nia.dinely.site`) tanpa perlu membangun website dari nol.
 2. Mengelola **profil usaha, kategori, menu, harga, dan ketersediaan** dari satu dashboard.
 3. Menerima dan mencatat **pesanan** secara terstruktur (tidak lagi tercecer di WhatsApp/nota kertas).
 4. Membayar **langganan paket** secara digital dan otomatis teraktivasi.
@@ -96,7 +96,7 @@ Proposal secara eksplisit mencakup hal-hal berikut untuk versi lomba:
 - Paket dasar (paket **Mikro**)
 - Pembayaran via **Midtrans**
 - Aktivasi tenant
-- Subdomain platform (mis. `namausaha.restolink.site`)
+- Subdomain platform (mis. `namausaha.dinely.site`)
 - **Satu** template website publik tenant
 - Pengelolaan kategori dan menu
 - Dashboard Pemilik Usaha
@@ -161,7 +161,7 @@ Proposal secara eksplisit mencakup hal-hal berikut untuk versi lomba:
 
 ## 8. Model Bisnis — Paket Layanan
 
-RestoLink menggunakan model **paket bertingkat + add-on terpisah**:
+Dinely menggunakan model **paket bertingkat + add-on terpisah**:
 
 | Paket | Sasaran | Fokus Fitur (contoh) | Status di Versi Lomba |
 |-------|---------|------------------------|-------------------------|

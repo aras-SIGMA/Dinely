@@ -7,12 +7,12 @@ Status: Disetujui
 
 ## 1. Keputusan Arsitektur & Stack Teknis
 * **Frontend Framework**: Svelte 5 (menggunakan Runes: `$state`, `$derived`).
-* **Router**: `svelte-spa-router`.
+* **Router**: `sv-router` (history mode).
 * **Styling**: Hybrid Tailwind CSS v4 + Scoped CSS Svelte (`<style>`) + CSS Variables untuk dynamic theming website tenant.
 * **Warna Tema Utama**: Oranye Kuliner (`#ea580c`) + Slate Netral. Warna aksen per tenant dikontrol dinamis via CSS variable.
 * **Backend Serverless**: Vercel Serverless Functions (`api/` berbasis Node.js/TypeScript).
 * **Database & Autentikasi**: Supabase Postgres + Supabase Auth (Anon key di browser, Service Role key di endpoint serverless).
-* **Storage Gambar**: Cloudflare R2 via Presigned PUT URL (dengan fallback sementara Supabase Storage bila diperlukan).
+* **Storage Gambar**: Cloudinary via signature-based direct upload (kuota gratis 25 GB tanpa perlu verifikasi kartu kredit).
 * **Payment Gateway**: Midtrans (Snap API + webhook verification server-side).
 
 ---
@@ -21,7 +21,7 @@ Status: Disetujui
 Aplikasi dibangun dalam satu repositori terpadu yang memisahkan konteks eksekusi:
 
 ```
-restolink/
+dinely/
 ├── docs/                               # Dokumentasi & Arsip
 │   ├── product/                        # PRD, Architecture, DB Schema (00–05)
 │   └── notulen/                        # Catatan keputusan teknis
@@ -29,8 +29,8 @@ restolink/
 │   ├── midtrans/
 │   │   ├── create.ts                   # Endpoint buat token Snap
 │   │   └── webhook.ts                  # Verifikasi SHA-512 & aktivasi tenant
-│   ├── r2/
-│   │   └── sign-upload.ts              # Presigned PUT URL Cloudflare R2
+│   ├── cloudinary/
+│   │   └── sign-upload.ts              # Endpoint signature upload Cloudinary
 │   └── gemini/
 │       └── chat.ts                     # Proxy Gemini API
 ├── supabase/                           # Database & SQL Engine

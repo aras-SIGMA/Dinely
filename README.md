@@ -1,4 +1,4 @@
-﻿# RestoLink
+﻿# Dinely
 
 > Platform web multi-tenant untuk UMKM kuliner: website menu digital mandiri per-tenant via subdomain dinamis, dashboard pengelolaan terpusat, dan alur pemesanan sederhana.
 
@@ -31,7 +31,7 @@ Salin file template `.env.example` menjadi `.env`:
   cp .env.example .env
   ```
 
-Buka file `.env` dan isi kredensial proyek (tanyakan nilai kredensial Supabase/Midtrans/R2 ke lead/koordinator tim).
+Buka file `.env` dan isi kredensial proyek (tanyakan nilai kredensial Supabase/Midtrans/Cloudinary ke lead/koordinator tim).
 
 ### 4. Menjalankan Aplikasi (Development)
 ```bash
@@ -53,14 +53,14 @@ Untuk menguji website tenant secara lokal di browser, akses melalui subdomain lo
 Proyek ini menggunakan arsitektur **Single Unified Repo** yang memisahkan Frontend dan Backend:
 
 ```
-restolink/
+dinely/
 ├── docs/                      # Dokumentasi PRD, arsitektur, & notulen keputusan
 │   ├── product/               # PRD, user flows, database schema, & feature spec
 │   └── notulen/               # Catatan keputusan teknis tim
 │
 ├── src/                       # FRONTEND (Svelte 5 + Tailwind v4 + sv-router)
 │   ├── apps/
-│   │   ├── landing/           # Website publik RestoLink (Beranda, Fitur, Harga)
+│   │   ├── landing/           # Website publik Dinely (Beranda, Fitur, Harga)
 │   │   ├── dashboard/         # Dashboard Pemilik Usaha (Kelola Menu, Pesanan)
 │   │   ├── admin/             # Dashboard Admin Platform (Audit, Override)
 │   │   └── tenant-site/       # Website Menu Publik Tenant (Katalog, Checkout)
@@ -71,7 +71,7 @@ restolink/
 │
 ├── api/                       # BACKEND (Vercel Serverless Functions / Node.js)
 │   ├── midtrans/              # Endpoint create transaction & webhook validator
-│   ├── r2/                    # Presigned PUT URL generator Cloudflare R2
+│   ├── cloudinary/            # Endpoint signature generator upload gambar Cloudinary
 │   └── gemini/                # Proxy AI chatbot landing page
 │
 ├── supabase/                  # DATABASE POSTGRES & KEAMANAN
@@ -99,7 +99,7 @@ Agar kolaborasi tim rapi dan tidak terjadi konflik kode (*merge conflict*), patu
      * `feature/subdomain-resolver`
      * `feature/auth-and-registration`
      * `feature/midtrans-payment`
-     * `feature/menu-and-r2-upload`
+     * `feature/menu-and-cloudinary-upload`
      * `feature/tenant-site-and-order`
      * `feature/order-management`
      * `feature/admin-and-landing`
@@ -126,9 +126,9 @@ git push -u origin feature/nama-fitur-kamu
 ---
 
 ## 📖 Dokumentasi Lengkap
-Seluruh rincian kebutuhan sistem ada di folder `docs/product/`:
-* `01_PRD.md` : Scope MVP Lomba vs Fitur Lanjutan.
-* `02_ARCHITECTURE.md` : Arsitektur teknis, resolusi subdomain, & alur keamanan pembayaran.
-* `03_DATABASE_SCHEMA.md` : Skema tabel Postgres & pola Row Level Security (RLS).
-* `04_USER_FLOWS.md` : Alur langkah demi langkah tiap peran & checklist UAT.
-* `05_FEATURE_SPEC.md` : Kriteria penerimaan (*acceptance criteria*) tiap modul.
+* `docs/MILESTONES.md` : **Roadmap & Checklist Milestone Tim (M0–M9)**.
+* `docs/product/01_PRD.md` : Scope MVP Lomba vs Fitur Lanjutan.
+* `docs/product/02_ARCHITECTURE.md` : Arsitektur teknis, resolusi subdomain, & alur keamanan pembayaran.
+* `docs/product/03_DATABASE_SCHEMA.md` : Skema tabel Postgres & pola Row Level Security (RLS).
+* `docs/product/04_USER_FLOWS.md` : Alur langkah demi langkah tiap peran & checklist UAT.
+* `docs/product/05_FEATURE_SPEC.md` : Kriteria penerimaan (*acceptance criteria*) tiap modul.

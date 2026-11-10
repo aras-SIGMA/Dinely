@@ -1,4 +1,4 @@
-# Skema Database — RestoLink (Supabase / Postgres)
+# Skema Database — Dinely (Supabase / Postgres)
 
 > ⚠️ **Semua nama tabel, kolom, dan tipe data di dokumen ini adalah ASUMSI DESAIN** yang diturunkan dari requirement di `01_PRD.md` dan `02_ARCHITECTURE.md`. Proposal asli hanya menyebutkan entitas-entitas ini secara naratif (tenant, paket & langganan, transaksi pembayaran, kategori, menu, pesanan) tanpa skema literal. Validasi & sesuaikan dengan tim sebelum migrasi final — tapi struktur ini sudah konsisten dengan semua requirement fungsional di PRD dan bisa langsung dipakai sebagai titik awal.
 
@@ -46,7 +46,7 @@ Satu baris = satu usaha UMKM yang terdaftar.
 | `owner_id` | `uuid` (FK → `profiles.id`) | Pemilik usaha |
 | `business_name` | `text` | Nama usaha |
 | `subdomain` | `text`, **unique**, not null | Slug untuk resolusi tenant (lihat `02_ARCHITECTURE.md` bag. 4) |
-| `logo_url` | `text` | Path/URL di Cloudflare R2 |
+| `logo_url` | `text` | Path/URL di Cloudinary |
 | `description` | `text` | |
 | `contact_phone` | `text` | |
 | `contact_whatsapp` | `text` | |
@@ -150,7 +150,7 @@ Kategori menu per tenant (mis. "Makanan Utama", "Minuman").
 | `name` | `text` | |
 | `description` | `text` | |
 | `price` | `numeric` | |
-| `image_url` | `text` | Cloudflare R2, format WebP |
+| `image_url` | `text` | Cloudinary, format WebP |
 | `is_available` | `boolean` | Toggle ketersediaan real-time (FR-06, FR-07) |
 | `sort_order` | `int` | |
 | `created_at` / `updated_at` | `timestamptz` | |

@@ -8,3 +8,5 @@ dist-ssr
 *.local
 .DS_Store
 .svelte-kit
+supabase/.temp/
+.vscode
