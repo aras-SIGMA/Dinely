@@ -172,7 +172,7 @@ async function runTests() {
 
   const adminClient = getSupabaseAdmin();
   adminClient.from = ((tableName: string) => {
-    if (tableName === 'users') {
+    if (tableName === 'profiles') {
       return {
         select: () => ({
           eq: (col: string, val: string) => ({

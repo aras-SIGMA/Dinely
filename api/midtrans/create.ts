@@ -298,8 +298,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     if (err instanceof HttpError) {
       return sendJson(res, err.statusCode, { error: err.message });
     }
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Midtrans create handler exception:', err);
+    }
     return sendJson(res, 500, {
-      error: `Internal Server Error: ${err?.message || 'Terjadi kesalahan tidak terduga.'}`,
+      error: 'Terjadi kesalahan internal pada server. Silakan coba lagi beberapa saat lagi.',
     });
   }
 }

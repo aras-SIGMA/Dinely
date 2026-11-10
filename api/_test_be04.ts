@@ -614,6 +614,19 @@ async function runTests() {
   // Restore fetch
   global.fetch = originalFetch;
 
+  // TC-20: Konfigurasi generasi dioptimalkan untuk latensi rendah (jawaban ringkas & cepat)
+  {
+    const payload = buildGeminiPayload('Berapa harga paket Mikro?');
+    const config = payload.generationConfig as any;
+
+    assert(
+      config?.maxOutputTokens === 600 &&
+      config?.thinkingConfig?.thinkingLevel === 'LOW',
+      'TC-20: generationConfig memakai maxOutputTokens 600 + thinkingLevel LOW untuk respons ringkas & cepat',
+      { config }
+    );
+  }
+
   console.log(`\nHasil: ${passed} Passed, ${failed} Failed`);
   if (failed > 0) process.exit(1);
 }
