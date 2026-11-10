@@ -195,7 +195,7 @@
               <button
                 type="button"
                 onclick={copyStoreLink}
-                class="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                class="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                 title="Salin tautan toko"
                 aria-label="Salin tautan toko"
               >
@@ -257,7 +257,7 @@
         <button
           type="button"
           onclick={signOut}
-          class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 focus:outline-hidden"
+          class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 focus:outline-hidden"
           title="Keluar dari akun"
           aria-label="Keluar dari akun"
         >

@@ -19,7 +19,7 @@
       <p class="flex-1">{item.message}</p>
       <button
         type="button"
-        class="text-current opacity-50 hover:opacity-100"
+        class="-m-1.5 shrink-0 p-1.5 text-current opacity-50 hover:opacity-100"
         onclick={() => toastState.dismiss(item.id)}
         aria-label="Tutup notifikasi"
       >

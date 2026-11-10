@@ -427,7 +427,7 @@
 
           <!-- Hardware Cards Grid -->
           <div class="mt-10">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
               <h3 class="text-xl font-extrabold tracking-tight text-slate-950">
                 Daftar Perangkat Yang Dibutuhkan ({currentTier.hardwareList.length} Item)
               </h3>

@@ -191,14 +191,23 @@
   const activeIdx = $derived(navItems.findIndex((item) => item.href === activePath));
 
   $effect(() => {
-    void innerW;
+    // Only compute desktop hover pill on screens >= 1024px
+    if (innerW && innerW < 1024) {
+      if (pill.visible) {
+        pill.visible = false;
+      }
+      return;
+    }
+
     void fontTick;
     const target = hoveredIdx !== null ? hoveredIdx : activeIdx >= 0 ? activeIdx : null;
     const list = navListEl;
     const el = target !== null ? (triggerEls[target] ?? null) : null;
 
     if (target === null || !list || !el) {
-      pill = { ...pill, visible: false };
+      if (pill.visible) {
+        pill.visible = false;
+      }
       return;
     }
 
@@ -206,16 +215,23 @@
     const elRect = el.getBoundingClientRect();
 
     if (!elRect.width) {
-      pill = { ...pill, visible: false };
+      if (pill.visible) {
+        pill.visible = false;
+      }
       return;
     }
 
-    pill = {
-      left: elRect.left - listRect.left,
-      width: elRect.width,
-      visible: true,
-      kind: hoveredIdx !== null && hoveredIdx !== activeIdx ? 'hover' : 'active'
-    };
+    const nextLeft = elRect.left - listRect.left;
+    const nextWidth = elRect.width;
+    const nextKind = hoveredIdx !== null && hoveredIdx !== activeIdx ? 'hover' : 'active';
+
+    // Only update if values actually changed to avoid effect depth loops
+    if (!pill.visible || pill.left !== nextLeft || pill.width !== nextWidth || pill.kind !== nextKind) {
+      pill.left = nextLeft;
+      pill.width = nextWidth;
+      pill.visible = true;
+      pill.kind = nextKind;
+    }
   });
 
   function handleNavEnter(index: number) {

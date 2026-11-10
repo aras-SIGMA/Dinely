@@ -128,7 +128,7 @@
             type="button"
             aria-label="Tutup keranjang belanja"
             onclick={closeDrawer}
-            class="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+            class="rounded-xl p-2.5 -mr-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
           >
             <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -204,7 +204,7 @@
                       type="button"
                       aria-label="Kurangi kuantitas {item.name}"
                       onclick={() => cartStore.decrement(item.menuItemId)}
-                      class="flex size-6 items-center justify-center rounded-md bg-white text-slate-700 shadow-2xs hover:bg-slate-100 active:scale-90"
+                      class="flex size-9 items-center justify-center rounded-md bg-white text-slate-700 shadow-2xs hover:bg-slate-100 active:scale-90"
                     >
                       <svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
@@ -219,7 +219,7 @@
                       type="button"
                       aria-label="Tambah kuantitas {item.name}"
                       onclick={() => cartStore.increment(item.menuItemId)}
-                      class="flex size-6 items-center justify-center rounded-md text-white shadow-2xs active:scale-90"
+                      class="flex size-9 items-center justify-center rounded-md text-white shadow-2xs active:scale-90"
                       style="background-color: var(--brand-primary, {primaryColor});"
                     >
                       <svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -233,7 +233,7 @@
                     type="button"
                     aria-label="Hapus menu {item.name}"
                     onclick={() => cartStore.removeItem(item.menuItemId)}
-                    class="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                    class="rounded-lg p-2.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
                   >
                     <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path

@@ -110,7 +110,7 @@
             disabled={guestOrderStore.submitting}
             onclick={handleCancel}
             aria-label="Tutup modal konfirmasi pesanan"
-            class="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition disabled:opacity-50"
+            class="rounded-xl p-2.5 -mr-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition disabled:opacity-50"
           >
             <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

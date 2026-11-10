@@ -199,7 +199,7 @@
 
               <a
                 href="mailto:support@restolink.id"
-                class="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                class="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                   <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -218,7 +218,7 @@
 
               <div class="border-t border-slate-100"></div>
 
-              <div class="flex items-center gap-4 px-5 py-4">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                   <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="12" r="10" />

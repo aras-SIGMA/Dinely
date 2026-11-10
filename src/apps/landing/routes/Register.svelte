@@ -459,7 +459,7 @@
                   placeholder="dapur-bu-nia"
                   value={subdomain}
                   oninput={handleSubdomainInput}
-                  class="h-10 sm:h-11 w-full pl-3.5 pr-28 rounded-xl border bg-white text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all {subdomainStatus === 'invalid'
+                  class="h-10 sm:h-11 w-full pl-3.5 pr-24 sm:pr-28 rounded-xl border bg-white text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all {subdomainStatus === 'invalid'
                     ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                     : subdomainStatus === 'valid'
                     ? 'border-emerald-500 bg-emerald-50/20 focus:border-emerald-600'
@@ -675,7 +675,7 @@
           <div class="text-left animate-in fade-in duration-200">
             <div class="divide-y divide-slate-100 border-y border-slate-100 text-xs mb-4">
               <!-- Restoran -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Restoran</span>
                 <div>
                   <p class="font-bold text-slate-900">{businessName || '-'}</p>
@@ -684,7 +684,7 @@
               </div>
 
               <!-- Subdomain -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Subdomain</span>
                 <p class="font-medium text-slate-700">
                   <span class="font-bold text-brand-600 font-mono">{subdomain}</span>
@@ -693,13 +693,13 @@
               </div>
 
               <!-- Email -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Email</span>
                 <p class="font-medium text-slate-700 break-all">{email}</p>
               </div>
 
               <!-- Pemilik -->
-              <div class="grid grid-cols-[100px_1fr] gap-4 py-3">
+              <div class="grid grid-cols-[72px_1fr] sm:grid-cols-[100px_1fr] gap-3 sm:gap-4 py-3">
                 <span class="font-bold text-slate-400">Pemilik</span>
                 <div>
                   <p class="font-medium text-slate-800">{fullName}</p>

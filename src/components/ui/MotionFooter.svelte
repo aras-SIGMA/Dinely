@@ -135,15 +135,15 @@
   };
 </script>
 
-<!-- The "Curtain Reveal" Wrapper -->
+<!-- The "Curtain Reveal" Wrapper: relative auto-height on mobile, fixed reveal on desktop -->
 <div
   bind:this={wrapperRef}
-  class="relative h-screen w-full"
+  class="relative min-h-screen w-full md:h-screen"
   style="clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%); -webkit-clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);"
 >
-  <!-- The actual footer stays fixed to viewport underneath everything (Original Light Theme) -->
+  <!-- The actual footer stays fixed to viewport on desktop, relative scroll on mobile -->
   <footer
-    class="cinematic-footer-wrapper fixed bottom-0 left-0 flex h-screen w-full flex-col justify-between overflow-hidden border-t border-slate-200/80 bg-white text-slate-900 select-none shadow-inner"
+    class="cinematic-footer-wrapper relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden border-t border-slate-200/80 bg-white text-slate-900 select-none shadow-inner md:fixed md:bottom-0 md:left-0 md:h-screen md:overflow-hidden"
   >
     <!-- Ambient Light Warm Aurora & Grid Background -->
     <div
@@ -189,7 +189,7 @@
 
     <!-- 2. Main Center Content -->
     <div
-      class="relative z-10 mx-auto mt-24 sm:mt-28 md:mt-32 flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 text-center"
+      class="relative z-10 mx-auto mt-20 sm:mt-28 md:mt-32 flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 text-center"
     >
       <h2
         bind:this={headingRef}
@@ -252,7 +252,7 @@
           <a
             use:magnetic
             href="/fitur"
-            class="footer-glass-pill rounded-full px-4 py-2 text-xs sm:text-sm font-medium hover:text-brand-600"
+            class="footer-glass-pill rounded-full px-4 py-2.5 text-xs sm:text-sm font-medium hover:text-brand-600"
           >
             Fitur Unggulan
           </a>
@@ -301,7 +301,7 @@
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
             aria-label="Instagram RestoLink"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -317,7 +317,7 @@
             href="https://tiktok.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
             aria-label="TikTok RestoLink"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -331,7 +331,7 @@
             href="https://youtube.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="footer-glass-pill flex size-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
+            class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
             aria-label="YouTube RestoLink"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

@@ -164,7 +164,7 @@
         <button
           type="button"
           onclick={() => (mobileOpen = true)}
-          class="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-100 lg:hidden"
+          class="inline-flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-100 lg:hidden"
           aria-label="Buka menu navigasi"
         >
           <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

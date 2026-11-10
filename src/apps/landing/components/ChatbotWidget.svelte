@@ -139,7 +139,7 @@
           onclick={() => chatbotStore.clear()}
           aria-label="Bersihkan riwayat percakapan dengan Linka"
           title="Reset percakapan"
-          class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+          class="rounded-lg p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -156,7 +156,7 @@
           type="button"
           onclick={() => chatbotStore.close()}
           aria-label="Tutup jendela obrolan Linka"
-          class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+          class="rounded-lg p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
         >
           <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

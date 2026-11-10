@@ -101,7 +101,7 @@
   });
 </script>
 
-<div class="flex items-center justify-center gap-2 sm:gap-3" role="group" aria-label="6 Digit Kode Verifikasi OTP">
+<div class="flex items-center justify-center gap-1.5 sm:gap-3" role="group" aria-label="6 Digit Kode Verifikasi OTP">
   {#each Array(length) as _, index}
     <input
       bind:this={inputRefs[index]}

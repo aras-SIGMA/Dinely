@@ -16,12 +16,16 @@
   // ===========================================================================
   let scrollY = $state(0);
   let windowHeight = $state(800);
+  let windowWidth = $state(1200);
   let prefersReducedMotion = $state(false);
+
+  const isDesktop = $derived(windowWidth >= 1024);
 
   function updateScrollMetrics() {
     if (typeof window !== 'undefined') {
       scrollY = window.scrollY;
       windowHeight = window.innerHeight;
+      windowWidth = window.innerWidth;
     }
   }
 
@@ -56,7 +60,7 @@
     prefersReducedMotion ? 1 : Math.min(1, Math.max(0, heroProgress / 0.28))
   );
   const stageTranslateY = $derived(
-    prefersReducedMotion ? 0 : (1 - stageRise) * 110
+    prefersReducedMotion ? 0 : (1 - stageRise) * (isDesktop ? 110 : 45)
   );
 
   // Spread and untwist progress: 0.28 -> 0.78 (leaves 0.78 -> 1.00 completely static & held)
@@ -129,7 +133,7 @@
   }
 </script>
 
-<svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} />
+<svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} />
 
 <div class="flex min-h-screen flex-col bg-white text-slate-900">
   <Navbar hidden={isStoryScrollActive} />
@@ -319,13 +323,13 @@
 
         <!-- B. THE CENTERPIECE SHOWCASE STAGE (Rises & untwists directly on marquee baseline) -->
         <div
-          class="absolute bottom-[44px] sm:bottom-[48px] inset-x-0 z-10 w-full flex flex-col items-center justify-end overflow-visible pt-6 pb-0 pointer-events-auto transition-transform duration-75 ease-out"
+          class="absolute bottom-[72px] sm:bottom-[60px] inset-x-0 z-10 w-full flex flex-col items-center justify-end overflow-visible pt-4 pb-0 pointer-events-auto transition-transform duration-75 ease-out"
           style="transform: translateY({stageTranslateY}%); will-change: transform;"
         >
           <!-- Prominent Solid Brand Orange Semicircle Arch Backdrop (Enlarged & Bold) -->
           <div
             class="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 rounded-t-full bg-gradient-to-b from-brand-500 via-brand-500 to-brand-600 shadow-[0_25px_65px_rgba(234,88,12,0.42)] border-t-2 border-x-2 border-brand-400/40 z-0 transition-all duration-200"
-            style="width: min(98vw, {560 + spreadProgress * 480}px); height: {340 + spreadProgress * 260}px;"
+            style="width: min(98vw, {560 + spreadProgress * 480}px); height: {370 + spreadProgress * 230}px;"
             aria-hidden="true"
           ></div>
 
@@ -468,10 +472,26 @@
           </div>
 
           <!-- MOBILE SWIPEABLE STACK VIEW (Visible only on < 1024px) -->
-          <div class="relative z-10 flex lg:hidden flex-col items-center justify-center w-full pb-8 mb-0">
+          <div class="relative z-10 flex lg:hidden flex-col items-center justify-center w-full pb-12 mb-0">
+            <!-- Mobile Swipe Navigation Tabs & Hint -->
+            <div class="mb-2 flex items-center justify-center gap-1.5 z-20">
+              {#each mobileMockupMeta as meta, idx}
+                <button
+                  type="button"
+                  onclick={() => (activeMobileCard = idx)}
+                  class="rounded-full px-3 py-1 text-[11px] font-bold transition-all cursor-pointer shadow-sm {activeMobileCard === idx
+                    ? 'bg-slate-900 text-white ring-1 ring-slate-900'
+                    : 'bg-white/95 backdrop-blur text-slate-700 hover:bg-white border border-slate-200'}"
+                >
+                  {meta.tag}
+                </button>
+              {/each}
+            </div>
+            <span class="mb-3 text-[10px] font-medium text-slate-500">Geser (swipe) layar untuk berganti</span>
+
             <!-- Swipe Deck Container -->
             <div
-              class="relative w-[250px] sm:w-[270px] h-[440px] sm:h-[470px] flex items-center justify-center touch-pan-y"
+              class="relative w-[195px] sm:w-[250px] h-[385px] sm:h-[480px] flex items-center justify-center touch-pan-y"
               role="group"
               aria-label="Galeri mockup aplikasi (geser untuk melihat)"
               ontouchstart={handleTouchStart}
@@ -481,25 +501,25 @@
               <div
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 0
                   ? 'z-30 scale-100 rotate-0 opacity-100'
-                  : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
+                  : 'z-10 scale-90 -rotate-6 -translate-x-6 opacity-40 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[44px] border-[5px] sm:border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
+                  <div class="h-3.5 w-16 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
+                    <div class="size-1 rounded-full bg-slate-800 mr-1"></div>
+                    <div class="size-0.5 rounded-full bg-slate-700"></div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1">
                       <span class="text-emerald-600">●</span>
                       <span class="truncate">dapur-nia.restolink.site</span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA KATALOG MENU TAMU]</span>
                       <p class="mt-1 text-[10px] text-slate-500">
                         Foto menu WebP, harga promo, dan tombol pesan
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                    <div class="w-20 sm:w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
@@ -509,26 +529,26 @@
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 1
                   ? 'z-30 scale-100 rotate-0 opacity-100'
                   : activeMobileCard === 0
-                    ? 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'
-                    : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
+                    ? 'z-10 scale-90 rotate-6 translate-x-6 opacity-40 pointer-events-none'
+                    : 'z-10 scale-90 -rotate-6 -translate-x-6 opacity-40 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[44px] border-[5px] sm:border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
+                  <div class="h-3.5 w-16 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
+                    <div class="size-1 rounded-full bg-slate-800 mr-1"></div>
+                    <div class="size-0.5 rounded-full bg-slate-700"></div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div class="rounded-lg bg-slate-900 text-white px-2.5 py-1 text-[10px] font-bold flex items-center justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-900 text-white px-2 py-1 text-[9px] sm:text-[10px] font-bold flex items-center justify-between">
                       <span>Meja 04</span>
                       <span class="size-1.5 rounded-full bg-emerald-400"></span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA STANDEE QR MEJA]</span>
                       <p class="mt-1 text-[10px] text-slate-600">
                         Scan kamera langsung tanpa instal aplikasi
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
+                    <div class="w-20 sm:w-24 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
@@ -537,45 +557,29 @@
               <div
                 class="absolute inset-0 transition-all duration-300 {activeMobileCard === 2
                   ? 'z-30 scale-100 rotate-0 opacity-100'
-                  : 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'}"
+                  : 'z-10 scale-90 rotate-6 translate-x-6 opacity-40 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[44px] border-[5px] sm:border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
+                  <div class="h-3.5 w-16 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
+                    <div class="size-1 rounded-full bg-slate-800 mr-1"></div>
+                    <div class="size-0.5 rounded-full bg-slate-700"></div>
                   </div>
-                  <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-800 flex items-center justify-between">
+                  <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] sm:text-[10px] font-bold text-slate-800 flex items-center justify-between">
                       <span>Layar Dapur</span>
                       <span class="text-[9px] text-brand-600">Live</span>
                     </div>
-                    <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-4 text-center flex flex-col items-center justify-center">
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA ANTREAN DAPUR]</span>
                       <p class="mt-1 text-[10px] text-slate-500">
                         Tiket order masuk realtime dan alur status
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                    <div class="w-20 sm:w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Mobile Swipe Navigation Tabs -->
-            <div class="mt-4 flex items-center justify-center gap-2">
-              {#each mobileMockupMeta as meta, idx}
-                <button
-                  type="button"
-                  onclick={() => (activeMobileCard = idx)}
-                  class="rounded-full px-3 py-1 text-xs font-bold transition-all cursor-pointer {activeMobileCard === idx
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}"
-                >
-                  {meta.tag}
-                </button>
-              {/each}
-            </div>
-            <span class="mt-1.5 text-[10px] text-slate-400">Geser (swipe) layar untuk berganti mockup</span>
           </div>
         </div>
 
