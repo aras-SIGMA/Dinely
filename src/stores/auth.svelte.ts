@@ -335,32 +335,15 @@ class AuthStore {
   }
 
   async verifyOtp(params: { email: string; token: string; type?: 'email' | 'signup' }): Promise<AuthActionResult> {
-    const { email, token, type = 'email' } = params;
+    const { email, token, type = 'signup' } = params;
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: token.trim(),
-        type: type as 'email' | 'signup'
+        type: (type === 'email' ? 'signup' : type) as 'signup' | 'email'
       });
 
       if (error) {
-        // Fallback ke custom Gmail OTP endpoint jika Kevin mengimplementasikannya di API
-        try {
-          const res = await fetch('/api/auth/verify-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim(), otp: token.trim() })
-          });
-          if (res.ok) {
-            const json = await res.json();
-            if (json.session || json.success) {
-              return { success: true, session: true, role: this.role ?? 'owner' };
-            }
-          }
-        } catch {
-          // endpoint custom belum aktif
-        }
-
         return {
           success: false,
           error: error.message || 'Kode OTP tidak valid atau telah kedaluwarsa.'
@@ -372,6 +355,10 @@ class AuthStore {
           this.loadProfile(data.user.id),
           this.loadTenant(data.user.id)
         ]);
+
+        if (!this.tenant) {
+          await this.ensureTenantExists(data.user);
+        }
       }
 
       return {
@@ -398,23 +385,11 @@ class AuthStore {
     }
     try {
       const { error } = await supabase.auth.resend({
-        type: (type === 'email' ? 'email_change' : 'signup') as 'signup' | 'email_change',
+        type: (type === 'email' ? 'signup' : type) as 'signup' | 'email_change',
         email
       });
 
       if (error) {
-        // Fallback ke custom Gmail OTP endpoint
-        try {
-          const res = await fetch('/api/auth/send-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-          });
-          if (res.ok) return { success: true };
-        } catch {
-          // endpoint custom belum aktif
-        }
-
         return { success: false, error: error.message };
       }
       return { success: true };
