@@ -170,27 +170,31 @@
         {#if msg.sender === 'assistant'}
           {@const isStreaming =
             chatbotStore.loading && msg.id === chatbotStore.messages.at(-1)?.id}
-          <!-- Bubble Assistant (Left-aligned) -->
-          <div class="flex items-start gap-2 max-w-[85%]">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-orange-100/90 border border-orange-200 p-0.5 shadow-2xs mt-0.5 select-none" aria-hidden="true">
-              <LinkaMascot variant="avatar" size="xs" />
-            </div>
-            <div
-              class="rounded-2xl rounded-tl-xs px-3.5 py-2.5 text-xs leading-relaxed shadow-2xs {msg.isError
-                ? 'border border-rose-200 bg-rose-50 text-rose-800'
-                : 'border border-slate-200/80 bg-white text-slate-800'}"
-            >
-              <div class="select-text">
-                {#if msg.isError}
-                  <div class="whitespace-pre-line">{msg.text}</div>
-                {:else if isStreaming}
-                  <div class="whitespace-pre-line"><TextType text={msg.text} animate /><span class="ml-0.5 inline-block w-1.5 h-3.5 -mb-0.5 bg-brand-500 animate-pulse rounded-sm" aria-hidden="true"></span></div>
-                {:else}
-                  <Markdown text={msg.text} />
-                {/if}
+          {@const isEmptyThinking =
+            isStreaming && !msg.text}
+          {#if !isEmptyThinking}
+            <!-- Bubble Assistant (Left-aligned) -->
+            <div class="flex items-start gap-2 max-w-[85%]">
+              <div class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-orange-100/90 border border-orange-200 p-0.5 shadow-2xs mt-0.5 select-none" aria-hidden="true">
+                <LinkaMascot variant="avatar" size="xs" />
+              </div>
+              <div
+                class="rounded-2xl rounded-tl-xs px-3.5 py-2.5 text-xs leading-relaxed shadow-2xs {msg.isError
+                  ? 'border border-rose-200 bg-rose-50 text-rose-800'
+                  : 'border border-slate-200/80 bg-white text-slate-800'}"
+              >
+                <div class="select-text">
+                  {#if msg.isError}
+                    <div class="whitespace-pre-line">{msg.text}</div>
+                  {:else if isStreaming}
+                    <div class="whitespace-pre-line"><TextType text={msg.text} animate /><span class="ml-0.5 inline-block w-1.5 h-3.5 -mb-0.5 bg-brand-500 animate-pulse rounded-sm" aria-hidden="true"></span></div>
+                  {:else}
+                    <Markdown text={msg.text} />
+                  {/if}
+                </div>
               </div>
             </div>
-          </div>
+          {/if}
         {:else}
           <!-- Bubble User (Right-aligned) -->
           <div class="flex justify-end">
