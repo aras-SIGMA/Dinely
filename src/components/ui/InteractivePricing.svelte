@@ -155,6 +155,7 @@
 
   let billingCycle = $state<'monthly' | 'annual'>('monthly');
   let activeTab = $state<'pricing' | 'comparison'>('pricing');
+  let hasClickedAnnual = $state(false);
   let isRolling = $state(false);
   let rollDirection = $state<'up' | 'down'>('up');
 
@@ -205,6 +206,9 @@
   }
 
   function handleCycleChange(next: 'monthly' | 'annual') {
+    if (next === 'annual') {
+      hasClickedAnnual = true;
+    }
     if (billingCycle === next) return;
     rollDirection = next === 'annual' ? 'up' : 'down';
     isRolling = true;
@@ -212,6 +216,10 @@
     setTimeout(() => {
       isRolling = false;
     }, 320);
+
+    setTimeout(() => {
+      updatePill();
+    }, 10);
 
     if (next === 'annual' && typeof window !== 'undefined') {
       const rect = annualBtnEl?.getBoundingClientRect();
@@ -310,14 +318,16 @@
               : 'text-slate-600 hover:text-slate-950'}"
           >
             <span>Tagihan Tahunan</span>
-            <span
-              class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-colors {billingCycle ===
-              'annual'
-                ? 'bg-brand-500 text-white'
-                : 'bg-brand-50 text-brand-700 border border-brand-200/80'}"
-            >
-              Hemat {annualDiscount}%
-            </span>
+            {#if hasClickedAnnual}
+              <span
+                class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-all duration-300 {billingCycle ===
+                'annual'
+                  ? 'bg-brand-500 text-white'
+                  : 'bg-brand-50 text-brand-700 border border-brand-200/80'}"
+              >
+                Hemat {annualDiscount}%
+              </span>
+            {/if}
           </button>
         </div>
       </div>
@@ -362,7 +372,7 @@
     <!-- Main Content: Pricing Cards View -->
     {#if !showComparison || activeTab === 'pricing'}
       <div
-        class="mt-14 grid max-w-7xl mx-auto grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+        class="mt-14 grid max-w-7xl mx-auto grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 animate-tab-appear"
       >
         {#each plans as plan, index (plan.id)}
           {@const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice}
@@ -535,16 +545,24 @@
     {:else}
       <!-- Comparison Table View -->
       <div
-        class="mt-12 max-w-5xl mx-auto overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm"
+        class="mt-8 sm:mt-12 max-w-5xl mx-auto overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-sm animate-tab-appear"
       >
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-[620px] border-collapse text-left text-xs sm:text-sm">
+        <!-- Mobile Horizontal Scroll Hint -->
+        <div class="flex sm:hidden items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200 text-[11px] text-slate-500">
+          <span class="font-medium text-slate-600">Perbandingan Paket</span>
+          <span class="flex items-center gap-1 font-semibold text-brand-600">
+            Geser tabel &rarr;
+          </span>
+        </div>
+
+        <div class="overflow-x-auto overscroll-x-contain">
+          <table class="w-full min-w-[500px] sm:min-w-[620px] border-collapse text-left text-xs sm:text-sm">
             <caption class="sr-only">Tabel Perbandingan Fitur Paket RestoLink</caption>
             <thead>
               <tr class="border-b border-slate-200 bg-slate-50/70">
                 <th
                   scope="col"
-                  class="sticky left-0 z-10 bg-slate-50/70 px-6 py-5 font-bold text-xs uppercase tracking-wider text-slate-500"
+                  class="sticky left-0 z-10 bg-slate-50 px-3 sm:px-6 py-3.5 sm:py-5 font-bold text-[11px] sm:text-xs uppercase tracking-wider text-slate-500 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.08)]"
                 >
                   Fitur &amp; Kemampuan
                 </th>
@@ -552,13 +570,13 @@
                   {@const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice}
                   <th
                     scope="col"
-                    class="px-5 py-5 text-center min-w-[150px] {plan.popular
+                    class="px-2.5 sm:px-5 py-3 sm:py-5 text-center min-w-[100px] sm:min-w-[150px] {plan.popular
                       ? 'bg-brand-50/40 text-brand-700 font-bold'
                       : 'text-slate-800 font-semibold'}"
                   >
-                    <div class="space-y-1">
-                      <div class="text-sm font-bold">{plan.name}</div>
-                      <div class="font-display text-lg font-black text-slate-950 overflow-hidden">
+                    <div class="space-y-0.5 sm:space-y-1">
+                      <div class="text-xs sm:text-sm font-bold">{plan.name}</div>
+                      <div class="font-display text-sm sm:text-lg font-black text-slate-950 overflow-hidden">
                         {#key price}
                           <span
                             class="inline-block transition-transform duration-250 {isRolling
@@ -571,7 +589,7 @@
                           </span>
                         {/key}
                       </div>
-                      <div class="text-[11px] text-slate-400 font-normal">
+                      <div class="text-[10px] sm:text-[11px] text-slate-400 font-normal">
                         /{billingCycle === 'annual' ? 'tahun' : 'bulan'}
                       </div>
                     </div>
@@ -585,7 +603,7 @@
                   <th
                     colspan="4"
                     scope="colgroup"
-                    class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-brand-700 border-t border-slate-200"
+                    class="px-3 sm:px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-brand-700 border-t border-slate-200"
                   >
                     {group.title}
                   </th>
@@ -594,16 +612,16 @@
                   <tr class="border-t border-slate-100 transition-colors hover:bg-slate-50/70">
                     <th
                       scope="row"
-                      class="sticky left-0 z-10 bg-white px-6 py-3.5 font-medium text-slate-800"
+                      class="sticky left-0 z-10 bg-white px-3 sm:px-6 py-2.5 sm:py-3.5 text-[11px] sm:text-xs font-medium text-slate-800 max-w-[130px] sm:max-w-none shadow-[2px_0_6px_-2px_rgba(0,0,0,0.08)]"
                     >
                       {row.label}
                     </th>
 
                     <!-- Paket Mikro -->
-                    <td class="px-5 py-3.5 text-center bg-brand-50/20 font-medium text-brand-900">
+                    <td class="px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-center bg-brand-50/20 font-medium text-brand-900 text-xs sm:text-sm">
                       {#if row.mikro === true}
                         <svg
-                          class="size-4.5 mx-auto text-emerald-600"
+                          class="size-4 sm:size-4.5 mx-auto text-emerald-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -620,10 +638,10 @@
                     </td>
 
                     <!-- Paket Kecil -->
-                    <td class="px-5 py-3.5 text-center text-slate-600">
+                    <td class="px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-center text-slate-600 text-xs sm:text-sm">
                       {#if row.kecil === true}
                         <svg
-                          class="size-4.5 mx-auto text-slate-600"
+                          class="size-4 sm:size-4.5 mx-auto text-slate-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -640,10 +658,10 @@
                     </td>
 
                     <!-- Paket Menengah -->
-                    <td class="px-5 py-3.5 text-center text-slate-600">
+                    <td class="px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-center text-slate-600 text-xs sm:text-sm">
                       {#if row.menengah === true}
                         <svg
-                          class="size-4.5 mx-auto text-slate-600"
+                          class="size-4 sm:size-4.5 mx-auto text-slate-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -676,3 +694,20 @@
     </div>
   </div>
 </section>
+
+<style>
+  @keyframes tabAppear {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-tab-appear {
+    animation: tabAppear 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+</style>

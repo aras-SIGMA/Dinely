@@ -169,11 +169,8 @@
 
             <!-- Kanal Langsung (1 Kartu Compact) -->
             <div class="mt-8 rounded-2xl border border-slate-200/90 bg-white shadow-sm shadow-slate-900/[0.02]">
-              <a
-                href="https://wa.me/6281234567890"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded-t-2xl"
+              <div
+                class="group flex items-center gap-4 px-5 py-4 rounded-t-2xl"
               >
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                   <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -185,20 +182,20 @@
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">WhatsApp Support</p>
-                  <p class="font-display text-sm font-bold text-slate-950 transition-colors group-hover:text-brand-600 sm:text-base">
-                    (+62) 812-3456-7890
+                  <p class="font-display text-sm font-bold text-slate-950 sm:text-base">
+                    (+62) 812-****-****
                   </p>
                 </div>
                 <span class="ml-auto flex items-center gap-1.5 text-xs font-medium text-slate-500">
                   <span class="size-1.5 rounded-full bg-emerald-500"></span>
                   Respon &lt; 15 menit
                 </span>
-              </a>
+              </div>
 
               <div class="border-t border-slate-100"></div>
 
               <a
-                href="mailto:support@restolink.id"
+                href="mailto:stefanohari2@gmail.com"
                 class="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
@@ -210,7 +207,7 @@
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Email Bantuan</p>
                   <p class="font-display text-sm font-bold text-slate-950 transition-colors group-hover:text-brand-600 sm:text-base">
-                    support@restolink.id
+                    stefanohari2@gmail.com
                   </p>
                 </div>
                 <span class="ml-auto shrink-0 text-xs font-medium text-slate-500">Balas &lt; 1x24 jam</span>
