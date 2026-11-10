@@ -86,13 +86,13 @@
             <span class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-600 font-black text-sm text-white">
               R
             </span>
-            <span class="truncate">RestoLink</span>
+            <span class="truncate">Dinely</span>
             <span class="ml-auto rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
               Admin
             </span>
           </a>
         {:else}
-          <a href="/admin" class="flex size-9 items-center justify-center rounded-lg bg-brand-600 font-black text-sm text-white" title="RestoLink Admin">
+          <a href="/admin" class="flex size-9 items-center justify-center rounded-lg bg-brand-600 font-black text-sm text-white" title="Dinely Admin">
             R
           </a>
         {/if}

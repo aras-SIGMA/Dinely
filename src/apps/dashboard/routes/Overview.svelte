@@ -19,7 +19,7 @@
     if (window.location.hostname.includes('localhost')) {
       return `${window.location.origin}/?tenant=${tenant.subdomain}`;
     }
-    return `https://${tenant.subdomain}.restolink.site`;
+    return `https://${tenant.subdomain}.dinely.site`;
   });
 
   $effect(() => {
@@ -91,7 +91,7 @@
         <div class="flex items-center gap-2">
           <span class="inline-flex size-2 rounded-full bg-emerald-500"></span>
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            RestoLink Portal Pemilik
+            Dinely Portal Pemilik
           </span>
         </div>
 
@@ -110,7 +110,7 @@
           <div class="min-w-0 flex-1 px-1">
             <p class="text-[11px] font-semibold text-slate-500">Website Pemesanan Pelanggan:</p>
             <p class="truncate font-mono text-xs font-bold text-slate-900">
-              {tenant.subdomain}.restolink.site
+              {tenant.subdomain}.dinely.site
             </p>
           </div>
 

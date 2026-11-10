@@ -101,7 +101,7 @@
     <!-- Simple Minimalist Footer -->
     <footer class="mt-16 border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">
       <p>
-        Ditenagai oleh <span class="font-medium text-slate-600">RestoLink</span>
+        Ditenagai oleh <span class="font-medium text-slate-600">Dinely</span>
       </p>
     </footer>
   {/if}

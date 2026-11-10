@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 005_SUBDOMAIN_RPC.SQL
+-- DINELY - 005_SUBDOMAIN_RPC.SQL
 -- RPC Pemeriksaan Ketersediaan Subdomain untuk Anon & Authenticated
 -- ==============================================================================
 

@@ -102,7 +102,7 @@
       a: 'Sama sekali tidak. Anda bisa mendaftar dan langsung menggunakan seluruh fitur Paket Mikro gratis selama 30 hari tanpa perlu memasukkan informasi kartu kredit atau pembayaran apa pun.'
     },
     {
-      q: 'Apakah RestoLink mengambil potongan komisi dari setiap pesanan pelanggan?',
+      q: 'Apakah Dinely mengambil potongan komisi dari setiap pesanan pelanggan?',
       a: 'Tidak ada potongan komisi (0%). Semua uang pembayaran dari pelanggan adalah 100% milik usaha Anda, berbeda dari aplikasi ojek online yang memotong 20% atau lebih.'
     },
     {
@@ -111,7 +111,7 @@
     },
     {
       q: 'Apakah saya bisa mengganti nama subdomain usaha setelah terdaftar?',
-      a: 'Nama subdomain dipilih saat pertama kali mendaftar. Jika ada kebutuhan perubahan khusus, Anda dapat menghubungi tim bantuan RestoLink untuk asistensi.'
+      a: 'Nama subdomain dipilih saat pertama kali mendaftar. Jika ada kebutuhan perubahan khusus, Anda dapat menghubungi tim bantuan Dinely untuk asistensi.'
     },
     {
       q: 'Apakah ada kontrak jangka panjang atau denda jika berhenti berlangganan?',
@@ -254,7 +254,7 @@
                 <div class="p-3.5 flex-1 flex flex-col justify-between">
                   <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1 border border-slate-200">
                     <span class="text-emerald-600">●</span>
-                    <span class="truncate">dapur-nia.restolink.site</span>
+                    <span class="truncate">dapur-nia.dinely.site</span>
                   </div>
                   <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 text-center flex flex-col items-center justify-center">
                     <div class="size-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 mb-1.5">
@@ -406,7 +406,7 @@
                   <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1">
                       <span class="text-emerald-600">●</span>
-                      <span class="truncate">dapur-nia.restolink.site</span>
+                      <span class="truncate">dapur-nia.dinely.site</span>
                     </div>
                     <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 sm:p-4 text-center flex flex-col items-center justify-center">
                       <span class="text-xs font-bold text-slate-900">[AREA KATALOG MENU TAMU]</span>
@@ -679,7 +679,7 @@
                 <!-- Visual Comparison Gauge -->
                 <div class="mt-4 rounded-xl border border-slate-200/80 bg-slate-50 p-2.5 flex items-center justify-between text-xs font-semibold">
                   <span class="text-slate-500 line-through">Ojol: 20% - 25%</span>
-                  <span class="text-emerald-600 font-bold">RestoLink: Rp 0</span>
+                  <span class="text-emerald-600 font-bold">Dinely: Rp 0</span>
                 </div>
 
                 <p class="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -733,7 +733,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-white/20" />
         <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-white/95">
-          Miliki alamat website toko sendiri seperti <strong class="underline decoration-white/60">usaha-anda.restolink.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
+          Miliki alamat website toko sendiri seperti <strong class="underline decoration-white/60">usaha-anda.dinely.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
         </p>
         <hr class="my-[2vw] border-none border-t border-white/20" />
         <div class="flex flex-wrap gap-[3vw]">
@@ -758,7 +758,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-white/20" />
         <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-white/70">
-          LANGKAH 01 — RESTOLINK PLATFORM
+          LANGKAH 01 — DINELY PLATFORM
         </p>
       </FlowSection>
 
@@ -798,7 +798,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-white/15" />
         <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 02 — RESTOLINK PLATFORM
+          LANGKAH 02 — DINELY PLATFORM
         </p>
       </FlowSection>
 
@@ -838,7 +838,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-slate-300" />
         <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 03 — RESTOLINK PLATFORM
+          LANGKAH 03 — DINELY PLATFORM
         </p>
       </FlowSection>
 
@@ -878,7 +878,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-white/20" />
         <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-white/70">
-          LANGKAH 04 — RESTOLINK PLATFORM
+          LANGKAH 04 — DINELY PLATFORM
         </p>
       </FlowSection>
 
@@ -918,7 +918,7 @@
         </div>
         <hr class="my-[2vw] border-none border-t border-white/15" />
         <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 05 — RESTOLINK PLATFORM
+          LANGKAH 05 — DINELY PLATFORM
         </p>
       </FlowSection>
     </StoryScroll>

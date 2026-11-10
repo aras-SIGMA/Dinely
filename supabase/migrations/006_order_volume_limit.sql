@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 006_ORDER_VOLUME_LIMIT.SQL
+-- DINELY - 006_ORDER_VOLUME_LIMIT.SQL
 -- Penegakan Batas Volume Pesanan Server-Side (RPC create_guest_order)
 -- Membatasi total akumulasi kuantitas seluruh item dalam sekali pemesanan (maks 99 item)
 -- Serta memastikan kuantitas per menu berada dalam rentang 1 - 99 item.

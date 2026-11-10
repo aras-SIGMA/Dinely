@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 008_ADMIN_AUDIT_LOGS.SQL
+-- DINELY - 008_ADMIN_AUDIT_LOGS.SQL
 -- Audit Trail Log untuk Seluruh Aksi Sensitif Platform Admin (FS-14 / M8)
 -- Mencatat aksi manual override status tenant, transaksi, dan alasan penanganan.
 -- ==============================================================================

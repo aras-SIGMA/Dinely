@@ -21,9 +21,9 @@ Endpoint `api/gemini/chat.ts` adalah proxy backend serverless yang menghubungkan
 3. **Guard Kredensial Server**:
    - Memastikan `GEMINI_API_KEY` tersedia di environment serverless. Jika tidak ada, mengembalikan HTTP `500`.
 4. **Instruksi Sistem (System Prompt Restriktif)**:
-   - AI diinstruksikan bertindak sebagai asisten resmi RestoLink dalam bahasa Indonesia.
+   - AI diinstruksikan bertindak sebagai asisten resmi Dinely dalam bahasa Indonesia.
    - Pengetahuan terfokus pada: profil platform, fitur menu digital berbasis subdomain, QR code meja, guest checkout, dashboard pemilik, paket Mikro Rp 49.000/bulan (trial 30 hari via Midtrans), dan panduan registrasi.
-   - Penolakan Sopan: Pertanyaan di luar RestoLink ditolak secara sopan dan diarahkan kembali ke topik RestoLink.
+   - Penolakan Sopan: Pertanyaan di luar Dinely ditolak secara sopan dan diarahkan kembali ke topik Dinely.
 5. **Format & Normalisasi Riwayat Pesan (History)**:
    - Mendukung riwayat percakapan multi-turn (maksimal 10 pesan terakhir).
    - Menormalisasi urutan percakapan secara ketat agar bergantian (`user` -> `model` -> `user`), memenuhi konvensi API Gemini.
@@ -77,18 +77,18 @@ npx vercel dev
 # Berjalan pada port 3000
 ```
 
-1. Chat tanya fitur RestoLink:
+1. Chat tanya fitur Dinely:
    ```bash
    curl -X POST http://localhost:3000/api/gemini/chat \
      -H "Content-Type: application/json" \
      -d '{
-       "message": "Berapa biaya langganan paket di RestoLink dan apakah ada uji coba?"
+       "message": "Berapa biaya langganan paket di Dinely dan apakah ada uji coba?"
      }'
    ```
    Contoh respon:
    ```json
    {
-     "reply": "Halo! RestoLink menyediakan Paket Mikro seharga Rp 49.000 per bulan..."
+     "reply": "Halo! Dinely menyediakan Paket Mikro seharga Rp 49.000 per bulan..."
    }
    ```
 
@@ -103,6 +103,6 @@ npx vercel dev
    Contoh respon:
    ```json
    {
-     "reply": "Maaf, saya adalah asisten virtual RestoLink dan hanya dapat membantu menjawab pertanyaan seputar platform RestoLink, fitur, paket harga, dan cara pendaftarannya..."
+     "reply": "Maaf, saya adalah asisten virtual Dinely dan hanya dapat membantu menjawab pertanyaan seputar platform Dinely, fitur, paket harga, dan cara pendaftarannya..."
    }
    ```

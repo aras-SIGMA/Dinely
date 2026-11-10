@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Client Image Compressor (FS-09 / Milestone 5)
+ * DINELY - Client Image Compressor (FS-09 / Milestone 5)
  * ============================================================================
  * Bertanggung jawab mengompresi foto menu dan logo usaha kuliner di sisi browser
  * sebelum diunggah ke Cloudinary.

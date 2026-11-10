@@ -276,7 +276,7 @@
 </script>
 
 <svelte:head>
-  <title>Daftar Resto - RestoLink Platform</title>
+  <title>Daftar Resto - Dinely Platform</title>
 </svelte:head>
 
 <main class="min-h-screen w-full bg-white text-slate-950 overflow-x-hidden relative flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-brand-500 selection:text-white">
@@ -310,7 +310,7 @@
       <a
         href="/"
         class="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-white/85 transition-all group drop-shadow-sm cursor-pointer"
-        title="Kembali ke Beranda RestoLink"
+        title="Kembali ke Beranda Dinely"
       >
         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -399,7 +399,7 @@
             Mulai Digitalisasi Resto Anda
           </h1>
           <p class="mt-1.5 text-xs sm:text-sm text-slate-500 font-medium">
-            Daftarkan restoran kamu dan mulai kelola menu mandiri dengan RestoLink.
+            Daftarkan restoran kamu dan mulai kelola menu mandiri dengan Dinely.
           </p>
         </div>
 
@@ -447,7 +447,7 @@
                 <label for="subdomain" class="text-[11px] font-bold text-slate-700">
                   Pilihan Subdomain Toko <span class="text-rose-500">*</span>
                 </label>
-                <span class="text-[11px] text-slate-400 font-mono">.restolink.site</span>
+                <span class="text-[11px] text-slate-400 font-mono">.dinely.site</span>
               </div>
 
               <div class="relative flex items-center">
@@ -466,14 +466,14 @@
                     : 'border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10'}"
                 />
                 <span class="absolute right-3 text-xs font-mono font-semibold text-slate-400 pointer-events-none select-none">
-                  .restolink.site
+                  .dinely.site
                 </span>
               </div>
 
               <!-- Live Status Pill -->
               <div class="flex items-center justify-between pt-0.5 text-[11px]">
                 <span class="font-mono text-slate-500 truncate text-[11px]">
-                  https://<strong class="text-brand-600">{subdomain || 'nama-resto'}</strong>.restolink.site
+                  https://<strong class="text-brand-600">{subdomain || 'nama-resto'}</strong>.dinely.site
                 </span>
                 <div>
                   {#if isCheckingSubdomain}
@@ -688,7 +688,7 @@
                 <span class="font-bold text-slate-400">Subdomain</span>
                 <p class="font-medium text-slate-700">
                   <span class="font-bold text-brand-600 font-mono">{subdomain}</span>
-                  <span class="font-mono text-slate-500">.restolink.site</span>
+                  <span class="font-mono text-slate-500">.dinely.site</span>
                 </p>
               </div>
 
@@ -767,7 +767,7 @@
                 Verifikasi Pendaftaran Resto
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                Satu langkah lagi untuk mengaktifkan subdomain <strong class="text-brand-600 font-mono">{subdomain}.restolink.site</strong>. Masukkan 6 digit kode OTP yang kami kirimkan ke email:
+                Satu langkah lagi untuk mengaktifkan subdomain <strong class="text-brand-600 font-mono">{subdomain}.dinely.site</strong>. Masukkan 6 digit kode OTP yang kami kirimkan ke email:
                 <strong class="text-slate-800 block mt-0.5">{email}</strong>
               </p>
             </div>
@@ -896,6 +896,6 @@
 
   <!-- BOTTOM FOOTER -->
   <footer class="w-full text-center text-xs text-slate-400 py-2 relative z-10">
-    <p>&copy; {new Date().getFullYear()} RestoLink Platform. Hak Cipta Dilindungi.</p>
+    <p>&copy; {new Date().getFullYear()} Dinely Platform. Hak Cipta Dilindungi.</p>
   </footer>
 </main>

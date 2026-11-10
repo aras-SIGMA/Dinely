@@ -11,9 +11,9 @@
       badge: 'Etalase Online',
       icon: 'browser',
       title: 'Website Menu Digital & Subdomain Mandiri',
-      desc: 'Setiap mitra mendapatkan alamat website eksklusif di subdomain RestoLink yang langsung aktif seketika setelah pendaftaran. Pelanggan membuka menu tanpa mengunduh aplikasi apa pun.',
+      desc: 'Setiap mitra mendapatkan alamat website eksklusif di subdomain Dinely yang langsung aktif seketika setelah pendaftaran. Pelanggan membuka menu tanpa mengunduh aplikasi apa pun.',
       points: [
-        'Subdomain unik otomatis (misal: dapurnia.restolink.site)',
+        'Subdomain unik otomatis (misal: dapurnia.dinely.site)',
         'Kategori menu dinamis: Makanan, Minuman, Paket Hemat',
         'Kompresi gambar otomatis ke format WebP untuk loading instan'
       ],
@@ -221,7 +221,7 @@
                     <span
                       class="rounded-full bg-slate-950 px-2.5 py-1 font-mono text-[9px] font-semibold text-white"
                     >
-                      dapurnia.restolink.site
+                      dapurnia.dinely.site
                     </span>
                   </div>
                   <div class="flex gap-1.5 px-4 pt-3">
@@ -374,7 +374,7 @@
     </section>
 
     <!-- Why band -->
-    <section class="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8" aria-label="Kenapa RestoLink">
+    <section class="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8" aria-label="Kenapa Dinely">
       <AnimatedContent distance={24} duration={0.6} class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {#each extras as extra (extra.id)}
           <div class="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 transition-colors duration-300 hover:border-brand-200 hover:bg-brand-50/40">

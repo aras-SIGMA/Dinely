@@ -31,20 +31,20 @@
   };
 
   const logoSrc = $derived.by(() => {
-    if (iconOnly) return '/restolink-icon.svg';
+    if (iconOnly) return '/dinely-icon.svg';
     if (showTagline) {
       return theme === 'dark'
-        ? '/restolink-logo-tagline-dark.svg'
-        : '/restolink-logo-tagline.svg';
+        ? '/dinely-logo-tagline-dark.svg'
+        : '/dinely-logo-tagline.svg';
     }
-    return theme === 'dark' ? '/restolink-logo-dark.svg' : '/restolink-logo.svg';
+    return theme === 'dark' ? '/dinely-logo-dark.svg' : '/dinely-logo.svg';
   });
 </script>
 
 <div class="inline-flex items-center shrink-0 {className}">
   <img
     src={logoSrc}
-    alt="RestoLink"
+    alt="Dinely"
     class="w-auto select-none object-contain {iconOnly ? iconSizes[size] : heights[size]}"
     draggable="false"
   />

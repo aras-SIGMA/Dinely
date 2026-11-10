@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 002_RLS_POLICIES.SQL
+-- DINELY - 002_RLS_POLICIES.SQL
 -- Keamanan & Isolasi Data Multi-Tenant via Supabase Row Level Security (RLS)
 -- ==============================================================================
 

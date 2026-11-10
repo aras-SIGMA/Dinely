@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 011_TENANT_INSERT_HARDENING.SQL
+-- DINELY - 011_TENANT_INSERT_HARDENING.SQL
 -- Hardening Otorisasi INSERT Tenant & Sanitasi Input Metadata Registrasi
 -- ==============================================================================
 -- Masalah 1 (CRITICAL): Policy "tenants_insert_owner" (002_rls_policies.sql) hanya

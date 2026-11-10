@@ -51,7 +51,7 @@
 | **K-29** | **Fallback Error Server (HTTP 500)**: Jika API Gemini mengalami kegagalan internal (500), server merespons HTTP 200 dengan fallback generik. | Baris 185–194 | **TC-10**: Gemini 500 server error ditangani dengan fallback generik (200 OK) | **PASS** |
 | **K-30** | **Resiliensi Jaringan (Network Exception)**: Gangguan soket jaringan atau timeout saat memanggil Gemini ditangani secara aman dengan fallback respons (HTTP 200). | Baris 210–218 | **TC-11**: Network exception / timeout ditangani aman dengan fallback | **PASS** |
 | **K-31** | **Kandidat Kosong**: Respons Gemini tanpa kandidat teks ditangani aman dengan pesan fallback (HTTP 200). | Baris 200–205 | **TC-12**: Candidates respons Gemini kosong ditangani dengan fallback | **PASS** |
-| **K-32** | **Cakupan Informasi System Prompt**: System prompt mencakup instruksi fitur menu digital subdomain, QR code meja, paket Mikro Rp 49.000, alur registrasi, dan penolakan sopan pertanyaan di luar topik. | Baris 17–41 (`RESTOLINK_SYSTEM_PROMPT`) | **TC-13**: System prompt memuat seluruh informasi wajib & penolakan off-topic | **PASS** |
+| **K-32** | **Cakupan Informasi System Prompt**: System prompt mencakup instruksi fitur menu digital subdomain, QR code meja, paket Mikro Rp 49.000, alur registrasi, dan penolakan sopan pertanyaan di luar topik. | Baris 17–41 (`DINELY_SYSTEM_PROMPT`) | **TC-13**: System prompt memuat seluruh informasi wajib & penolakan off-topic | **PASS** |
 | **K-33** | **Anti-DoS Token Riwayat**: Teks pada tiap item riwayat (`history`) dibatasi maksimal 1000 karakter guna mencegah lonjakan memori dan token exhaustion. | Baris 84–86 (`formatHistory`) | **TC-14**: History item dipotong aman ke 1000 karakter | **PASS** |
 
 ---

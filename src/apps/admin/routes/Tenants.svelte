@@ -260,7 +260,7 @@
                         rel="noreferrer"
                         class="inline-flex items-center gap-1 font-mono text-[11px] text-brand-600 hover:underline"
                       >
-                        {tenant.subdomain}.restolink.site
+                        {tenant.subdomain}.dinely.site
                         <svg class="size-3" viewBox="0 0 20 20" fill="currentColor">
                           <path
                             fill-rule="evenodd"
@@ -364,7 +364,7 @@
       <!-- Info Ringkas Tenant -->
       <div class="rounded-lg bg-slate-50 p-3 border border-slate-200">
         <p class="text-xs font-semibold text-slate-900">{selectedTenant.business_name}</p>
-        <p class="text-[11px] text-slate-500 font-mono">{selectedTenant.subdomain}.restolink.site</p>
+        <p class="text-[11px] text-slate-500 font-mono">{selectedTenant.subdomain}.dinely.site</p>
         <div class="mt-2 flex items-center gap-2">
           <span class="text-[11px] text-slate-500">Status Sekarang:</span>
           <Badge

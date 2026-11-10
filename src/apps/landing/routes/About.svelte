@@ -67,7 +67,7 @@
           <div
             class="inline-flex items-center rounded-full border border-brand-200/70 bg-brand-50/60 px-4 py-1.5 text-xs font-semibold tracking-wide text-slate-950"
           >
-            TENTANG RESTOLINK
+            TENTANG DINELY
           </div>
         </AnimatedContent>
 
@@ -96,7 +96,7 @@
 
         <AnimatedContent distance={24} duration={0.6} delay={0.35}>
           <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-            RestoLink hadir sebagai jembatan teknologi bagi pedagang, warung, kedai kopi, dan restoran
+            Dinely hadir sebagai jembatan teknologi bagi pedagang, warung, kedai kopi, dan restoran
             lokal agar memiliki platform pemesanan mandiri tanpa tercekik biaya komisi 20–30%.
           </p>
         </AnimatedContent>
@@ -104,12 +104,12 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- SECTION 2: LOGO RESTOLINK & KISAH SINGKAT APLIKASI                       -->
+    <!-- SECTION 2: LOGO DINELY & KISAH SINGKAT APLIKASI                       -->
     <!-- ========================================================================= -->
     <section
       id="kisah"
       class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 sm:pt-20 lg:px-8 scroll-mt-32"
-      aria-label="Kisah Lahirnya RestoLink"
+      aria-label="Kisah Lahirnya Dinely"
     >
       <AnimatedContent distance={36} duration={0.6}>
         <div class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xl shadow-slate-900/[0.03] sm:p-10 lg:p-12">
@@ -117,8 +117,8 @@
             <!-- Sisi Kiri: Tampilan Logo & Identitas Brand -->
             <div class="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/70 p-8 text-center lg:col-span-4 lg:p-10">
               <img
-                src="/restolink-icon.svg"
-                alt="Ikon RestoLink"
+                src="/dinely-icon.svg"
+                alt="Ikon Dinely"
                 class="size-24 sm:size-28 rounded-3xl shadow-lg shadow-brand-600/20"
                 draggable="false"
               />
@@ -127,10 +127,10 @@
             <!-- Sisi Kanan: Narasi Kisah Mengapa Aplikasi Ini Dibuat -->
             <div class="lg:col-span-8">
               <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand-700">
-                Kisah di Balik RestoLink
+                Kisah di Balik Dinely
               </span>
               <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
-                Mengapa Kami Membangun RestoLink?
+                Mengapa Kami Membangun Dinely?
               </h2>
 
               <div class="mt-4 space-y-4 text-sm sm:text-base leading-relaxed text-slate-600">
@@ -146,7 +146,7 @@
                   profesional mereka sendiri.
                 </p>
                 <p>
-                  <strong class="text-brand-600">RestoLink lahir sebagai jawaban yang adil.</strong> Kami
+                  <strong class="text-brand-600">Dinely lahir sebagai jawaban yang adil.</strong> Kami
                   menyediakan website menu digital dengan subdomain mandiri instan, pemesanan QR code di meja
                   makan tanpa unduh aplikasi, dan antrean layar dapur sinkron real-time. Semua operasional modern
                   ini dapat dinikmati dengan biaya langganan flat terjangkau — keuntungan penjualan 100% tetap
@@ -172,7 +172,7 @@
           Landasan Kami
         </span>
         <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
-          Visi &amp; Misi RestoLink
+          Visi &amp; Misi Dinely
         </h2>
         <p class="mt-2 text-sm text-slate-600">
           Prinsip fundamental yang mengarahkan setiap baris kode dan inovasi fitur yang kami kembangkan.
@@ -274,14 +274,14 @@
     <section
       id="tim-leadership"
       class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 sm:pt-24 lg:px-8 scroll-mt-32"
-      aria-label="Profil Pengembang RestoLink"
+      aria-label="Profil Pengembang Dinely"
     >
       <div class="text-center max-w-3xl mx-auto mb-12">
         <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-brand-700">
           Tim Leadership &amp; Engineering
         </span>
         <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl lg:text-4xl">
-          Para Pengembang di Balik RestoLink
+          Para Pengembang di Balik Dinely
         </h2>
         <p class="mt-3 text-sm sm:text-base leading-relaxed text-slate-600">
           Karya kolaboratif dari <strong class="text-slate-900">Tim Kepiting Purba — SMK Taruna Bhakti</strong>,

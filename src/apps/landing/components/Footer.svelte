@@ -20,14 +20,14 @@
 </script>
 
 <MotionFooter
-  heading={showCta ? ctaTitle : 'RestoLink Indonesia'}
+  heading={showCta ? ctaTitle : 'Dinely Indonesia'}
   subtitle={showCta ? ctaSubtitle : 'Digital Menu & Kitchen OS untuk seluruh UMKM Kuliner Indonesia.'}
   primaryCtaText={ctaButtonText}
   primaryCtaHref={ctaButtonHref}
   secondaryCtaText="Hubungi Tim Kami"
   secondaryCtaHref="/hubungi-kami"
-  giantText="RESTOLINK"
-  copyrightText="© 2026 RestoLink. Hak Cipta Dilindungi."
+  giantText="DINELY"
+  copyrightText="© 2026 Dinely. Hak Cipta Dilindungi."
   authorName="Kepiting Purba — SMK Taruna Bhakti"
 />
 

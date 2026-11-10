@@ -1,12 +1,12 @@
-# Task List: Upgrade Tampilan Login & Register RestoLink
+# Task List: Upgrade Tampilan Login & Register Dinely
 
 ## Phase 1: Redesign Halaman Masuk (Login)
 
 ### Task 1: Implementasi Split-Screen Layout & UI Modern Halaman Login (`/masuk`)
-**Description:** Mengubah layout single-card saat ini menjadi layout split-screen kelas dunia. Sisi kiri menampilkan panel branding RestoLink bertema dark slate dengan ilustrasi fitur andalan (katalog QR & manajemen dapur) dan kutipan testimoni UMKM. Sisi kanan menampilkan form masuk yang bersih dengan label modern, toggle intip kata sandi, dan navigasi balik.
+**Description:** Mengubah layout single-card saat ini menjadi layout split-screen kelas dunia. Sisi kiri menampilkan panel branding Dinely bertema dark slate dengan ilustrasi fitur andalan (katalog QR & manajemen dapur) dan kutipan testimoni UMKM. Sisi kanan menampilkan form masuk yang bersih dengan label modern, toggle intip kata sandi, dan navigasi balik.
 **Acceptance criteria:**
 - [ ] Layout split-screen 50:50 pada layar besar (`lg+`) dan full-width kartu rapi pada mobile (`< lg`)
-- [ ] Sisi kiri memuat logo RestoLink, tagline UMKM kuliner, kartu visual mockup, dan avatar Linka
+- [ ] Sisi kiri memuat logo Dinely, tagline UMKM kuliner, kartu visual mockup, dan avatar Linka
 - [ ] Sisi kanan memuat form login (email, kata sandi, toggle show password, tombol masuk)
 - [ ] Error alert saat kredensial salah tertampil jelas dan ramah pengguna
 - [ ] Modal pemulihan kata sandi tetap dapat dibuka dengan lancar
@@ -61,7 +61,7 @@
 ### Task 4: Polish Subdomain Live Checker Card & Interactive Feedback
 **Description:** Mempercantik kartu indikator subdomain dinamis agar tampak seperti live browser address bar mini dengan status ping animasi, badge ketersediaan (Tersedia / Sedang Dicek / Sudah Dipakai), dan preview format URL lengkap.
 **Acceptance criteria:**
-- [ ] Desain mock URL bar mini: `https://[subdomain].restolink.site` yang reaktif
+- [ ] Desain mock URL bar mini: `https://[subdomain].dinely.site` yang reaktif
 - [ ] Indikator animasi status: loading ping saat debounce, checklist hijau saat tersedia, silang merah saat tidak valid/sudah dipakai
 - [ ] Auto-slugify dari nama usaha tetap mulus tanpa lag
 **Verification:**

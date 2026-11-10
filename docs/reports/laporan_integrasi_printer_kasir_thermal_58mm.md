@@ -10,7 +10,7 @@
 
 ## 1. Ringkasan Eksekutif
 
-Dalam operasional usaha kuliner skala Kecil dan Menengah pada RestoLink, pencetakan bukti transaksi fisik (struk kasir) adalah kebutuhan vital untuk validasi antrean dapur dan kepercayaan pelanggan. Mengingat keterbatasan waktu dan fragmentasi ekosistem printer thermal portabel di Indonesia (mayoritas menggunakan printer thermal Bluetooth/USB 58mm buatan OEM tanpa sertifikasi driver khusus), diimplementasikan solusi cetak struk kasir berbasis **W3C CSS Paged Media (`@media print`)**.
+Dalam operasional usaha kuliner skala Kecil dan Menengah pada Dinely, pencetakan bukti transaksi fisik (struk kasir) adalah kebutuhan vital untuk validasi antrean dapur dan kepercayaan pelanggan. Mengingat keterbatasan waktu dan fragmentasi ekosistem printer thermal portabel di Indonesia (mayoritas menggunakan printer thermal Bluetooth/USB 58mm buatan OEM tanpa sertifikasi driver khusus), diimplementasikan solusi cetak struk kasir berbasis **W3C CSS Paged Media (`@media print`)**.
 
 Solusi ini mengeliminasi kebutuhan pairing Web Bluetooth manual yang rentan gagal di iOS/Safari, serta dapat langsung memanfaatkan **OS Print Spooler** bawaan pada perangkat Android, iOS, Windows, Mac, maupun POS Terminal.
 
@@ -115,7 +115,7 @@ Template `#thermal-receipt-58mm` memuat komponen:
    - Nyalakan printer thermal 58mm (Bluetooth atau kabel USB).
    - Sambungkan printer ke perangkat (HP Android, iPad, atau Laptop Kasir) via menu Bluetooth / Printer Settings OS.
 2. **Mencetak Struk Pesanan:**
-   - Masuk ke dashboard RestoLink menu **Antrean Pesanan**.
+   - Masuk ke dashboard Dinely menu **Antrean Pesanan**.
    - Klik ikon **Printer** pada kartu pesanan ATAU buka **Detail** dan klik **Cetak Struk (58mm)**.
    - Dialog cetak bawaan OS akan muncul. Pastikan ukuran kertas disetel ke `58mm` atau `Roll Paper`.
    - Klik **Print** (Cetak). Struk akan keluar dari printer thermal seketika.

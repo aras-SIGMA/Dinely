@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 004_TRIGGERS.SQL
+-- DINELY - 004_TRIGGERS.SQL
 -- Otomasi Database: Sinkronisasi Akun Auth, Proteksi Role, Billing, & Updated_At
 -- ==============================================================================
 

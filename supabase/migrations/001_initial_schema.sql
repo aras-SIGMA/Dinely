@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 001_INITIAL_SCHEMA.SQL
+-- DINELY - 001_INITIAL_SCHEMA.SQL
 -- DDL Tabel Utama, ENUMs, Relasi, Constraint, Index, dan Public View
 -- ==============================================================================
 

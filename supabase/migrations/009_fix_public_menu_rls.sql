@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 009_FIX_PUBLIC_MENU_RLS.SQL
+-- DINELY - 009_FIX_PUBLIC_MENU_RLS.SQL
 -- Perbaikan Akses RLS Publik (Anon) untuk Kategori dan Menu Restoran Aktif
 -- ==============================================================================
 -- Masalah sebelumnya: Policy SELECT pada categories dan menu_items melakukan subquery

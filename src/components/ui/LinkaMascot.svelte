@@ -15,7 +15,7 @@
     size = 'md',
     class: className = '',
     animated = false,
-    title = 'Linka — Maskot Resmi RestoLink'
+    title = 'Linka — Maskot Resmi Dinely'
   }: Props = $props();
 
   const sizeClasses: Record<MascotSize, string> = {
@@ -162,7 +162,7 @@
         stroke="#E2E8F0"
         stroke-width="1.5"
       />
-      <!-- Logo RestoLink Mini di Celemek (Piring / Garpu Petir) -->
+      <!-- Logo Dinely Mini di Celemek (Piring / Garpu Petir) -->
       <g transform="translate(60, 80) scale(0.65)">
         <circle cx="0" cy="0" r="8" fill="#F97316" />
         <!-- Simbol R/Garpu Putih -->
@@ -247,7 +247,7 @@
         <!-- Titik Kilap Antena -->
         <circle cx="58.5" cy="6.5" r="1.5" fill="#A7F3D0" />
 
-        <!-- Gelombang Sinyal Digital WiFi (RestoLink Connection) -->
+        <!-- Gelombang Sinyal Digital WiFi (Dinely Connection) -->
         <path
           d="M52 5 Q60 -1 68 5"
           fill="none"

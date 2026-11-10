@@ -117,10 +117,10 @@
       align: 'right',
       subMenus: [
         {
-          title: 'Mengenal RestoLink',
+          title: 'Mengenal Dinely',
           items: [
             {
-              label: 'Kisah RestoLink',
+              label: 'Kisah Dinely',
               description: 'Perjalanan & latar belakang',
               icon: 'book',
               href: '/tentang-kami#kisah'
@@ -324,7 +324,7 @@
         <a
           href="/"
           class="rounded-full p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-opacity hover:opacity-90"
-          aria-label="RestoLink Beranda"
+          aria-label="Dinely Beranda"
           onclick={closeMobileMenu}
         >
           <Logo size="sm" theme="light" />

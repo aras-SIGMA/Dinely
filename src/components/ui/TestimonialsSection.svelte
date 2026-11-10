@@ -19,7 +19,7 @@
     {
       id: 'nia',
       quote:
-        'Semenjak beralih ke RestoLink, pesanan tamu langsung masuk antrean tanpa ada nota kertas terselip lagi. Pelanggan juga senang scan QR langsung dari meja tanpa instal aplikasi.',
+        'Semenjak beralih ke Dinely, pesanan tamu langsung masuk antrean tanpa ada nota kertas terselip lagi. Pelanggan juga senang scan QR langsung dari meja tanpa instal aplikasi.',
       name: 'Nia Rahmawati',
       role: 'Pemilik Usaha',
       company: 'Dapur Nia (Depok)',
@@ -48,7 +48,7 @@
     {
       id: 'hendra',
       quote:
-        'Yang paling terasa itu 0% potongan komisi. Di aplikasi lain margin habis 20–25%, di RestoLink keuntungan penjualan 100% tetap masuk utuh ke kas resto.',
+        'Yang paling terasa itu 0% potongan komisi. Di aplikasi lain margin habis 20–25%, di Dinely keuntungan penjualan 100% tetap masuk utuh ke kas resto.',
       name: 'Hendra Setiawan',
       role: 'Owner',
       company: 'Sate Maranggi Pak De (Bogor)',

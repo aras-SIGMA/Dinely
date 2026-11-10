@@ -311,9 +311,9 @@
     {@const tenant = authStore.tenant}
     <div id="thermal-receipt-58mm" class="hidden font-mono text-[11px] leading-tight text-black" aria-hidden="true">
       <div class="text-center">
-        <p class="text-sm font-bold uppercase">{tenant?.business_name || 'RESTOLINK'}</p>
+        <p class="text-sm font-bold uppercase">{tenant?.business_name || 'DINELY'}</p>
         {#if tenant?.subdomain}
-          <p class="text-[10px]">{tenant.subdomain}.restolink.site</p>
+          <p class="text-[10px]">{tenant.subdomain}.dinely.site</p>
         {/if}
         {#if tenant?.contact_whatsapp || tenant?.contact_phone}
           <p class="text-[10px]">Telp: {tenant.contact_whatsapp || tenant.contact_phone}</p>
@@ -361,7 +361,7 @@
 
       <div class="text-center text-[10px]">
         <p>Terima Kasih Atas Pesanan Anda</p>
-        <p class="text-[8px] text-black">Powered by RestoLink</p>
+        <p class="text-[8px] text-black">Powered by Dinely</p>
         <div class="h-8"></div>
       </div>
     </div>

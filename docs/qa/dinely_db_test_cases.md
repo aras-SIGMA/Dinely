@@ -1,4 +1,4 @@
-# 10 Skenario Pengujian Keamanan & Integritas Database — RestoLink
+# 10 Skenario Pengujian Keamanan & Integritas Database — Dinely
 
 Dokumen ini berisi 10 skenario uji (*test cases*) beserta script SQL siap pakai yang dapat Anda jalankan langsung di **Supabase SQL Editor** (atau diberikan ke *coding agent* Anda) untuk memverifikasi apakah skema baru, RLS, Trigger, dan RPC sudah bebas dari celah keamanan maupun *bug* logika.
 

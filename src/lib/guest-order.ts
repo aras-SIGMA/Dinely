@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Guest Order Service (FS-12 / Milestone 6)
+ * DINELY - Guest Order Service (FS-12 / Milestone 6)
  * ============================================================================
  * Menyediakan fungsi pemesanan pelanggan (guest) tanpa login dan pelacakan status
  * pesanan via PostgreSQL RPC:

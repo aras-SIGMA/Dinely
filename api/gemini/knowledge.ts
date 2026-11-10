@@ -1,13 +1,13 @@
 /**
  * ============================================================================
- * RESTOLINK - Knowledge Base Produk (Single Source of Truth untuk Linka AI)
+ * DINELY - Knowledge Base Produk (Single Source of Truth untuk Linka AI)
  * ============================================================================
- * Sumber data terpusat untuk fakta produk RestoLink yang dipakai membangun
+ * Sumber data terpusat untuk fakta produk Dinely yang dipakai membangun
  * system prompt asisten Linka. Data paket di sini WAJIB sinkron dengan
  * `supabase/seed.sql` (tabel packages) dan konfigurasi fitur resmi.
  *
  * Jika harga/paket/fitur berubah, cukup ubah di sini dan prompt akan
- * teregenerasi otomatis (buildRestoLinkSystemPrompt).
+ * teregenerasi otomatis (buildDinelySystemPrompt).
  * ============================================================================
  */
 
@@ -32,10 +32,10 @@ export interface KnowledgeFaq {
   answer: string;
 }
 
-export const PLATFORM_NAME = 'RestoLink';
+export const PLATFORM_NAME = 'Dinely';
 export const ASSISTANT_NAME = 'Linka';
-export const PLATFORM_DOMAIN = 'restolink.site';
-export const SUPPORT_EMAIL = 'support@restolink.site';
+export const PLATFORM_DOMAIN = 'dinely.site';
+export const SUPPORT_EMAIL = 'stefanohari2@gmail.com';
 
 export const PACKAGES: KnowledgePackage[] = [
   {
@@ -74,7 +74,7 @@ export const FEATURES: KnowledgeFeature[] = [
   {
     title: 'Website Menu Digital',
     description:
-      'Website berbasis subdomain unik per usaha (contoh: warungmakan.restolink.site) yang langsung aktif dan cepat dibuka pelanggan via browser mobile.'
+      'Website berbasis subdomain unik per usaha (contoh: warungmakan.dinely.site) yang langsung aktif dan cepat dibuka pelanggan via browser mobile.'
   },
   {
     title: 'Manajemen Kategori & Menu',
@@ -101,12 +101,12 @@ export const FEATURES: KnowledgeFeature[] = [
 export const FAQ: KnowledgeFaq[] = [
   {
     question: 'Apakah ada biaya komisi per pesanan?',
-    answer: 'Tidak. RestoLink tidak memungut komisi potongan per pesanan (0% komisi). Anda hanya membayar langganan paket.'
+    answer: 'Tidak. Dinely tidak memungut komisi potongan per pesanan (0% komisi). Anda hanya membayar langganan paket.'
   },
   {
     question: 'Apakah bisa memakai domain sendiri?',
     answer:
-      'Saat ini setiap usaha mendapat subdomain unik gratis berakhiran restolink.site. Untuk domain kustom, silakan hubungi tim dukungan.'
+      'Saat ini setiap usaha mendapat subdomain unik gratis berakhiran dinely.site. Untuk domain kustom, silakan hubungi tim dukungan.'
   },
   {
     question: 'Bagaimana cara mencetak QR Code meja?',
@@ -131,7 +131,7 @@ export function packageSummary(pkg: KnowledgePackage): string {
   )}/6 bulan, ${formatRupiah(pkg.priceYearly)}/tahun. Uji coba ${pkg.trialDays} hari. ${pkg.highlight}`;
 }
 
-export function buildRestoLinkSystemPrompt(): string {
+export function buildDinelySystemPrompt(): string {
   const packagesText = PACKAGES.map((p) => packageSummary(p)).join('\n');
   const featuresText = FEATURES.map((f) => `- ${f.title}: ${f.description}`).join('\n');
   const faqText = FAQ.map((f) => `- T: ${f.question}\n  J: ${f.answer}`).join('\n');

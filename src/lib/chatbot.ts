@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Client Chatbot Service (FE-17 / Milestone 8)
+ * DINELY - Client Chatbot Service (FE-17 / Milestone 8)
  * ============================================================================
  * Menghubungkan widget chatbot landing page ke serverless endpoint
  * `/api/gemini/chat` secara aman tanpa mengekspos API key di browser.

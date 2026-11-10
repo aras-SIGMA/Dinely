@@ -207,7 +207,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       const sub = uploadType === 'logo' ? 'logos' : 'menus';
       targetFolder = targetTenant
         ? `restolink/tenants/${targetTenant.id}/${sub}`
-        : `restolink/${sub}`;
+        : `dinely/${sub}`;
     }
 
     // 6. Generate Timestamp & SHA-1 Signature Berbatas Waktu

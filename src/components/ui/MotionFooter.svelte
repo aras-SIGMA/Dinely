@@ -20,14 +20,14 @@
   };
 
   let {
-    giantText = 'RESTOLINK',
+    giantText = 'DINELY',
     heading = 'Siap Modernisasi UMKM Anda?',
     subtitle = 'Platform penyedia layanan pemesanan QR, manajemen dapur, dan kasir terpadu #1 di Indonesia.',
     primaryCtaText = 'Mulai Sekarang',
     primaryCtaHref = '/daftar',
     secondaryCtaText = 'Hubungi Tim Kami',
     secondaryCtaHref = '/hubungi-kami',
-    copyrightText = '© 2026 RestoLink. Hak Cipta Dilindungi.',
+    copyrightText = '© 2026 Dinely. Hak Cipta Dilindungi.',
     authorName = 'Kepiting Purba — SMK Taruna Bhakti'
   }: Props = $props();
 
@@ -298,7 +298,7 @@
           <!-- Instagram -->
           <span
             class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 cursor-default"
-            aria-label="Instagram RestoLink"
+            aria-label="Instagram Dinely"
             role="img"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -311,7 +311,7 @@
           <!-- TikTok -->
           <span
             class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 cursor-default"
-            aria-label="TikTok RestoLink"
+            aria-label="TikTok Dinely"
             role="img"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -326,7 +326,7 @@
             target="_blank"
             rel="noopener noreferrer"
             class="footer-glass-pill flex size-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-900"
-            aria-label="YouTube RestoLink"
+            aria-label="YouTube Dinely"
           >
             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -381,7 +381,7 @@
   .cinematic-footer-wrapper {
     -webkit-font-smoothing: antialiased;
 
-    /* Theme Dynamic Variables - RestoLink Light Theme */
+    /* Theme Dynamic Variables - Dinely Light Theme */
     --pill-bg-1: #ffffff;
     --pill-bg-2: #f8fafc;
     --pill-shadow: rgba(15, 23, 42, 0.04);

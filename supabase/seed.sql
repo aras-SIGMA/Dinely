@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - SEED DATA (DATA AWAL DATABASE & DEMO LOMBA GTNIC 2026)
+-- DINELY - SEED DATA (DATA AWAL DATABASE & DEMO LOMBA GTNIC 2026)
 -- ==============================================================================
 -- Petunjuk Eksekusi:
 -- 1. Pastikan migrasi skema tabel (001 s/d 008) sudah dijalankan.
@@ -63,7 +63,7 @@ ON CONFLICT (id) DO UPDATE SET
 -- ------------------------------------------------------------------------------
 -- 2. AKUN PENGGUNA DEMO (auth.users & public.profiles)
 -- ------------------------------------------------------------------------------
--- Akun 1: Platform Admin (admin@restolink.site / password123)
+-- Akun 1: Platform Admin (admin@dinely.site / password123)
 -- Akun 2: Tenant Owner (owner@dapur-nia.com / password123)
 DO $$
 DECLARE
@@ -95,13 +95,13 @@ BEGIN
       v_admin_id,
       'authenticated',
       'authenticated',
-      'admin@restolink.site',
+      'admin@dinely.site',
       crypt('password123', gen_salt('bf')),
       now(),
       now(),
       now(),
       '{"provider":"email","providers":["email"]}',
-      '{"full_name":"Super Admin RestoLink","phone":"081122334455"}',
+      '{"full_name":"Super Admin Dinely","phone":"081122334455"}',
       now(),
       now(),
       '',
@@ -113,10 +113,10 @@ BEGIN
 
   -- Insert/Ensure Profile Admin
   INSERT INTO public.profiles (id, full_name, phone, role)
-  VALUES (v_admin_id, 'Super Admin RestoLink', '081122334455', 'platform_admin')
+  VALUES (v_admin_id, 'Super Admin Dinely', '081122334455', 'platform_admin')
   ON CONFLICT (id) DO UPDATE SET
     role = 'platform_admin',
-    full_name = 'Super Admin RestoLink',
+    full_name = 'Super Admin Dinely',
     phone = '081122334455';
 
   -- Insert Demo Tenant Owner ke auth.users jika belum ada
@@ -172,7 +172,7 @@ $$;
 
 -- ------------------------------------------------------------------------------
 -- 3. TENANT UTAMA DEMO (Tabel: tenants)
--- Usaha: Dapur Bu Nia (Subdomain: dapur-nia.restolink.site)
+-- Usaha: Dapur Bu Nia (Subdomain: dapur-nia.dinely.site)
 -- ------------------------------------------------------------------------------
 INSERT INTO public.tenants (
   id,
@@ -409,7 +409,7 @@ INSERT INTO public.transactions (
   '00000000-0000-0000-0000-000000000001',
   'monthly',
   49000,
-  'RESTOLINK-SUB-DEMO01',
+  'DINELY-SUB-DEMO01',
   'trx-midtrans-sandbox-demo-01',
   'settlement',
   now() - interval '3 days',

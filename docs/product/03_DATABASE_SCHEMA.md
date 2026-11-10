@@ -1,4 +1,4 @@
-# Skema Database — RestoLink (Supabase / Postgres)
+# Skema Database — Dinely (Supabase / Postgres)
 
 > ⚠️ **Semua nama tabel, kolom, dan tipe data di dokumen ini adalah ASUMSI DESAIN** yang diturunkan dari requirement di `01_PRD.md` dan `02_ARCHITECTURE.md`. Proposal asli hanya menyebutkan entitas-entitas ini secara naratif (tenant, paket & langganan, transaksi pembayaran, kategori, menu, pesanan) tanpa skema literal. Validasi & sesuaikan dengan tim sebelum migrasi final — tapi struktur ini sudah konsisten dengan semua requirement fungsional di PRD dan bisa langsung dipakai sebagai titik awal.
 

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Platform Admin Store (FS-14 / Milestone 8)
+ * DINELY - Platform Admin Store (FS-14 / Milestone 8)
  * ============================================================================
  * Mengelola data lintas-tenant, riwayat transaksi Midtrans platform,
  * filter & pencarian, serta aksi manual override status untuk role platform_admin.

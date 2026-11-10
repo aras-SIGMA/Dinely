@@ -116,7 +116,7 @@
     {
       title: 'Etalase & Menu Digital',
       rows: [
-        { label: 'Website Subdomain Mandiri (*.restolink.site)', mikro: true, kecil: true, menengah: true },
+        { label: 'Website Subdomain Mandiri (*.dinely.site)', mikro: true, kecil: true, menengah: true },
         { label: 'Jumlah Menu & Kategori', mikro: 'Tanpa Batas', kecil: 'Tanpa Batas', menengah: 'Tanpa Batas' },
         { label: 'Optimasi Foto WebP Otomatis', mikro: true, kecil: true, menengah: true },
         { label: 'Kendali Stok Menu Instan (Tersedia / Habis)', mikro: true, kecil: true, menengah: true },
@@ -596,7 +596,7 @@
 
         <div class="overflow-x-auto overscroll-x-contain rounded-b-2xl">
           <table class="w-full min-w-[520px] sm:min-w-[620px] border-collapse text-left text-xs sm:text-sm">
-            <caption class="sr-only">Tabel Perbandingan Fitur Paket RestoLink</caption>
+            <caption class="sr-only">Tabel Perbandingan Fitur Paket Dinely</caption>
             <thead>
               <tr class="border-b border-slate-200 bg-slate-50/70">
                 <th

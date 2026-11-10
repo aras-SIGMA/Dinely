@@ -46,7 +46,7 @@
   <div
     role="status"
     aria-live="polite"
-    aria-label="Memuat aplikasi RestoLink"
+    aria-label="Memuat aplikasi Dinely"
     class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f7f3ea] transition-opacity duration-500 ease-out {isVisible
       ? 'opacity-100 pointer-events-auto'
       : 'opacity-0 pointer-events-none'}"

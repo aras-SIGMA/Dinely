@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 010_TENANT_ON_SIGNUP_TRIGGER.SQL
+-- DINELY - 010_TENANT_ON_SIGNUP_TRIGGER.SQL
 -- Otomasi Pembuatan Tenant Saat Registrasi Akun Auth (Dukungan Email OTP)
 -- ==============================================================================
 -- Masalah sebelumnya: Saat email confirmation aktif di Supabase, auth.signUp()

@@ -148,7 +148,7 @@
           </div>
 
           <p class="mt-1 text-xs text-slate-500">
-            <code class="rounded bg-slate-100 px-1.5 py-0.5">{tenant.subdomain}.restolink.site</code>
+            <code class="rounded bg-slate-100 px-1.5 py-0.5">{tenant.subdomain}.dinely.site</code>
           </p>
 
           {#if tenant.description}

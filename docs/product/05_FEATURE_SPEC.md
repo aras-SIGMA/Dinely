@@ -1,4 +1,4 @@
-# Feature Spec — RestoLink
+# Feature Spec — Dinely
 
 > Setiap fitur diberi label **[MVP Lomba]** atau **[Lanjutan]** sesuai `01_PRD.md` bag. 5. Kerjakan **[MVP Lomba]** dulu secara penuh sebelum menyentuh fitur **[Lanjutan]** — tapi desain skema/arsitektur tetap mempertimbangkan fitur lanjutan (NFR-08) seperti sudah dibahas di `02_ARCHITECTURE.md` dan `03_DATABASE_SCHEMA.md`.
 
@@ -12,12 +12,12 @@
 
 ### A2. Chatbot AI (Gemini API)
 - Hanya muncul di landing page utama platform.
-- Menjawab pertanyaan calon pengguna tentang: fitur RestoLink, paket layanan, proses pendaftaran, cara kerja platform.
+- Menjawab pertanyaan calon pengguna tentang: fitur Dinely, paket layanan, proses pendaftaran, cara kerja platform.
 - **Eksplisit TIDAK tersedia** di website publik tenant, dan **bukan** add-on tenant.
 - **AC**:
   - [ ] Chatbot widget hanya render di route landing page, tidak pernah render di dashboard atau tenant-site.
   - [ ] Chatbot bisa menjawab minimal 3 kategori pertanyaan: fitur, paket/harga, cara daftar.
-  - [ ] Ada fallback response yang sopan bila pertanyaan di luar topik RestoLink.
+  - [ ] Ada fallback response yang sopan bila pertanyaan di luar topik Dinely.
 
 ---
 

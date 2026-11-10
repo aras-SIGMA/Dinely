@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Formatter Utilities
+ * DINELY - Formatter Utilities
  * ============================================================================
  * Pemformatan standar Indonesia untuk mata uang Rupiah dan tanggal/waktu.
  * ============================================================================

@@ -1,6 +1,6 @@
 # Panduan Integrasi Email OTP 6-Digit (Supabase Auth + Gmail SMTP)
 
-Dokumen spesifikasi arsitektur dan langkah implementasi alur registrasi akun dan verifikasi email menggunakan kode OTP 6-digit otomatis via Gmail SMTP pada RestoLink.
+Dokumen spesifikasi arsitektur dan langkah implementasi alur registrasi akun dan verifikasi email menggunakan kode OTP 6-digit otomatis via Gmail SMTP pada Dinely.
 
 ---
 
@@ -32,7 +32,7 @@ Mengacu pada `package.json`:
 3. Supabase Auth generate 6-digit OTP -> Kirim via smtp.gmail.com
        │
        ▼
-4. Email masuk ke Gmail User: "Kode Verifikasi Akun RestoLink: 123456"
+4. Email masuk ke Gmail User: "Kode Verifikasi Akun Dinely: 123456"
        │
        ▼
 5. User input 6 digit di UI Register (Step 2)
@@ -169,15 +169,15 @@ Untuk membuat pengiriman OTP ke Gmail berjalan otomatis:
 1. Buka **Akun Google** (`myaccount.google.com`) -> menu **Keamanan** (Security).
 2. Pastikan **Verifikasi 2 Langkah** (2-Step Verification) sudah aktif.
 3. Cari menu **Sandi Aplikasi** (App Passwords).
-4. Buat nama aplikasi baru: `RestoLink SMTP`.
+4. Buat nama aplikasi baru: `Dinely SMTP`.
 5. Salin 16 karakter password yang diberikan (tanpa spasi).
 
 #### 2. Konfigurasi SMTP di Dashboard Supabase
 1. Masuk ke project Supabase -> **Project Settings** -> **Authentication** -> **SMTP Settings**.
 2. Nyalakan toggle **Enable Custom SMTP**.
 3. Masukkan parameter konfigurasi:
-   - **Sender email**: Alamat email Gmail Anda (misal: `restolink.auth@gmail.com`).
-   - **Sender name**: `RestoLink`.
+   - **Sender email**: Alamat email Gmail Anda (misal: `dinely.auth@gmail.com`).
+   - **Sender name**: `Dinely`.
    - **Host**: `smtp.gmail.com`.
    - **Port**: `587`.
    - **Minimum TLS Version**: `TLS 1.2`.
@@ -189,12 +189,12 @@ Untuk membuat pengiriman OTP ke Gmail berjalan otomatis:
 1. Masuk ke menu **Authentication** -> **Email Templates** -> pilih **Confirm signup**.
 2. Ubah **Subject** menjadi:
    ```
-   Kode Verifikasi RestoLink: {{ .Token }}
+   Kode Verifikasi Dinely: {{ .Token }}
    ```
 3. Ubah **Body** menjadi (atau sesuaikan desain HTML):
    ```html
-   <h2>Verifikasi Akun RestoLink</h2>
-   <p>Terima kasih telah mendaftar di RestoLink. Gunakan kode verifikasi 6 digit berikut untuk mengaktifkan akun Anda:</p>
+   <h2>Verifikasi Akun Dinely</h2>
+   <p>Terima kasih telah mendaftar di Dinely. Gunakan kode verifikasi 6 digit berikut untuk mengaktifkan akun Anda:</p>
    <h1 style="letter-spacing: 5px; font-size: 32px; color: #ea580c;">{{ .Token }}</h1>
    <p>Kode ini berlaku selama 60 menit. Jangan berikan kode ini kepada siapa pun.</p>
    ```

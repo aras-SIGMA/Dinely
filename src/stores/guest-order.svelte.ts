@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Guest Order Reactive Store (FS-12 / Milestone 6)
+ * DINELY - Guest Order Reactive Store (FS-12 / Milestone 6)
  * ============================================================================
  * Mengelola state interaktif proses pemesanan guest dan pelacakan status pesanan
  * secara real-time via polling ringan (10-15s).

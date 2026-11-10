@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Parser Markdown Ringan untuk Bubble Chatbot
+ * DINELY - Parser Markdown Ringan untuk Bubble Chatbot
  * ============================================================================
  * Menghasilkan struktur data (bukan string HTML) sehingga Svelte dapat
  * merender tanpa `innerHTML` — aman dari XSS. Mendukung subset markdown:

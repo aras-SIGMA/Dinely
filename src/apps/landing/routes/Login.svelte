@@ -180,7 +180,7 @@
 </script>
 
 <svelte:head>
-  <title>Masuk - RestoLink Platform</title>
+  <title>Masuk - Dinely Platform</title>
 </svelte:head>
 
 <main class="min-h-screen w-full bg-white text-slate-950 overflow-x-hidden relative flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-brand-500 selection:text-white">
@@ -214,7 +214,7 @@
       <a
         href="/"
         class="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-white/85 transition-all group drop-shadow-sm cursor-pointer"
-        title="Kembali ke Beranda RestoLink"
+        title="Kembali ke Beranda Dinely"
       >
         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -280,7 +280,7 @@
                 Hai, selamat datang <br class="hidden sm:inline" /> kembali
               </h1>
               <p class="mt-2 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                Baru di RestoLink?
+                Baru di Dinely?
                 <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
                   Daftar sekarang
                 </a>
@@ -532,7 +532,7 @@
 
   <!-- BOTTOM FOOTER -->
   <footer class="w-full text-center text-xs text-slate-400 py-2 relative z-10">
-    <p>&copy; {new Date().getFullYear()} RestoLink Platform. Hak Cipta Dilindungi.</p>
+    <p>&copy; {new Date().getFullYear()} Dinely Platform. Hak Cipta Dilindungi.</p>
   </footer>
 </main>
 
@@ -544,11 +544,11 @@
 >
   <div class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
     <p>
-      Untuk menjaga keamanan data transaksi dan akun usaha kuliner Anda, pemulihan kata sandi dilakukan melalui verifikasi tim operasional RestoLink.
+      Untuk menjaga keamanan data transaksi dan akun usaha kuliner Anda, pemulihan kata sandi dilakukan melalui verifikasi tim operasional Dinely.
     </p>
 
     <div class="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-1.5 font-mono text-xs text-slate-800">
-      <p><strong>Email Layanan:</strong> support@restolink.site</p>
+      <p><strong>Email Layanan:</strong> support@dinely.site</p>
       <p><strong>WhatsApp Bantuan:</strong> +62 812-3456-7890</p>
       <p class="text-[11px] text-slate-500 font-sans mt-2">
         Sertakan nama usaha, alamat email terdaftar, dan nama subdomain resto Anda saat mengirim permintaan pemulihan.

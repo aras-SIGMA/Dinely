@@ -22,7 +22,7 @@ export function sanitizeSlug(value: string): string | null {
  *
  * Evaluation Order:
  * 1. Query parameter override (`?tenant=slug` or `?t=slug`) for development & preview.
- * 2. Production domain (`slug.restolink.site`).
+ * 2. Production domain (`slug.dinely.site`).
  * 3. Localhost development (`slug.localhost`).
  * 4. Generic multi-level domain (`slug.customdomain.com`).
  *

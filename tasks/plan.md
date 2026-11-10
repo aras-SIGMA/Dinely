@@ -1,14 +1,14 @@
-# Implementation Plan: Redesign & Upgrade Tampilan Login & Register RestoLink
+# Implementation Plan: Redesign & Upgrade Tampilan Login & Register Dinely
 
 ## Overview
-Meningkatkan kualitas tampilan dan pengalaman pengguna (UI/UX) pada halaman **Masuk (`/masuk`)** dan **Daftar (`/daftar`)** RestoLink agar setara dengan standar web SaaS kelas juara (seperti CationGate, Stripe, dan Supabase). Peningkatan meliputi layout split-screen modern (50:50 desktop), showcase visual branding & mockup subdomain di panel kiri, formulir terstruktur dengan micro-interactions di panel kanan, serta fitur kemudahan pengujian bagi juri kompetisi (1-Click Demo Credentials).
+Meningkatkan kualitas tampilan dan pengalaman pengguna (UI/UX) pada halaman **Masuk (`/masuk`)** dan **Daftar (`/daftar`)** Dinely agar setara dengan standar web SaaS kelas juara (seperti CationGate, Stripe, dan Supabase). Peningkatan meliputi layout split-screen modern (50:50 desktop), showcase visual branding & mockup subdomain di panel kiri, formulir terstruktur dengan micro-interactions di panel kanan, serta fitur kemudahan pengujian bagi juri kompetisi (1-Click Demo Credentials).
 
 ## Architecture & Design Decisions
 1. **Layout Split-Screen Responsif**:
    - Desktop (`lg`): 2 kolom berdampingan. Sisi kiri menampilkan visual showcase bertema *Dark Premium Slate & Warm Brand Glow* dengan poin nilai tambah platform; sisi kanan menampilkan formulir bersih yang fokus dan elegan.
    - Mobile & Tablet (`< lg`): Stack vertikal yang rapi, memprioritaskan form dengan header brand yang ringkas agar tidak membebani scrolling di layar kecil.
 2. **Branding Showcase di Sisi Kiri**:
-   - Menampilkan kutipan nilai produk UMKM, kartu simulasi live website subdomain (`https://dapur-nia.restolink.site`), dan badge maskot Linka yang ramah.
+   - Menampilkan kutipan nilai produk UMKM, kartu simulasi live website subdomain (`https://dapur-nia.dinely.site`), dan badge maskot Linka yang ramah.
 3. **Formulir Terstruktur & Micro-Interactions**:
    - Halaman Register: Pengelompokan visual yang jelas antara **Data Usaha & Subdomain** dengan **Akun Pemilik & Keamanan**.
    - Live Subdomain Checker: Tampilan status ketersediaan subdomain yang lebih visual dan interaktif dengan preview URL instan.

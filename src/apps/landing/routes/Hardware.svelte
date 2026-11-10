@@ -267,10 +267,10 @@
 </script>
 
 <svelte:head>
-  <title>Kebutuhan Perangkat Keras (Hardware) — RestoLink</title>
+  <title>Kebutuhan Perangkat Keras (Hardware) — Dinely</title>
   <meta
     name="description"
-    content="Panduan kebutuhan perangkat keras RestoLink untuk Usaha Mikro, Kecil, dan Menengah. Cukup mulai dengan smartphone atau gunakan POS modern."
+    content="Panduan kebutuhan perangkat keras Dinely untuk Usaha Mikro, Kecil, dan Menengah. Cukup mulai dengan smartphone atau gunakan POS modern."
   />
 </svelte:head>
 

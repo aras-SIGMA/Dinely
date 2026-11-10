@@ -1,5 +1,5 @@
 -- ==============================================================================
--- RESTOLINK - 007_ORDER_SECURITY_HARDENING.SQL
+-- DINELY - 007_ORDER_SECURITY_HARDENING.SQL
 -- 1. Proteksi State Machine DB (Kunci pesanan selesai/batal dari manipulasi)
 -- 2. Anti-Spam Throttling & Anti-DoS Payload Cap pada create_guest_order
 -- 3. Kolom tracking_token & Anti-Enumeration Scraping pada get_guest_order_status

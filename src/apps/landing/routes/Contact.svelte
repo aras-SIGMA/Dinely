@@ -50,12 +50,12 @@
     {
       id: 'aktivasi',
       q: 'Berapa lama proses aktivasi subdomain menu digital?',
-      a: 'Sangat cepat — setelah berlangganan, Anda cukup memilih nama subdomain, mengisi menu, dan website Anda tampil dalam waktu kurang dari 5 menit. Panduan langkah demi langkah tersedia langsung di dashboard RestoLink.'
+      a: 'Sangat cepat — setelah berlangganan, Anda cukup memilih nama subdomain, mengisi menu, dan website Anda tampil dalam waktu kurang dari 5 menit. Panduan langkah demi langkah tersedia langsung di dashboard Dinely.'
     },
     {
       id: 'komisi',
-      q: 'Apakah benar RestoLink tidak memotong komisi penjualan?',
-      a: 'Benar. Seluruh hasil penjualan menu digital dan pemesanan QR meja 100% milik pelaku usaha. RestoLink hanya memungut biaya langganan flat bulanan, tanpa potongan per transaksi.'
+      q: 'Apakah benar Dinely tidak memotong komisi penjualan?',
+      a: 'Benar. Seluruh hasil penjualan menu digital dan pemesanan QR meja 100% milik pelaku usaha. Dinely hanya memungut biaya langganan flat bulanan, tanpa potongan per transaksi.'
     },
     {
       id: 'setup',
@@ -65,7 +65,7 @@
     {
       id: 'demo',
       q: 'Bisa minta demo langsung bersama tim di lokasi?',
-      a: 'Tentu. Ajukan permintaan kunjungan melalui formulir ini; Tim Kepiting Purba — SMK Taruna Bhakti akan menjadwalkan sesi demonstrasi langsung layanan RestoLink di basecamp kami.'
+      a: 'Tentu. Ajukan permintaan kunjungan melalui formulir ini; Tim Kepiting Purba — SMK Taruna Bhakti akan menjadwalkan sesi demonstrasi langsung layanan Dinely di basecamp kami.'
     }
   ];
 
@@ -138,7 +138,7 @@
         <AnimatedContent distance={24} duration={0.6} delay={0.35}>
           <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
             Punya pertanyaan seputar aktivasi subdomain, panduan paket langganan, atau bantuan
-            integrasi? Kirimkan pesan Anda — tim teknis RestoLink balas maksimal 1x24 jam kerja.
+            integrasi? Kirimkan pesan Anda — tim teknis Dinely balas maksimal 1x24 jam kerja.
           </p>
         </AnimatedContent>
       </div>
@@ -150,7 +150,7 @@
     <section
       id="formulir-kontak"
       class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 sm:pt-20 lg:px-8 scroll-mt-32"
-      aria-label="Kanal Bantuan dan Formulir Pesan RestoLink"
+      aria-label="Kanal Bantuan dan Formulir Pesan Dinely"
     >
       <div class="grid gap-10 lg:grid-cols-2 lg:gap-14">
         <!-- Kolom Kiri: Narasi, Kanal Langsung, & Komitmen -->
@@ -355,7 +355,7 @@
                       </svg>
                     </button>
                     <p class="mt-3 text-center text-xs text-slate-500">
-                      Pesan Anda bersifat privat &amp; hanya dibaca oleh tim inti RestoLink.
+                      Pesan Anda bersifat privat &amp; hanya dibaca oleh tim inti Dinely.
                     </p>
                   </div>
                 </div>

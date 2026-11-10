@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * RESTOLINK - Chatbot Reactive Store (FE-17 / Milestone 8)
+ * DINELY - Chatbot Reactive Store (FE-17 / Milestone 8)
  * ============================================================================
  * Mengelola state dialog percakapan asisten virtual AI di landing page
  * berbasis Svelte 5 Runes ($state).
@@ -23,12 +23,12 @@ const MAX_PERSISTED_MESSAGES = 60;
 const INITIAL_GREETING: UiChatMessage = {
   id: 'greeting-default',
   sender: 'assistant',
-  text: 'Halo! Saya Linka, maskot & asisten virtual resmi RestoLink. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
+  text: 'Halo! Saya Linka, maskot & asisten virtual resmi Dinely. Ada yang bisa saya bantu terkait fitur menu digital, cara pendaftaran, atau paket Mikro usaha Anda?',
   timestamp: new Date().toISOString()
 };
 
 export const QUICK_PROMPTS = [
-  'Apa itu RestoLink?',
+  'Apa itu Dinely?',
   'Berapa biaya paket Mikro?',
   'Bagaimana cara daftarnya?',
   'Apakah ada komisi per pesanan?'
@@ -90,7 +90,7 @@ class ChatbotStore {
       {
         id: `greeting-${Date.now()}`,
         sender: 'assistant',
-        text: 'Halo kembali! Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar RestoLink yang bisa saya bantu?',
+        text: 'Halo kembali! Percakapan telah direset. Saya Linka, ada pertanyaan lain seputar Dinely yang bisa saya bantu?',
         timestamp: new Date().toISOString()
       }
     ];

@@ -1,17 +1,17 @@
 /**
  * Konfigurasi Domain Utama Platform
  *
- * - Saat tahap produksi: ubah ke domain live Anda, misalnya 'restolink.site'.
+ * - Saat tahap produksi: ubah ke domain live Anda, misalnya 'dinely.site'.
  * - Saat tahap development lokal: resolver otomatis mendukung 'slug.localhost' (contoh: dapur-nia.localhost:5173).
- * - Jika menggunakan domain lain di Vercel (misal: 'restolink.vercel.app' atau custom domain lomba), sesuaikan nilai di sini.
+ * - Jika menggunakan domain lain di Vercel (misal: 'dinely.vercel.app' atau custom domain lomba), sesuaikan nilai di sini.
  */
-export const APP_DOMAIN = 'restolink.site';
+export const APP_DOMAIN = 'dinely.site';
 
 /**
  * Kontak Dukungan Resmi Platform
  * Sinkron dengan modal bantuan pada halaman Login.
  */
-export const SUPPORT_EMAIL = 'support@restolink.site';
+export const SUPPORT_EMAIL = 'stefanohari2@gmail.com';
 export const SUPPORT_WHATSAPP_DISPLAY = '+62 812-3456-7890';
 export const SUPPORT_WHATSAPP_NUMBER = '6281234567890';
 

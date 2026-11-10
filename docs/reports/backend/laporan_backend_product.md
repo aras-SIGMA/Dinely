@@ -5,7 +5,7 @@ Dokumen ini disusun oleh Backend Developer berdasarkan hasil penelaahan mendalam
 ---
 
 ## 1. Ringkasan Proyek
-RestoLink adalah platform web multi-tenant yang berfungsi sebagai pusat kendali terpadu bagi UMKM kuliner untuk mengelola profil, menu digital, dan pesanan secara terstruktur (`01_PRD.md`, `00_README.md`). Platform ini menyediakan website menu publik berbasis subdomain unik (`{slug}.restolink.site`) yang diselesaikan secara runtime di sisi client menggunakan satu basis kode frontend (`01_PRD.md`, `02_ARCHITECTURE.md`). Pemilik usaha mendaftar, memilih paket layanan (fokus MVP pada paket Mikro), dan membayar langganan melalui payment gateway Midtrans (`01_PRD.md`, `05_FEATURE_SPEC.md`). Aktivasi tenant dan paket hanya dapat dipicu oleh validasi server terhadap webhook resmi dari Midtrans (`02_ARCHITECTURE.md`, `04_USER_FLOWS.md`). Ruang lingkup MVP mencakup registrasi pemilik, manajemen menu dan pesanan sederhana, website publik untuk pemesanan tamu (guest checkout), chatbot AI informasi platform di landing page, serta dashboard admin platform (`01_PRD.md`, `05_FEATURE_SPEC.md`).
+Dinely adalah platform web multi-tenant yang berfungsi sebagai pusat kendali terpadu bagi UMKM kuliner untuk mengelola profil, menu digital, dan pesanan secara terstruktur (`01_PRD.md`, `00_README.md`). Platform ini menyediakan website menu publik berbasis subdomain unik (`{slug}.dinely.site`) yang diselesaikan secara runtime di sisi client menggunakan satu basis kode frontend (`01_PRD.md`, `02_ARCHITECTURE.md`). Pemilik usaha mendaftar, memilih paket layanan (fokus MVP pada paket Mikro), dan membayar langganan melalui payment gateway Midtrans (`01_PRD.md`, `05_FEATURE_SPEC.md`). Aktivasi tenant dan paket hanya dapat dipicu oleh validasi server terhadap webhook resmi dari Midtrans (`02_ARCHITECTURE.md`, `04_USER_FLOWS.md`). Ruang lingkup MVP mencakup registrasi pemilik, manajemen menu dan pesanan sederhana, website publik untuk pemesanan tamu (guest checkout), chatbot AI informasi platform di landing page, serta dashboard admin platform (`01_PRD.md`, `05_FEATURE_SPEC.md`).
 
 ---
 
@@ -15,7 +15,7 @@ Berdasarkan `02_ARCHITECTURE.md` (Bagian 1, 2, 4, 5, 7):
 * **Backend & Database**: Supabase (PostgreSQL), Supabase Auth, Row Level Security (RLS), serta RPC / Edge Functions / Serverless API routes untuk logika bisnis server.
 * **Asset Storage**: Cloudinary untuk penyimpanan logo usaha dan foto menu dalam format WebP yang dikompresi sebelum upload.
 * **Payment Gateway**: Midtrans (Snap / Sandbox) khusus untuk pembayaran paket langganan (bukan untuk pesanan pembeli).
-* **Hosting & Subdomain**: Vercel dengan konfigurasi wildcard subdomain (`*.restolink.site`).
+* **Hosting & Subdomain**: Vercel dengan konfigurasi wildcard subdomain (`*.dinely.site`).
 * **Chatbot AI**: Google Gemini API, hanya aktif di Landing Page utama platform.
 * **Konvensi & Aturan Arsitektur Penting**:
   1. *Data Isolation Guarantee*: Setiap tabel entitas tenant wajib memiliki kolom `tenant_id` dan dilindungi oleh RLS Supabase (`auth.uid() = owner_id`).
@@ -97,7 +97,7 @@ Berdasarkan `02_ARCHITECTURE.md`, `03_DATABASE_SCHEMA.md`, `05_FEATURE_SPEC.md`,
    * *Method & Path*: `POST` (Path: TIDAK JELAS di dokumen produk; disarankan `api/gemini/chat` atau Edge Function) (`05_FEATURE_SPEC.md` Bagian A2).
    * *Tujuan*: Menjadi perantara permintaan chat dari landing page ke Google Gemini API agar `GEMINI_API_KEY` tidak bocor ke bundle frontend.
    * *Validasi*: Format input pertanyaan user tidak kosong, rate limiting request.
-   * *Aturan Bisnis*: System prompt restriksi ketat (hanya seputar platform RestoLink: fitur, paket, cara daftar); sediakan fallback ramah jika pertanyaan di luar konteks.
+   * *Aturan Bisnis*: System prompt restriksi ketat (hanya seputar platform Dinely: fitur, paket, cara daftar); sediakan fallback ramah jika pertanyaan di luar konteks.
 
 ---
 
@@ -107,12 +107,12 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
 ### 5.1 Alur Registrasi, Checkout Paket, & Aktivasi Tenant
 1. User sign up via Supabase Auth -> backend membuat row di `profiles` (`role = 'owner'`) dan `tenants` (`status = 'pending'`).
 2. User memilih paket -> client meminta pembuatan transaksi -> backend membuat record di `transactions` (`status = 'pending'`) dan request Snap token ke Midtrans.
-3. User menyelesaikan pembayaran di Midtrans -> Midtrans mengirim HTTP POST notifikasi ke Webhook server RestoLink.
+3. User menyelesaikan pembayaran di Midtrans -> Midtrans mengirim HTTP POST notifikasi ke Webhook server Dinely.
 4. Backend memvalidasi signature SHA-512 -> update status `transactions` -> update `tenants.status` dari `'pending'` menjadi `'active'` (atau `'trial'`), mengisi `current_package_id`.
 5. Website publik tenant aktif dan dapat diakses pembeli.
 
 ### 5.2 Alur Pemesanan oleh Pembeli (Guest)
-1. Pembeli membuka `{subdomain}.restolink.site` -> frontend resolve subdomain melalui query publik ke `tenants`.
+1. Pembeli membuka `{subdomain}.dinely.site` -> frontend resolve subdomain melalui query publik ke `tenants`.
 2. Pembeli memasukkan menu ke keranjang dan menekan submit pesanan.
 3. Backend (via RPC/server) memvalidasi ketersediaan `menu_items.is_available` secara realtime.
 4. Backend mencatat `orders` baru dengan `status = 'baru'`, membuat `order_code`, dan menyimpan snapshot item ke `order_items`.
@@ -179,7 +179,7 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
 4. **Implementasi Pemesanan Guest**: Sudah tuntas via RPC PostgreSQL `create_guest_order` (M1) untuk menjamin atomisitas validasi ketersediaan menu dan snapshot harga.
 5. **Format `order_code`**: Sudah tuntas via generator di dalam RPC `create_guest_order` (M1).
 6. **Harga Paket Mikro**: **Rp 49.000** (final).
-7. **Arsitektur Chatbot Gemini**: Dipanggil via proxy backend `api/gemini/chat.ts` untuk menjaga kerahasiaan `GEMINI_API_KEY` dan membatasi respon hanya seputar produk RestoLink.
+7. **Arsitektur Chatbot Gemini**: Dipanggil via proxy backend `api/gemini/chat.ts` untuk menjaga kerahasiaan `GEMINI_API_KEY` dan membatasi respon hanya seputar produk Dinely.
 
 ---
 
@@ -203,7 +203,7 @@ Berdasarkan `04_USER_FLOWS.md` dan `02_ARCHITECTURE.md`:
    * Membangun endpoint signer (`api/cloudinary/sign-upload.ts`) untuk upload gambar menu dan logo ke Cloudinary secara aman.
 
 5. **Tahap 5: Chatbot AI Proxy (Gemini API)**
-   * Membangun endpoint proxy untuk request chat landing page menggunakan Gemini API dengan system prompt RestoLink dan proteksi API key.
+   * Membangun endpoint proxy untuk request chat landing page menggunakan Gemini API dengan system prompt Dinely dan proteksi API key.
 
 6. **Tahap 6: Pengujian Integrasi & Keamanan**
    * Uji coba webhook Midtrans di sandbox (skenario settlement, deny, expire, duplicate webhook).

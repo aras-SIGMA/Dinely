@@ -59,7 +59,7 @@ class TenantStore {
           .maybeSingle();
 
         if (error) {
-          console.error('[RestoLink] Gagal memuat data tenant:', error.message);
+          console.error('[Dinely] Gagal memuat data tenant:', error.message);
           this.error = error.message;
           this.tenant = null;
         } else {
@@ -67,7 +67,7 @@ class TenantStore {
         }
       } catch (err: any) {
         const message = err?.message ?? 'Terjadi kesalahan jaringan saat memuat tenant';
-        console.error('[RestoLink] Exception saat memuat tenant:', err);
+        console.error('[Dinely] Exception saat memuat tenant:', err);
         this.error = message;
         this.tenant = null;
       } finally {
