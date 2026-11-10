@@ -82,8 +82,12 @@
           localStorage.removeItem('restolink_remembered_email');
         }
 
-        const targetPath = homePathForRole(authStore.role);
-        router.navigate(targetPath as `/${string}`);
+        // Tampilkan layar verifikasi OTP setelah mencet tombol Masuk
+        step = 'otp';
+        startCountdown(60);
+        otpErrorMessage = '';
+        otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        return;
       } else {
         const errText = result.error?.toLowerCase() || '';
 
@@ -99,6 +103,7 @@
           startCountdown(60);
           otpErrorMessage = '';
           otpSuccessNotice = 'Silakan masukkan 6 digit kode verifikasi yang dikirimkan ke email Anda.';
+          return;
         } else if (errText.includes('invalid login credentials')) {
           errorMessage = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
         } else if (errText.includes('failed to fetch')) {
@@ -141,10 +146,22 @@
         }
         const targetPath = homePathForRole(authStore.role);
         router.navigate(targetPath as `/${string}`);
+      } else if (authStore.isAuthenticated) {
+        if (rememberMe && typeof localStorage !== 'undefined') {
+          localStorage.setItem('restolink_remember_me', 'true');
+          localStorage.setItem('restolink_remembered_email', email.trim());
+        }
+        const targetPath = homePathForRole(authStore.role);
+        router.navigate(targetPath as `/${string}`);
       } else {
         otpErrorMessage = result.error || 'Kode OTP tidak valid atau telah kedaluwarsa.';
       }
     } catch (err: unknown) {
+      if (authStore.isAuthenticated) {
+        const targetPath = homePathForRole(authStore.role);
+        router.navigate(targetPath as `/${string}`);
+        return;
+      }
       otpErrorMessage = err instanceof Error ? err.message : 'Gagal memverifikasi OTP. Silakan coba lagi.';
     } finally {
       isVerifyingOtp = false;
