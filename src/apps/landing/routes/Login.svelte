@@ -331,12 +331,6 @@
               <h1 class="text-2xl sm:text-3xl lg:text-[2.15rem] font-extrabold tracking-tight text-slate-900 leading-tight">
                 Hai, selamat datang <br class="hidden sm:inline" /> kembali
               </h1>
-              <p class="mt-2 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                Baru di RestoLink?
-                <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
-                  Daftar sekarang
-                </a>
-              </p>
             </div>
 
             <!-- Registered Success Notice Banner -->
@@ -434,8 +428,28 @@
                 </div>
               </div>
 
-              <!-- 3. Submit Button -->
-              <div class="pt-2">
+              <!-- 3. Remember Me & Forgot Password Links -->
+              <div class="pt-0.5 flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    bind:checked={rememberMe}
+                    class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 accent-brand-600 cursor-pointer"
+                  />
+                  <span class="text-xs font-semibold text-slate-600">Ingatkan saya</span>
+                </label>
+
+                <button
+                  type="button"
+                  onclick={() => (isForgotPasswordModalOpen = true)}
+                  class="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors"
+                >
+                  Lupa kata sandi?
+                </button>
+              </div>
+
+              <!-- 4. Submit Button -->
+              <div class="pt-1.5">
                 <button
                   type="submit"
                   disabled={isSubmitting || !isFormValid}
@@ -456,24 +470,14 @@
                 </button>
               </div>
 
-              <!-- 4. Remember Me & Forgot Password Links -->
-              <div class="pt-1 flex items-center justify-between">
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    bind:checked={rememberMe}
-                    class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 accent-brand-600 cursor-pointer"
-                  />
-                  <span class="text-xs font-semibold text-slate-600">Ingatkan saya</span>
-                </label>
-
-                <button
-                  type="button"
-                  onclick={() => (isForgotPasswordModalOpen = true)}
-                  class="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors"
-                >
-                  Lupa kata sandi?
-                </button>
+              <!-- 5. Register Link (Bottom Centered) -->
+              <div class="pt-3 text-center border-t border-slate-100/80">
+                <p class="text-xs sm:text-sm text-slate-500 font-medium">
+                  Baru di RestoLink?
+                  <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
+                    Daftar sekarang
+                  </a>
+                </p>
               </div>
             </form>
           </div>
