@@ -238,8 +238,8 @@
       return;
     }
 
-    if (formMenuPrice < 0) {
-      menuFormError = 'Harga tidak boleh bernilai negatif.';
+    if (!Number.isFinite(formMenuPrice) || formMenuPrice < 0 || formMenuPrice > 50000000) {
+      menuFormError = 'Harga menu harus wajar antara Rp 0 sampai Rp 50.000.000.';
       return;
     }
 
@@ -748,6 +748,7 @@
           type="number"
           id="form-price"
           min="0"
+          max="50000000"
           step="500"
           bind:value={formMenuPrice}
           required

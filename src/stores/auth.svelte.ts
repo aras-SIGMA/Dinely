@@ -337,11 +337,25 @@ class AuthStore {
   async verifyOtp(params: { email: string; token: string; type?: 'email' | 'signup' }): Promise<AuthActionResult> {
     const { email, token, type = 'signup' } = params;
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
+      let { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: token.trim(),
         type: (type === 'email' ? 'signup' : type) as 'signup' | 'email'
       });
+
+      // Fallback: jika type pertama gagal, coba type alternatif ('signup' vs 'email')
+      if (error && (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('expired'))) {
+        const altType = (type === 'signup' ? 'email' : 'signup') as 'signup' | 'email';
+        const alt = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: token.trim(),
+          type: altType
+        });
+        if (!alt.error && alt.data?.user) {
+          data = alt.data;
+          error = null;
+        }
+      }
 
       if (error) {
         return {

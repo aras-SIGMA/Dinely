@@ -121,12 +121,6 @@
 
   // State for hiding navbar during fullscreen StoryScroll
   let isStoryScrollActive = $state(false);
-
-  function handleHeroDropdownClick(tier: string) {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('restolink:tier-change', { detail: { tier } }));
-    }
-  }
 </script>
 
 <svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} />
@@ -177,13 +171,13 @@
           </h1>
 
           <!-- Description -->
-          <p class="mx-auto mt-5 max-w-2xl text-base text-slate-600 sm:text-lg sm:leading-relaxed">
+          <p class="mx-auto mt-3 sm:mt-5 max-w-2xl text-base text-slate-600 sm:text-lg sm:leading-relaxed">
             Beri pelanggan kemudahan melihat menu dan memesan langsung via browser di subdomain unik usaha Anda.
             Tanpa unduh aplikasi, tanpa potongan komisi 20% ojek online.
           </p>
 
-          <!-- Call to Action Buttons -->
-          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <!-- Call to Action Button -->
+          <div class="mt-5 sm:mt-8 flex items-center justify-center">
             <a href="/daftar" class="w-full sm:w-auto">
               <Button size="lg" full>
                 Mulai Trial 30 Hari Gratis
@@ -192,110 +186,10 @@
                 </svg>
               </Button>
             </a>
-            <!-- Interactive Hardware Button with Hover Preview Dropdown -->
-            <div class="relative w-full sm:w-auto group">
-              <a href="/hardware" class="w-full sm:w-auto inline-block">
-                <Button size="lg" variant="secondary" full>
-                  <svg class="size-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span>Kebutuhan Hardware</span>
-                  <svg class="size-3.5 text-slate-400 transition-transform duration-200 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
-                  </svg>
-                </Button>
-              </a>
-
-              <!-- Dropdown Hover Preview Card -->
-              <div
-                class="absolute left-1/2 -translate-x-1/2 top-full pt-2.5 z-40 w-80 max-w-[92vw] transition-all duration-200 pointer-events-none group-hover:pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0"
-              >
-                <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/15 text-left ring-1 ring-slate-900/5">
-                  <div class="px-2.5 pb-2 pt-1 border-b border-slate-100 flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Skala Usaha</span>
-                    <span class="text-[10px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Preview Alat</span>
-                  </div>
-
-                  <div class="mt-2 space-y-1">
-                    <!-- 1. Mikro -->
-                    <a
-                      href="/hardware?tier=mikro"
-                      onclick={() => handleHeroDropdownClick('mikro')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Mikro</span>
-                          <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">1 HP</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">1 unit Smartphone (Modal Rp0)</p>
-                      </div>
-                    </a>
-
-                    <!-- 2. Kecil -->
-                    <a
-                      href="/hardware?tier=kecil"
-                      onclick={() => handleHeroDropdownClick('kecil')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Kecil</span>
-                          <span class="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">5 Item</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">Tablet, Printer Struk & HP Staf</p>
-                      </div>
-                    </a>
-
-                    <!-- 3. Menengah -->
-                    <a
-                      href="/hardware?tier=menengah"
-                      onclick={() => handleHeroDropdownClick('menengah')}
-                      class="flex items-start gap-3 rounded-xl p-2.5 transition-all duration-150 hover:bg-brand-50/70 group/tier"
-                    >
-                      <div class="size-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover/tier:bg-brand-600 group-hover/tier:text-white transition-colors duration-150">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                          <span class="text-xs font-bold text-slate-900 group-hover/tier:text-brand-700">Usaha Menengah</span>
-                          <span class="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">8 Item</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">POS Station, KDS Dapur & Waiter</p>
-                      </div>
-                    </a>
-                  </div>
-
-                  <a
-                    href="/hardware"
-                    class="mt-2 block rounded-xl bg-slate-50 px-3 py-2 text-center text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                  >
-                    Buka Halaman Panduan Lengkap &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-            <a href="#harga" class="w-full sm:w-auto">
-              <Button size="lg" variant="ghost" full>
-                Skema Harga
-              </Button>
-            </a>
           </div>
 
           <!-- Trust Badges -->
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs font-medium text-slate-500">
+          <div class="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs font-medium text-slate-500">
             <div class="flex items-center gap-1.5">
               <svg class="size-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -322,156 +216,170 @@
           class="absolute bottom-[44px] sm:bottom-[48px] inset-x-0 z-10 w-full flex flex-col items-center justify-end overflow-visible pt-6 pb-0 pointer-events-auto transition-transform duration-75 ease-out"
           style="transform: translateY({stageTranslateY}%); will-change: transform;"
         >
-          <!-- Prominent Solid Brand Orange Semicircle Arch Backdrop (Enlarged & Bold) -->
-          <div
-            class="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 rounded-t-full bg-gradient-to-b from-brand-500 via-brand-500 to-brand-600 shadow-[0_25px_65px_rgba(234,88,12,0.42)] border-t-2 border-x-2 border-brand-400/40 z-0 transition-all duration-200"
-            style="width: min(98vw, {560 + spreadProgress * 480}px); height: {340 + spreadProgress * 260}px;"
-            aria-hidden="true"
-          ></div>
-
-          <!-- DESKTOP TRIO VIEW (Hidden on mobile < 1024px, Spread & Untwist on >= 1024px) -->
-          <div class="relative z-10 hidden lg:flex items-end justify-center w-full max-w-5xl mb-8 gap-8 xl:gap-12">
-            <!-- 1. IPHONE 14 PRO KIRI (Menu Digital) -->
+          <!-- ADAPTIVE VIEWPORT SCALER -->
+          <div class="hero-stage-scaler relative flex flex-col items-center justify-end w-full">
+            <!-- Prominent Solid Brand Orange Semicircle Arch Backdrop (Enlarged & Bold) -->
             <div
-              class="relative shrink-0 w-[240px] xl:w-[265px] h-[520px] xl:h-[575px] z-10 transition-all duration-200"
-              style="transform: translateX({spreadProgress * -40}px) rotate(-7deg); transform-origin: bottom center; will-change: transform;"
-            >
-              <div class="h-full w-full rounded-[44px] border-[7px] border-slate-900 bg-white shadow-[0_22px_45px_-10px_rgba(0,0,0,0.32),0_10px_20px_-6px_rgba(0,0,0,0.18)] hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.42),0_14px_25px_-6px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow">
-                <!-- Dynamic Island -->
-                <div class="h-4.5 w-22 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                  <div class="size-2 rounded-full bg-slate-800 mr-2"></div>
-                  <div class="size-1.5 rounded-full bg-slate-700"></div>
-                </div>
-                <!-- Status Bar -->
-                <div class="flex items-center justify-between px-5 pt-1 text-[10px] font-bold text-slate-800">
-                  <span>9:41</span>
-                  <div class="flex items-center gap-1 text-slate-700">
-                    <span class="text-[8px]">5G</span>
-                    <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
-                  </div>
-                </div>
-                <!-- Screen Content Placeholder: Menu Tamu -->
-                <div class="p-3.5 flex-1 flex flex-col justify-between">
-                  <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1 border border-slate-200">
-                    <span class="text-emerald-600">●</span>
-                    <span class="truncate">dapur-nia.restolink.site</span>
-                  </div>
-                  <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 text-center flex flex-col items-center justify-center">
-                    <div class="size-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 mb-1.5">
-                      <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
+              class="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 rounded-t-full bg-gradient-to-b from-brand-500 via-brand-500 to-brand-600 shadow-[0_25px_65px_rgba(234,88,12,0.42)] border-t-2 border-x-2 border-brand-400/40 z-0 transition-all duration-200"
+              style="width: min(98vw, {560 + spreadProgress * 480}px); height: {340 + spreadProgress * 260}px;"
+              aria-hidden="true"
+            ></div>
+
+            <!-- DESKTOP TRIO VIEW (Hidden on mobile < 1024px, Spread & Untwist on >= 1024px) -->
+            <div class="relative z-10 hidden lg:flex items-end justify-center w-full max-w-5xl mb-6 lg:mb-8 gap-5 xl:gap-10">
+              <!-- 1. IPHONE 12 KIRI (Menu Digital Pelanggan) -->
+              <div
+                class="relative shrink-0 w-[230px] xl:w-[255px] h-[500px] xl:h-[550px] z-10 transition-all duration-200"
+                style="transform: translateX({spreadProgress * -40}px) rotate(-7deg); transform-origin: bottom center; will-change: transform;"
+              >
+                <div class="h-full w-full rounded-[38px] border-[6px] border-slate-900 bg-white shadow-[0_22px_45px_-10px_rgba(0,0,0,0.32),0_10px_20px_-6px_rgba(0,0,0,0.18)] hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.42),0_14px_25px_-6px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <!-- Top Attached Notch -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 sm:h-4 w-24 sm:w-26 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-0.5 sm:h-1 w-8 sm:w-9 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
                     </div>
-                    <span class="text-[11px] font-bold text-slate-900">[AREA KATALOG MENU TAMU]</span>
-                    <p class="mt-1 text-[9px] text-slate-500 leading-snug">
-                      Daftar menu makanan, foto WebP ringan, harga promo, dan tombol + Pesan
-                    </p>
-                    <span class="mt-2.5 rounded-full bg-brand-600 text-white px-2.5 py-0.5 text-[8.5px] font-bold">
-                      Tampilan Pelanggan
-                    </span>
+                    <!-- Status Bar (Left & Right Ears) -->
+                    <div class="flex items-center justify-between px-4 sm:px-5 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1 text-slate-700">
+                        <span class="text-[8px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+
+                  <!-- Screen Content: Menu Tamu -->
+                  <div class="p-3.5 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1 border border-slate-200">
+                      <span class="text-emerald-600">●</span>
+                      <span class="truncate">dapur-nia.restolink.site</span>
+                    </div>
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 text-center flex flex-col items-center justify-center">
+                      <div class="size-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 mb-1.5">
+                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                      </div>
+                      <span class="text-[11px] font-bold text-slate-900">[AREA KATALOG MENU TAMU]</span>
+                      <p class="mt-1 text-[9px] text-slate-500 leading-snug">
+                        Daftar menu makanan, foto WebP ringan, harga promo, dan tombol + Pesan
+                      </p>
+                      <span class="mt-2.5 rounded-full bg-brand-600 text-white px-2.5 py-0.5 text-[8.5px] font-bold">
+                        Tampilan Pelanggan
+                      </span>
+                    </div>
+                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. IPHONE 12 TENGAH (Standee QR Code Meja) -->
+              <div
+                class="relative shrink-0 w-[250px] xl:w-[275px] h-[535px] xl:h-[585px] z-20 transition-all duration-200"
+                style="transform: translateX(0px) rotate(0deg); will-change: transform;"
+              >
+                <div class="h-full w-full rounded-[40px] border-[7px] border-slate-900 bg-white shadow-[0_26px_55px_-10px_rgba(0,0,0,0.38),0_12px_24px_-6px_rgba(0,0,0,0.22)] hover:shadow-[0_36px_70px_-10px_rgba(0,0,0,0.48),0_16px_28px_-6px_rgba(0,0,0,0.28)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <!-- Top Attached Notch -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-28 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-1 w-9 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                    </div>
+                    <!-- Status Bar (Left & Right Ears) -->
+                    <div class="flex items-center justify-between px-5 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1.5 text-slate-700">
+                        <span class="text-[9px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-4 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Screen Content: Standee QR Meja -->
+                  <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div class="rounded-xl bg-slate-900 text-white px-3 py-1.5 text-xs font-bold flex items-center justify-between">
+                      <span>Meja 04 • Resto Demo</span>
+                      <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    </div>
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-4 text-center flex flex-col items-center justify-center">
+                      <div class="size-12 rounded-2xl border-2 border-dashed border-amber-500 bg-white flex items-center justify-center text-amber-700 mb-2 shadow-2xs">
+                        <svg class="size-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                      </div>
+                      <span class="text-xs sm:text-sm font-extrabold text-slate-900">[AREA STANDEE QR CODE MEJA]</span>
+                      <p class="mt-1 text-[10px] text-slate-600 leading-relaxed max-w-[180px]">
+                        Tempat penempatan QR Code meja yang dapat di-scan langsung oleh pengunjung tanpa instal aplikasi
+                      </p>
+                      <span class="mt-3 rounded-full bg-slate-900 text-white px-3 py-0.5 text-[9px] font-bold shadow-xs">
+                        Scan Langsung via Kamera
+                      </span>
+                    </div>
+                    <div class="w-28 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. IPHONE 12 KANAN (Antrean Dapur Pemilik) -->
+              <div
+                class="relative shrink-0 w-[230px] xl:w-[255px] h-[500px] xl:h-[550px] z-10 transition-all duration-200"
+                style="transform: translateX({spreadProgress * 40}px) rotate(7deg); transform-origin: bottom center; will-change: transform;"
+              >
+                <div class="h-full w-full rounded-[38px] border-[6px] border-slate-900 bg-white shadow-[0_22px_45px_-10px_rgba(0,0,0,0.32),0_10px_20px_-6px_rgba(0,0,0,0.18)] hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.42),0_14px_25px_-6px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <!-- Top Attached Notch -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 sm:h-4 w-24 sm:w-26 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-0.5 sm:h-1 w-8 sm:w-9 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                    </div>
+                    <!-- Status Bar (Left & Right Ears) -->
+                    <div class="flex items-center justify-between px-4 sm:px-5 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1 text-slate-700">
+                        <span class="text-[8px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Screen Content: Antrean Dapur -->
+                  <div class="p-3.5 flex-1 flex flex-col justify-between">
+                    <div class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-800 flex items-center justify-between border border-slate-200">
+                      <span>Layar Dapur</span>
+                      <span class="text-[9px] text-brand-600 font-semibold">Live Sync</span>
+                    </div>
+                    <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-3 text-center flex flex-col items-center justify-center">
+                      <div class="size-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 mb-1.5">
+                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                      </div>
+                      <span class="text-[11px] font-bold text-slate-900">[AREA ANTREAN DAPUR PEMILIK]</span>
+                      <p class="mt-1 text-[9px] text-slate-500 leading-snug">
+                        Daftar tiket order masuk realtime, rincian item pesanan, dan tombol proses status dapur
+                      </p>
+                      <span class="mt-2.5 rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[8.5px] font-bold">
+                        Tampilan Pemilik Resto
+                      </span>
+                    </div>
+                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- 2. IPHONE 14 PRO TENGAH (Standee QR Code) -->
-            <div
-              class="relative shrink-0 w-[260px] xl:w-[285px] h-[560px] xl:h-[615px] z-20 transition-all duration-200"
-              style="transform: translateX(0px) rotate(0deg); will-change: transform;"
-            >
-              <div class="h-full w-full rounded-[48px] border-[8px] border-slate-900 bg-white shadow-[0_26px_55px_-10px_rgba(0,0,0,0.38),0_12px_24px_-6px_rgba(0,0,0,0.22)] hover:shadow-[0_36px_70px_-10px_rgba(0,0,0,0.48),0_16px_28px_-6px_rgba(0,0,0,0.28)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow">
-                <!-- Dynamic Island -->
-                <div class="h-5 w-24 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                  <div class="size-2 rounded-full bg-slate-800 mr-2"></div>
-                  <div class="size-1.5 rounded-full bg-slate-700"></div>
-                </div>
-                <!-- Status Bar -->
-                <div class="flex items-center justify-between px-6 pt-1 text-[10px] font-bold text-slate-800">
-                  <span>9:41</span>
-                  <div class="flex items-center gap-1.5 text-slate-700">
-                    <span class="text-[9px]">5G</span>
-                    <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    <div class="h-2 w-4 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
-                  </div>
-                </div>
-                <!-- Screen Content Placeholder: Standee QR Meja -->
-                <div class="p-4 flex-1 flex flex-col justify-between">
-                  <div class="rounded-xl bg-slate-900 text-white px-3 py-1.5 text-xs font-bold flex items-center justify-between">
-                    <span>Meja 04 • Resto Demo</span>
-                    <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  </div>
-                  <div class="my-auto rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/50 p-4 text-center flex flex-col items-center justify-center">
-                    <div class="size-12 rounded-2xl border-2 border-dashed border-amber-500 bg-white flex items-center justify-center text-amber-700 mb-2 shadow-2xs">
-                      <svg class="size-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                      </svg>
-                    </div>
-                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">[AREA STANDEE QR CODE MEJA]</span>
-                    <p class="mt-1 text-[10px] text-slate-600 leading-relaxed max-w-[180px]">
-                      Tempat penempatan QR Code meja yang dapat di-scan langsung oleh pengunjung tanpa instal aplikasi
-                    </p>
-                    <span class="mt-3 rounded-full bg-slate-900 text-white px-3 py-0.5 text-[9px] font-bold shadow-xs">
-                      Scan Langsung via Kamera
-                    </span>
-                  </div>
-                  <div class="w-28 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. IPHONE 14 PRO KANAN (Antrean Dapur) -->
-            <div
-              class="relative shrink-0 w-[240px] xl:w-[265px] h-[520px] xl:h-[575px] z-10 transition-all duration-200"
-              style="transform: translateX({spreadProgress * 40}px) rotate(7deg); transform-origin: bottom center; will-change: transform;"
-            >
-              <div class="h-full w-full rounded-[44px] border-[7px] border-slate-900 bg-white shadow-[0_22px_45px_-10px_rgba(0,0,0,0.32),0_10px_20px_-6px_rgba(0,0,0,0.18)] hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.42),0_14px_25px_-6px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col ring-1 ring-slate-800 transition-shadow">
-                <!-- Dynamic Island -->
-                <div class="h-4.5 w-22 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                  <div class="size-2 rounded-full bg-slate-800 mr-2"></div>
-                  <div class="size-1.5 rounded-full bg-slate-700"></div>
-                </div>
-                <!-- Status Bar -->
-                <div class="flex items-center justify-between px-5 pt-1 text-[10px] font-bold text-slate-800">
-                  <span>9:41</span>
-                  <div class="flex items-center gap-1 text-slate-700">
-                    <span class="text-[8px]">5G</span>
-                    <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
-                  </div>
-                </div>
-                <!-- Screen Content Placeholder: Antrean Dapur -->
-                <div class="p-3.5 flex-1 flex flex-col justify-between">
-                  <div class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-800 flex items-center justify-between border border-slate-200">
-                    <span>Layar Dapur</span>
-                    <span class="text-[9px] text-brand-600 font-semibold">Live Sync</span>
-                  </div>
-                  <div class="my-auto rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50/40 p-3 text-center flex flex-col items-center justify-center">
-                    <div class="size-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 mb-1.5">
-                      <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                      </svg>
-                    </div>
-                    <span class="text-[11px] font-bold text-slate-900">[AREA ANTREAN DAPUR PEMILIK]</span>
-                    <p class="mt-1 text-[9px] text-slate-500 leading-snug">
-                      Daftar tiket order masuk realtime, rincian item pesanan, dan tombol proses status dapur
-                    </p>
-                    <span class="mt-2.5 rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[8.5px] font-bold">
-                      Tampilan Pemilik Resto
-                    </span>
-                  </div>
-                  <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- MOBILE SWIPEABLE STACK VIEW (Visible only on < 1024px) -->
           <div class="relative z-10 flex lg:hidden flex-col items-center justify-center w-full pb-8 mb-0">
             <!-- Swipe Deck Container -->
             <div
-              class="relative w-[250px] sm:w-[270px] h-[440px] sm:h-[470px] flex items-center justify-center touch-pan-y"
+              class="relative w-[245px] sm:w-[265px] h-[435px] sm:h-[465px] flex items-center justify-center touch-pan-y"
               role="group"
               aria-label="Galeri mockup aplikasi (geser untuk melihat)"
               ontouchstart={handleTouchStart}
@@ -483,10 +391,21 @@
                   ? 'z-30 scale-100 rotate-0 opacity-100'
                   : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 w-24 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-0.5 w-8 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                    </div>
+                    <div class="flex items-center justify-between px-4 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1 text-slate-700">
+                        <span class="text-[8px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
                   </div>
                   <div class="p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1">
@@ -499,7 +418,7 @@
                         Foto menu WebP, harga promo, dan tombol pesan
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                    <div class="w-22 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
@@ -512,10 +431,21 @@
                     ? 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'
                     : 'z-10 scale-90 -rotate-12 -translate-x-10 opacity-50 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 w-24 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-0.5 w-8 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                    </div>
+                    <div class="flex items-center justify-between px-4 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1 text-slate-700">
+                        <span class="text-[8px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
                   </div>
                   <div class="p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-900 text-white px-2.5 py-1 text-[10px] font-bold flex items-center justify-between">
@@ -528,7 +458,7 @@
                         Scan kamera langsung tanpa instal aplikasi
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
+                    <div class="w-22 h-1 rounded-full bg-slate-400 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
@@ -539,10 +469,21 @@
                   ? 'z-30 scale-100 rotate-0 opacity-100'
                   : 'z-10 scale-90 rotate-12 translate-x-10 opacity-50 pointer-events-none'}"
               >
-                <div class="h-full w-full rounded-[42px] border-[7px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800">
-                  <div class="h-4.5 w-20 bg-slate-900 rounded-full mx-auto mt-2 flex items-center justify-center">
-                    <div class="size-1.5 rounded-full bg-slate-800 mr-1.5"></div>
-                    <div class="size-1 rounded-full bg-slate-700"></div>
+                <div class="h-full w-full rounded-[36px] sm:rounded-[38px] border-[6px] border-slate-900 bg-white shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-800 relative">
+                  <!-- iPhone 12 Top Bezel & Notch -->
+                  <div class="relative w-full bg-white select-none">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3.5 w-24 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5 z-20">
+                      <div class="h-0.5 w-8 rounded-full bg-slate-700/80"></div>
+                      <div class="size-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                    </div>
+                    <div class="flex items-center justify-between px-4 pt-1 text-[10px] font-bold text-slate-800 relative z-10">
+                      <span>9:41</span>
+                      <div class="flex items-center gap-1 text-slate-700">
+                        <span class="text-[8px]">5G</span>
+                        <svg class="size-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <div class="h-2 w-3.5 border border-slate-700 rounded-2xs p-0.5"><div class="h-full w-full bg-slate-800"></div></div>
+                      </div>
+                    </div>
                   </div>
                   <div class="p-4 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-800 flex items-center justify-between">
@@ -555,7 +496,7 @@
                         Tiket order masuk realtime dan alur status
                       </p>
                     </div>
-                    <div class="w-24 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
+                    <div class="w-22 h-1 rounded-full bg-slate-300 mx-auto mt-auto"></div>
                   </div>
                 </div>
               </div>
@@ -578,6 +519,7 @@
             <span class="mt-1.5 text-[10px] text-slate-400">Geser (swipe) layar untuk berganti mockup</span>
           </div>
         </div>
+      </div>
 
         <!-- C. BOTTOM MARQUEE TICKER BAR (Pinned on the baseline of sticky viewport) -->
         <div
@@ -825,202 +767,392 @@
     >
       <!-- LANGKAH 1 -->
       <FlowSection aria-label="Langkah 1: Registrasi Kilat" style="background-color: #ea580c; color: #ffffff;">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-90">01 / 05 — REGISTRASI KILAT</p>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <div>
-          <h3 class="text-[clamp(2.5rem,7vw,7rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
-            KLAIM<br />SUBDOMAIN<br />MANDIRI
-          </h3>
-        </div>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-white/95">
-          Miliki alamat website toko sendiri seperti <strong class="underline decoration-white/60">usaha-anda.restolink.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
-        </p>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <div class="flex flex-wrap gap-[3vw]">
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Subdomain Khusus</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Identitas resmi toko Anda, mudah diingat pembeli saat bertransaksi.
-            </p>
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between border-b border-white/20 pb-3 sm:pb-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center rounded-md bg-white/20 px-2 py-0.5 font-mono text-[11px] sm:text-xs font-bold text-white shadow-2xs">01</span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-white/95">REGISTRASI KILAT</span>
           </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Aktivasi Instan</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Langsung bisa dibagikan ke bio Instagram, TikTok, dan chat WhatsApp.
-            </p>
-          </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Cloud Hosting Bebas Biaya</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Infrastruktur server cepat terkelola penuh tanpa biaya langganan hosting terpisah.
-            </p>
+          <!-- Segmented Step Progress Indicator -->
+          <div class="flex items-center gap-1.5 opacity-90" aria-label="Langkah 1 dari 5">
+            <span class="h-1.5 w-6 sm:w-8 rounded-full bg-white transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
           </div>
         </div>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-white/70">
-          LANGKAH 01 — RESTOLINK PLATFORM
-        </p>
+
+        <!-- Middle Content (Desktop: Massive Title Left, 3 Sub-texts Right) -->
+        <div class="my-auto py-3 sm:py-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12 min-h-0">
+          <div class="flex-1 max-w-2xl xl:max-w-3xl min-w-0">
+            <h3 class="text-[clamp(2.5rem,6.2vw,5.5rem)] xl:text-[clamp(2.75rem,6.8vw,6.5rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
+              KLAIM<br />SUBDOMAIN<br />MANDIRI
+            </h3>
+            <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-white/95">
+              Miliki alamat website toko sendiri seperti <strong class="underline underline-offset-4 decoration-white/40 font-semibold">usaha-anda.restolink.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
+            </p>
+          </div>
+
+          <!-- 3 Sub-texts Relocated to Right Side -->
+          <div class="w-full lg:w-[380px] xl:w-[440px] shrink-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-3.5 lg:gap-4 bg-black/15 lg:bg-white/10 backdrop-blur-md p-4 sm:p-5 xl:p-6 rounded-2xl border border-white/20 shadow-xl shadow-black/5">
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                01
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Subdomain Khusus</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Identitas resmi toko Anda, mudah diingat pembeli saat bertransaksi.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-white/15 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                02
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Aktivasi Instan</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Langsung bisa dibagikan ke bio Instagram, TikTok, dan chat WhatsApp.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-white/15 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                03
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Cloud Hosting Bebas Biaya</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Infrastruktur server cepat terkelola penuh tanpa biaya langganan hosting terpisah.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-3 sm:pt-4 border-t border-white/20 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-white/70 shrink-0">
+          <span>LANGKAH 01 — 5 LANGKAH DIGITALISASI</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+        </div>
       </FlowSection>
 
       <!-- LANGKAH 2 -->
       <FlowSection aria-label="Langkah 2: Upload Menu & Foto WebP" style="background-color: #0f172a; color: #ffffff;">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">02 / 05 — KATALOG CERDAS</p>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <div>
-          <h3 class="text-[clamp(2.5rem,7vw,7rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
-            UPLOAD<br />FOTO WEBP<br />RINGAN
-          </h3>
-        </div>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-slate-300">
-          Unggah foto makanan dan rincian harga. Sistem otomatis mengompresi gambar ke WebP ringan hemat kuota (-93%), agar katalog terbuka secepat kilat di HP pembeli.
-        </p>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <div class="flex flex-wrap gap-[3vw]">
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Kompresi Ringan</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Optimasi WebP: 2.8 MB dikompresi jadi 190 KB seketika saat upload.
-            </p>
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between border-b border-white/15 pb-3 sm:pb-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center rounded-md bg-brand-500/20 border border-brand-500/30 px-2 py-0.5 font-mono text-[11px] sm:text-xs font-bold text-brand-400 shadow-2xs">02</span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-white">KATALOG CERDAS</span>
           </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Kendali Stok Instan</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Bahan baku habis? Geser toggle ke "Habis" dan website langsung terupdate.
-            </p>
-          </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Kategori Rapi</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Pisahkan menu makanan, minuman, dan paket promo dengan rapi.
-            </p>
+          <!-- Segmented Step Progress Indicator -->
+          <div class="flex items-center gap-1.5 opacity-80" aria-label="Langkah 2 dari 5">
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-6 sm:w-8 rounded-full bg-brand-400 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
           </div>
         </div>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 02 — RESTOLINK PLATFORM
-        </p>
+
+        <!-- Middle Content (Desktop: Massive Title Left, 3 Sub-texts Right) -->
+        <div class="my-auto py-3 sm:py-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12 min-h-0">
+          <div class="flex-1 max-w-2xl xl:max-w-3xl min-w-0">
+            <h3 class="text-[clamp(2.5rem,6.2vw,5.5rem)] xl:text-[clamp(2.75rem,6.8vw,6.5rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
+              UPLOAD<br />FOTO WEBP<br />RINGAN
+            </h3>
+            <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-slate-300">
+              Unggah foto makanan dan rincian harga. Sistem otomatis mengompresi gambar ke WebP ringan hemat kuota (-93%), agar katalog terbuka secepat kilat di HP pembeli.
+            </p>
+          </div>
+
+          <!-- 3 Sub-texts Relocated to Right Side -->
+          <div class="w-full lg:w-[380px] xl:w-[440px] shrink-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-3.5 lg:gap-4 bg-slate-800/80 backdrop-blur-md p-4 sm:p-5 xl:p-6 rounded-2xl border border-slate-700/80 shadow-xl shadow-black/20">
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-brand-500/20 border border-brand-400/40 text-[11px] font-mono font-bold text-brand-400 shrink-0 mt-0.5">
+                01
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Kompresi Ringan</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Optimasi WebP: 2.8 MB dikompresi jadi 190 KB seketika saat upload.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-700/60 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-brand-500/20 border border-brand-400/40 text-[11px] font-mono font-bold text-brand-400 shrink-0 mt-0.5">
+                02
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Kendali Stok Instan</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Bahan baku habis? Geser toggle ke "Habis" dan website langsung terupdate.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-700/60 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-brand-500/20 border border-brand-400/40 text-[11px] font-mono font-bold text-brand-400 shrink-0 mt-0.5">
+                03
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Kategori Rapi</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Pisahkan menu makanan, minuman, dan paket promo dengan rapi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-3 sm:pt-4 border-t border-white/15 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-slate-400 shrink-0">
+          <span>LANGKAH 02 — 5 LANGKAH DIGITALISASI</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+        </div>
       </FlowSection>
 
       <!-- LANGKAH 3 -->
       <FlowSection aria-label="Langkah 3: Pasang QR Meja & Link Medsos" style="background-color: #f7f3ea; color: #0f172a;">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-700">03 / 05 — AKSES TANPA INSTAL</p>
-        <hr class="my-[2vw] border-none border-t border-slate-300" />
-        <div>
-          <h3 class="text-[clamp(2.5rem,7vw,7rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-slate-900">
-            PASANG<br />QR MEJA &amp;<br />LINK BIO
-          </h3>
-        </div>
-        <hr class="my-[2vw] border-none border-t border-slate-300" />
-        <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-slate-700">
-          Cetak template QR Code meja atau sematkan tautan di bio media sosial. Tamu cukup scan kamera langsung di tempat duduk tanpa perlu unduh aplikasi apa pun.
-        </p>
-        <hr class="my-[2vw] border-none border-t border-slate-300" />
-        <div class="flex flex-wrap gap-[3vw]">
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900">Standee QR Otomatis</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-600">
-              Generator QR Meja 01 s/d Meja 20 siap cetak dalam resolusi tajam.
-            </p>
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between border-b border-amber-900/15 pb-3 sm:pb-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center rounded-md bg-brand-600/10 border border-brand-600/20 px-2 py-0.5 font-mono text-[11px] sm:text-xs font-bold text-brand-700 shadow-2xs">03</span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-slate-900">AKSES TANPA INSTAL</span>
           </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900">Guest Checkout</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-600">
-              Tamu tidak perlu mendaftar akun atau mengingat password.
-            </p>
-          </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-900">Browser Native</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-600">
-              Mulus di semua browser iPhone maupun Android tanpa unduh aplikasi.
-            </p>
+          <!-- Segmented Step Progress Indicator -->
+          <div class="flex items-center gap-1.5 opacity-80" aria-label="Langkah 3 dari 5">
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-slate-300 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-slate-300 transition-all"></span>
+            <span class="h-1.5 w-6 sm:w-8 rounded-full bg-brand-600 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-slate-300 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-slate-300 transition-all"></span>
           </div>
         </div>
-        <hr class="my-[2vw] border-none border-t border-slate-300" />
-        <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 03 — RESTOLINK PLATFORM
-        </p>
+
+        <!-- Middle Content (Desktop: Massive Title Left, 3 Sub-texts Right) -->
+        <div class="my-auto py-3 sm:py-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12 min-h-0">
+          <div class="flex-1 max-w-2xl xl:max-w-3xl min-w-0">
+            <h3 class="text-[clamp(2.5rem,6.2vw,5.5rem)] xl:text-[clamp(2.75rem,6.8vw,6.5rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-slate-900">
+              PASANG<br />QR MEJA &amp;<br />LINK BIO
+            </h3>
+            <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-slate-700">
+              Cetak template QR Code meja atau sematkan tautan di bio media sosial. Tamu cukup scan kamera langsung di tempat duduk tanpa perlu unduh aplikasi apa pun.
+            </p>
+          </div>
+
+          <!-- 3 Sub-texts Relocated to Right Side -->
+          <div class="w-full lg:w-[380px] xl:w-[440px] shrink-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-3.5 lg:gap-4 bg-white/85 backdrop-blur-md p-4 sm:p-5 xl:p-6 rounded-2xl border border-amber-900/10 shadow-xl shadow-amber-950/5">
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-amber-100 border border-amber-300 text-[11px] font-mono font-bold text-brand-800 shrink-0 mt-0.5">
+                01
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-slate-900">Standee QR Otomatis</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-600">
+                  Generator QR Meja 01 s/d Meja 20 siap cetak dalam resolusi tajam.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-200 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-amber-100 border border-amber-300 text-[11px] font-mono font-bold text-brand-800 shrink-0 mt-0.5">
+                02
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-slate-900">Guest Checkout</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-600">
+                  Tamu tidak perlu mendaftar akun atau mengingat password.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-200 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-amber-100 border border-amber-300 text-[11px] font-mono font-bold text-brand-800 shrink-0 mt-0.5">
+                03
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-slate-900">Browser Native</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-600">
+                  Mulus di semua browser iPhone maupun Android tanpa unduh aplikasi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-3 sm:pt-4 border-t border-amber-900/15 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-slate-500 shrink-0">
+          <span>LANGKAH 03 — 5 LANGKAH DIGITALISASI</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+        </div>
       </FlowSection>
 
       <!-- LANGKAH 4 -->
       <FlowSection aria-label="Langkah 4: Terima Pesanan di Layar Dapur" style="background-color: #c2410c; color: #ffffff;">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-90">04 / 05 — REALTIME SYNC</p>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <div>
-          <h3 class="text-[clamp(2.5rem,7vw,7rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
-            TERIMA<br />ORDER DI<br />LAYAR DAPUR
-          </h3>
-        </div>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-white/95">
-          Pesanan tamu seketika masuk ke antrean dapur secara realtime. Kelola alur status terstruktur dengan satu klik: Baru → Sedang Masak → Siap Antar tanpa resiko nota terselip.
-        </p>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <div class="flex flex-wrap gap-[3vw]">
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Live Kitchen Queue</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Notifikasi order baru langsung tampil di layar tablet atau HP dapur.
-            </p>
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between border-b border-white/20 pb-3 sm:pb-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center rounded-md bg-white/20 px-2 py-0.5 font-mono text-[11px] sm:text-xs font-bold text-white shadow-2xs">04</span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-white/95">REALTIME SYNC</span>
           </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Alur 3 Status Jelas</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Baru → Sedang Masak → Siap Antar, dapur tidak bingung mana yang prioritas.
-            </p>
-          </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Bebas Kertas Tercecer</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-white/80">
-              Eliminasi total 10% potensi salah catat dan kehilangan nota kertas manual.
-            </p>
+          <!-- Segmented Step Progress Indicator -->
+          <div class="flex items-center gap-1.5 opacity-80" aria-label="Langkah 4 dari 5">
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
+            <span class="h-1.5 w-6 sm:w-8 rounded-full bg-white transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/30 transition-all"></span>
           </div>
         </div>
-        <hr class="my-[2vw] border-none border-t border-white/20" />
-        <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-white/70">
-          LANGKAH 04 — RESTOLINK PLATFORM
-        </p>
+
+        <!-- Middle Content (Desktop: Massive Title Left, 3 Sub-texts Right) -->
+        <div class="my-auto py-3 sm:py-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12 min-h-0">
+          <div class="flex-1 max-w-2xl xl:max-w-3xl min-w-0">
+            <h3 class="text-[clamp(2.5rem,6.2vw,5.5rem)] xl:text-[clamp(2.75rem,6.8vw,6.5rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
+              TERIMA<br />ORDER DI<br />LAYAR DAPUR
+            </h3>
+            <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-white/95">
+              Pesanan tamu seketika masuk ke antrean dapur secara realtime. Kelola alur status terstruktur dengan satu klik: Baru &rarr; Sedang Masak &rarr; Siap Antar tanpa resiko nota terselip.
+            </p>
+          </div>
+
+          <!-- 3 Sub-texts Relocated to Right Side -->
+          <div class="w-full lg:w-[380px] xl:w-[440px] shrink-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-3.5 lg:gap-4 bg-black/15 lg:bg-white/10 backdrop-blur-md p-4 sm:p-5 xl:p-6 rounded-2xl border border-white/20 shadow-xl shadow-black/5">
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                01
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Live Kitchen Queue</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Notifikasi order baru langsung tampil di layar tablet atau HP dapur.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-white/15 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                02
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Alur 3 Status Jelas</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Baru &rarr; Sedang Masak &rarr; Siap Antar, dapur tidak bingung mana yang prioritas.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-white/15 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-white/20 border border-white/30 text-[11px] font-mono font-bold text-white shrink-0 mt-0.5">
+                03
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Bebas Kertas Tercecer</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-white/80">
+                  Eliminasi total 10% potensi salah catat dan kehilangan nota kertas manual.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-3 sm:pt-4 border-t border-white/20 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-white/70 shrink-0">
+          <span>LANGKAH 04 — 5 LANGKAH DIGITALISASI</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+        </div>
       </FlowSection>
 
       <!-- LANGKAH 5 -->
       <FlowSection aria-label="Langkah 5: Rekap Omset & Untung 100%" style="background-color: #020617; color: #ffffff;">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">05 / 05 — 0% KOMISI</p>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <div>
-          <h3 class="text-[clamp(2.5rem,7vw,7rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
-            REKAP OMSET<br />UNTUNG 100%<br />MILIK ANDA
-          </h3>
-        </div>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <p class="max-w-[55ch] text-[clamp(1rem,2vw,1.75rem)] font-normal leading-relaxed text-slate-300">
-          Pantau seluruh riwayat transaksi harian secara transparan. Seluruh rupiah dari pesanan pelanggan adalah 100% hak pemilik usaha tanpa potongan komisi 20% seperti ojek online.
-        </p>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <div class="flex flex-wrap gap-[3vw]">
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">0% Komisi Pesanan</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Bebas bagi hasil. Omset penjualan masuk utuh ke rekening usaha Anda.
-            </p>
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between border-b border-white/15 pb-3 sm:pb-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center rounded-md bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 font-mono text-[11px] sm:text-xs font-bold text-emerald-400 shadow-2xs">05</span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-white">0% KOMISI PESANAN</span>
           </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Laporan Transparan</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Pantau item terlaris, jam sibuk, dan total pesanan selesai per hari.
-            </p>
-          </div>
-          <div class="min-w-[180px] flex-1">
-            <p class="mb-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-white">Kendali Finansial Penuh</p>
-            <p class="text-[clamp(0.85rem,1.2vw,1rem)] leading-relaxed text-slate-400">
-              Atur harga promo mandiri tanpa potongan margin sepihak.
-            </p>
+          <!-- Segmented Step Progress Indicator -->
+          <div class="flex items-center gap-1.5 opacity-80" aria-label="Langkah 5 dari 5">
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-2 sm:w-2.5 rounded-full bg-white/20 transition-all"></span>
+            <span class="h-1.5 w-6 sm:w-8 rounded-full bg-emerald-400 transition-all"></span>
           </div>
         </div>
-        <hr class="my-[2vw] border-none border-t border-white/15" />
-        <p class="mt-auto ml-auto text-right text-xs sm:text-sm font-mono tracking-wider text-slate-500">
-          LANGKAH 05 — RESTOLINK PLATFORM
-        </p>
+
+        <!-- Middle Content (Desktop: Massive Title Left, 3 Sub-texts Right) -->
+        <div class="my-auto py-3 sm:py-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-12 min-h-0">
+          <div class="flex-1 max-w-2xl xl:max-w-3xl min-w-0">
+            <h3 class="text-[clamp(2.5rem,6.2vw,5.5rem)] xl:text-[clamp(2.75rem,6.8vw,6.5rem)] font-extrabold leading-[0.88] uppercase tracking-tight text-white">
+              REKAP OMSET<br />UNTUNG 100%<br />MILIK ANDA
+            </h3>
+            <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-slate-300">
+              Pantau seluruh riwayat transaksi harian secara transparan. Seluruh rupiah dari pesanan pelanggan adalah 100% hak pemilik usaha tanpa potongan komisi 20% seperti ojek online.
+            </p>
+          </div>
+
+          <!-- 3 Sub-texts Relocated to Right Side -->
+          <div class="w-full lg:w-[380px] xl:w-[440px] shrink-0 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-3.5 lg:gap-4 bg-slate-900/80 backdrop-blur-md p-4 sm:p-5 xl:p-6 rounded-2xl border border-emerald-500/25 shadow-xl shadow-black/30">
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-mono font-bold text-emerald-400 shrink-0 mt-0.5">
+                01
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">0% Komisi Pesanan</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Bebas bagi hasil. Omset penjualan masuk utuh ke rekening usaha Anda.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-800/80 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-mono font-bold text-emerald-400 shrink-0 mt-0.5">
+                02
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Laporan Transparan</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Pantau item terlaris, jam sibuk, dan total pesanan selesai per hari.
+                </p>
+              </div>
+            </div>
+            <div class="h-px w-full bg-slate-800/80 hidden lg:block"></div>
+            <div class="flex items-start gap-3 min-w-0">
+              <span class="flex items-center justify-center size-6.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-mono font-bold text-emerald-400 shrink-0 mt-0.5">
+                03
+              </span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-bold tracking-wide text-white">Kendali Finansial Penuh</h4>
+                <p class="mt-0.5 text-xs sm:text-[13px] leading-snug sm:leading-relaxed text-slate-400">
+                  Atur harga promo mandiri tanpa potongan margin sepihak.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-3 sm:pt-4 border-t border-white/15 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-slate-400 shrink-0">
+          <span>LANGKAH 05 — 5 LANGKAH DIGITALISASI</span>
+          <div class="flex items-center gap-2 pr-16 sm:pr-24 lg:pr-32">
+            <a
+              href="/daftar"
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-1.5 text-xs transition-all shadow-md active:scale-95"
+            >
+              <span>Mulai Digitalisasi Sekarang</span>
+              <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
       </FlowSection>
     </StoryScroll>
 
@@ -1077,3 +1209,47 @@
 
   <Footer />
 </div>
+
+<style>
+  /* Adaptive scaling for hero 3-phone centerpiece showcase on short viewports / non-fullscreen */
+  .hero-stage-scaler {
+    transform-origin: bottom center;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (min-width: 1024px) and (max-height: 850px) {
+    .hero-stage-scaler {
+      transform: scale(0.88);
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 750px) {
+    .hero-stage-scaler {
+      transform: scale(0.78);
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 660px) {
+    .hero-stage-scaler {
+      transform: scale(0.68);
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 560px) {
+    .hero-stage-scaler {
+      transform: scale(0.58);
+    }
+  }
+
+  @media (max-width: 1023px) and (max-height: 720px) {
+    .hero-stage-scaler {
+      transform: scale(0.88);
+    }
+  }
+
+  @media (max-width: 1023px) and (max-height: 620px) {
+    .hero-stage-scaler {
+      transform: scale(0.78);
+    }
+  }
+</style>
