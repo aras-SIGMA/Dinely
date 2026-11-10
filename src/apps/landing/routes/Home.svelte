@@ -16,16 +16,12 @@
   // ===========================================================================
   let scrollY = $state(0);
   let windowHeight = $state(800);
-  let windowWidth = $state(1200);
   let prefersReducedMotion = $state(false);
-
-  const isDesktop = $derived(windowWidth >= 1024);
 
   function updateScrollMetrics() {
     if (typeof window !== 'undefined') {
       scrollY = window.scrollY;
       windowHeight = window.innerHeight;
-      windowWidth = window.innerWidth;
     }
   }
 
@@ -60,7 +56,7 @@
     prefersReducedMotion ? 1 : Math.min(1, Math.max(0, heroProgress / 0.28))
   );
   const stageTranslateY = $derived(
-    prefersReducedMotion ? 0 : (1 - stageRise) * (isDesktop ? 110 : 45)
+    prefersReducedMotion ? 0 : (1 - stageRise) * 115
   );
 
   // Spread and untwist progress: 0.28 -> 0.78 (leaves 0.78 -> 1.00 completely static & held)
@@ -133,7 +129,7 @@
   }
 </script>
 
-<svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} />
+<svelte:window bind:scrollY={scrollY} bind:innerHeight={windowHeight} />
 
 <div class="flex min-h-screen flex-col bg-white text-slate-900">
   <Navbar hidden={isStoryScrollActive} />
@@ -636,7 +632,7 @@
       <!-- ======================================================================= -->
       <section
         id="masalah-umkm"
-        class="relative z-20 w-full border-t border-slate-200/90 bg-slate-50 shadow-[0_-30px_70px_rgba(0,0,0,0.25)] py-16 sm:py-24 overflow-hidden"
+        class="relative z-20 w-full border-t border-slate-200/90 bg-slate-50 shadow-[0_-30px_70px_rgba(0,0,0,0.25)] pt-24 pb-16 sm:py-24 overflow-hidden"
       >
         <!-- 54px Architectural Grid with Radial Mask (from smooth-scroll component) -->
         <div class="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,#cbd5e135_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e135_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)]"></div>
