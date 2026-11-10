@@ -27,6 +27,7 @@ class AuthStore {
   loading = $state(true);
   profile = $state<Profile | null>(null);
   tenant = $state<Tenant | null>(null);
+  pending2FAEmail = $state<string | null>(null);
 
   #ready: Promise<void>;
   #resolveReady!: () => void;
@@ -334,13 +335,100 @@ class AuthStore {
     };
   }
 
+  /**
+   * Tahap 1 Login 2FA:
+   * 1. Validasi password via signInWithPassword.
+   * 2. Jika valid, karantina sesi (signOut) seketika agar tidak bypass sebelum OTP.
+   * 3. Terbitkan dan kirim 6-digit OTP asli via signInWithOtp.
+   */
+  async loginWith2FA(params: SignInParams): Promise<{
+    success: boolean;
+    error?: string;
+    otpRequired?: boolean;
+    otpType?: 'email' | 'signup';
+    message?: string;
+  }> {
+    const { email, password } = params;
+    const cleanEmail = email.trim();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
+      password
+    });
+
+    if (error) {
+      const errText = error.message.toLowerCase();
+      // Akun unconfirmed signup (belum verifikasi pendaftaran)
+      if (
+        errText.includes('email not confirmed') ||
+        errText.includes('not confirmed') ||
+        errText.includes('verify') ||
+        errText.includes('confirmation')
+      ) {
+        await this.resendOtp({ email: cleanEmail, type: 'signup' });
+        this.pending2FAEmail = cleanEmail;
+        return {
+          success: true,
+          otpRequired: true,
+          otpType: 'signup',
+          message: 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda untuk mengaktifkan akun.'
+        };
+      }
+
+      if (errText.includes('invalid login credentials')) {
+        return {
+          success: false,
+          error: 'Email atau kata sandi tidak cocok. Silakan periksa kembali.'
+        };
+      }
+
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+
+    if (!data.user) {
+      return {
+        success: false,
+        error: 'Data pengguna tidak ditemukan.'
+      };
+    }
+
+    // Password benar: Cabut sesi aktif seketika (Karantina 2FA)
+    await supabase.auth.signOut();
+    this.profile = null;
+    this.tenant = null;
+    this.pending2FAEmail = cleanEmail;
+
+    // Terbitkan dan kirim 6-digit OTP asli via signInWithOtp
+    const otpRes = await supabase.auth.signInWithOtp({
+      email: cleanEmail,
+      options: { shouldCreateUser: false }
+    });
+
+    if (otpRes.error) {
+      return {
+        success: false,
+        error: otpRes.error.message || 'Gagal mengirim kode OTP ke email. Silakan coba lagi.'
+      };
+    }
+
+    return {
+      success: true,
+      otpRequired: true,
+      otpType: 'email',
+      message: 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.'
+    };
+  }
+
   async verifyOtp(params: { email: string; token: string; type?: 'email' | 'signup' }): Promise<AuthActionResult> {
     const { email, token, type = 'signup' } = params;
     try {
       let { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: token.trim(),
-        type: (type === 'email' ? 'signup' : type) as 'signup' | 'email'
+        type: type as 'signup' | 'email'
       });
 
       // Fallback: jika type pertama gagal, coba type alternatif ('signup' vs 'email')
@@ -363,6 +451,8 @@ class AuthStore {
           error: error.message || 'Kode OTP tidak valid atau telah kedaluwarsa.'
         };
       }
+
+      this.pending2FAEmail = null;
 
       if (data.user) {
         await Promise.all([
@@ -398,8 +488,19 @@ class AuthStore {
       return { success: false, error: 'Email tidak boleh kosong.' };
     }
     try {
+      if (type === 'email') {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: false }
+        });
+        if (error) {
+          return { success: false, error: error.message };
+        }
+        return { success: true };
+      }
+
       const { error } = await supabase.auth.resend({
-        type: (type === 'email' ? 'signup' : type) as 'signup' | 'email_change',
+        type: 'signup',
         email
       });
 
@@ -413,6 +514,7 @@ class AuthStore {
   }
 
   async signOut(): Promise<void> {
+    this.pending2FAEmail = null;
     await supabase.auth.signOut();
     this.profile = null;
     this.tenant = null;

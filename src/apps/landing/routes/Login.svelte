@@ -24,6 +24,7 @@
 
   // OTP States
   let otpCode = $state('');
+  let otpType = $state<'email' | 'signup'>('email');
   let isVerifyingOtp = $state(false);
   let otpErrorMessage = $state('');
   let otpSuccessNotice = $state('');
@@ -59,8 +60,9 @@
       const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       const isFromRegistration = registeredNotice !== '' || params?.get('registered') === 'true';
 
-      // Pas abis mencet tombol "Masuk", jika akun baru registrasi langsung tampilkan verifikasi OTP
+      // Pas abis mencet tombol "Masuk", jika akun baru registrasi langsung tampilkan verifikasi OTP signup
       if (isFromRegistration) {
+        otpType = 'signup';
         step = 'otp';
         startCountdown(60);
         otpErrorMessage = '';
@@ -68,49 +70,28 @@
         return;
       }
 
-      const result = await authStore.signIn({
+      // Validasi kredensial password & kirim kode OTP login (2FA Karantina)
+      const result = await authStore.loginWith2FA({
         email: email.trim(),
         password
       });
 
-      if (result.success) {
+      if (result.success && result.otpRequired) {
         if (rememberMe && typeof localStorage !== 'undefined') {
           localStorage.setItem('restolink_remember_me', 'true');
           localStorage.setItem('restolink_remembered_email', email.trim());
-        } else if (typeof localStorage !== 'undefined') {
-          localStorage.removeItem('restolink_remember_me');
-          localStorage.removeItem('restolink_remembered_email');
         }
 
-        // Tampilkan layar verifikasi OTP setelah mencet tombol Masuk
+        otpType = result.otpType || 'email';
         step = 'otp';
         startCountdown(60);
         otpErrorMessage = '';
-        otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        otpSuccessNotice = result.message || 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
         return;
-      } else {
-        const errText = result.error?.toLowerCase() || '';
+      }
 
-        // Deteksi jika akun membutuhkan verifikasi email / OTP
-        if (
-          errText.includes('email not confirmed') ||
-          errText.includes('not confirmed') ||
-          errText.includes('verify') ||
-          errText.includes('otp') ||
-          errText.includes('confirmation')
-        ) {
-          step = 'otp';
-          startCountdown(60);
-          otpErrorMessage = '';
-          otpSuccessNotice = 'Silakan masukkan 6 digit kode verifikasi yang dikirimkan ke email Anda.';
-          return;
-        } else if (errText.includes('invalid login credentials')) {
-          errorMessage = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
-        } else if (errText.includes('failed to fetch')) {
-          errorMessage = 'Gagal terhubung ke database. Pastikan koneksi internet Anda aktif.';
-        } else {
-          errorMessage = result.error || 'Gagal masuk. Silakan periksa kredensial Anda.';
-        }
+      if (!result.success) {
+        errorMessage = result.error || 'Gagal masuk. Silakan periksa kredensial Anda.';
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kendala jaringan. Silakan coba lagi.';
@@ -136,17 +117,10 @@
       const result = await authStore.verifyOtp({
         email: email.trim(),
         token: token.trim(),
-        type: 'signup'
+        type: otpType
       });
 
-      if (result.success) {
-        if (rememberMe && typeof localStorage !== 'undefined') {
-          localStorage.setItem('restolink_remember_me', 'true');
-          localStorage.setItem('restolink_remembered_email', email.trim());
-        }
-        const targetPath = homePathForRole(authStore.role);
-        router.navigate(targetPath as `/${string}`);
-      } else if (authStore.isAuthenticated) {
+      if (result.success && authStore.isAuthenticated) {
         if (rememberMe && typeof localStorage !== 'undefined') {
           localStorage.setItem('restolink_remember_me', 'true');
           localStorage.setItem('restolink_remembered_email', email.trim());
@@ -157,11 +131,6 @@
         otpErrorMessage = result.error || 'Kode OTP tidak valid atau telah kedaluwarsa.';
       }
     } catch (err: unknown) {
-      if (authStore.isAuthenticated) {
-        const targetPath = homePathForRole(authStore.role);
-        router.navigate(targetPath as `/${string}`);
-        return;
-      }
       otpErrorMessage = err instanceof Error ? err.message : 'Gagal memverifikasi OTP. Silakan coba lagi.';
     } finally {
       isVerifyingOtp = false;
@@ -175,7 +144,7 @@
     otpErrorMessage = '';
     otpSuccessNotice = '';
 
-    const res = await authStore.resendOtp({ email: email.trim(), type: 'signup' });
+    const res = await authStore.resendOtp({ email: email.trim(), type: otpType });
     if (res.success) {
       otpSuccessNotice = 'Kode OTP baru telah dikirimkan ke kotak masuk email Anda.';
       startCountdown(60);
@@ -201,6 +170,15 @@
       authStore.signOut();
     }
 
+    // Jika sedang dalam proses 2FA pending (belum lolos OTP)
+    if (authStore.pending2FAEmail && !authStore.isAuthenticated) {
+      email = authStore.pending2FAEmail;
+      otpType = 'email';
+      step = 'otp';
+      startCountdown(60);
+      otpSuccessNotice = 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+    }
+
     if (typeof localStorage !== 'undefined') {
       const isRemembered = localStorage.getItem('restolink_remember_me') === 'true';
       const rememberedEmail = localStorage.getItem('restolink_remembered_email');
@@ -218,8 +196,10 @@
         email = prefillEmail;
       }
       if (isRegistered) {
+        otpType = 'signup';
         registeredNotice = 'Pendaftaran resto berhasil! Masukkan kata sandi akun Anda lalu klik Masuk untuk verifikasi kode OTP.';
       } else if (needOtp && prefillEmail) {
+        otpType = 'signup';
         step = 'otp';
         startCountdown(60);
       }
@@ -490,6 +470,7 @@
               onclick={() => {
                 step = 'credentials';
                 otpErrorMessage = '';
+                authStore.pending2FAEmail = null;
               }}
               class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-600 transition-colors cursor-pointer"
             >
