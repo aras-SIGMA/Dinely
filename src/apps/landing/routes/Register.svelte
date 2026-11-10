@@ -22,7 +22,7 @@
 
   // Step Management (1: Restoran, 2: Pemilik, 3: Konfirmasi, 4: OTP)
   let step = $state<1 | 2 | 3 | 4>(1);
-  let maxReachedStep = $state<1 | 2 | 3>(1);
+  let maxReachedStep = $state<1 | 2 | 3 | 4>(1);
 
   // UI States
   let isSubdomainManuallyEdited = $state(false);
