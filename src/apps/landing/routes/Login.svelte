@@ -391,7 +391,7 @@
                   <button
                     type="button"
                     onclick={() => (showPassword = !showPassword)}
-                    class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer p-2 rounded"
+                    class="absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center rounded"
                     aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   >
                     {#if showPassword}
@@ -453,7 +453,7 @@
               <!-- 5. Register Link (Bottom Centered) -->
               <div class="pt-3 text-center border-t border-slate-100/80">
                 <p class="text-xs sm:text-sm text-slate-500 font-medium">
-                  Baru di RestoLink?
+                  Baru di Dinely?
                   <a href="/daftar" class="font-bold text-brand-600 hover:text-brand-700 hover:underline transition-colors ml-1">
                     Daftar sekarang
                   </a>

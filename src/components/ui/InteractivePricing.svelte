@@ -159,6 +159,10 @@
   let isRolling = $state(false);
   let rollDirection = $state<'up' | 'down'>('up');
 
+  $effect.pre(() => {
+    billingCycle = defaultBillingCycle;
+  });
+
   // Mobile comparison: short plan labels for the sticky scroll hint
   const mobilePlanLabels: Record<string, string> = {
     mikro: 'Mikro',
@@ -166,7 +170,7 @@
     menengah: 'Menengah'
   };
 
-  // Aggregate coverage per plan for the mobile inline badge
+  // Aggregate coverage per plan for the mobile inline badge (checklist features)
   const planCoverage = $derived.by(() => {
     const totals: Record<string, { covered: number; total: number }> = {};
     plans.forEach((p) => {
@@ -176,9 +180,10 @@
       group.rows.forEach((row) => {
         plans.forEach((p) => {
           const value = row[p.id as 'mikro' | 'kecil' | 'menengah'];
-          if (value === undefined) return;
-          totals[p.id].total += 1;
-          if (value === true || typeof value === 'string') totals[p.id].covered += 1;
+          if (typeof value === 'boolean') {
+            totals[p.id].total += 1;
+            if (value === true) totals[p.id].covered += 1;
+          }
         });
       });
     });
@@ -198,12 +203,6 @@
       };
     }
   }
-
-  $effect(() => {
-    if (defaultBillingCycle) {
-      billingCycle = defaultBillingCycle;
-    }
-  });
 
   $effect(() => {
     // Recompute pill position when cycle changes
@@ -326,7 +325,7 @@
             bind:this={monthlyBtnEl}
             type="button"
             onclick={() => handleCycleChange('monthly')}
-            class="relative z-10 rounded-full px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 {billingCycle ===
+            class="relative z-10 flex min-h-[44px] items-center justify-center rounded-full px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 {billingCycle ===
             'monthly'
               ? 'text-white'
               : 'text-slate-600 hover:text-slate-950'}"
@@ -338,7 +337,7 @@
             bind:this={annualBtnEl}
             type="button"
             onclick={() => handleCycleChange('annual')}
-            class="relative z-10 flex items-center gap-1.5 rounded-full px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 {billingCycle ===
+            class="relative z-10 flex min-h-[44px] items-center gap-1.5 rounded-full px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 {billingCycle ===
             'annual'
               ? 'text-white'
               : 'text-slate-600 hover:text-slate-950'}"
@@ -371,7 +370,7 @@
               role="tab"
               aria-selected={activeTab === 'pricing'}
               onclick={() => (activeTab = 'pricing')}
-              class="rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all {activeTab ===
+              class="flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all {activeTab ===
               'pricing'
                 ? 'bg-white text-slate-950 shadow-sm'
                 : 'text-slate-600 hover:text-slate-950'}"
@@ -383,7 +382,7 @@
               role="tab"
               aria-selected={activeTab === 'comparison'}
               onclick={() => (activeTab = 'comparison')}
-              class="rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all {activeTab ===
+              class="flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all {activeTab ===
               'comparison'
                 ? 'bg-white text-slate-950 shadow-sm'
                 : 'text-slate-600 hover:text-slate-950'}"

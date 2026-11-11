@@ -536,7 +536,7 @@
                 <button
                   type="button"
                   onclick={() => (showPassword = !showPassword)}
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer p-0.5 rounded"
+                  class="absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center rounded"
                   aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                 >
                   {#if showPassword}

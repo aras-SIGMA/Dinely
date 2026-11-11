@@ -158,7 +158,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .eq('status', 'pending')
       .gte('created_at', oneHourAgo);
 
-    if (!pendingCheckErr && pendingCount !== null && pendingCount >= 3) {
+    if (pendingCheckErr) {
+      console.error('[BE-01] Database pending transaction check error:', pendingCheckErr);
+      return sendJson(res, 500, {
+        error: 'Gagal memverifikasi riwayat transaksi: Terjadi kesalahan internal database.',
+      });
+    }
+
+    if (pendingCount !== null && pendingCount >= 3) {
       return sendJson(res, 429, {
         error: 'Terlalu banyak transaksi pending (maksimal 3). Selesaikan atau tunggu pembayaran sebelumnya kedaluwarsa.',
       });

@@ -51,7 +51,20 @@ class ChatbotStore {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          this.messages = parsed;
+          const valid = parsed.filter(
+            (m): m is UiChatMessage =>
+              Boolean(
+                m &&
+                typeof m === 'object' &&
+                typeof m.id === 'string' &&
+                (m.sender === 'user' || m.sender === 'assistant') &&
+                typeof m.text === 'string' &&
+                typeof m.timestamp === 'string'
+              )
+          );
+          if (valid.length > 0) {
+            this.messages = valid;
+          }
         }
       }
     } catch {
