@@ -9,6 +9,8 @@
 
 import { supabase } from '@/lib/supabase';
 import { toastState } from '@/stores/toast.svelte';
+import { isDemoMode } from '@/lib/demo/mode';
+import { demoStore } from '@/lib/demo/store';
 import type { OrderStatus, OrderWithItems } from '@/types';
 
 export type StatusFilter = OrderStatus | 'all';
@@ -139,6 +141,19 @@ class OrdersStore {
     if (!tenantId) return;
     this.activeTenantId = tenantId;
 
+    // Mode demo: baca langsung dari sandbox lokal, tanpa polling jaringan.
+    if (isDemoMode()) {
+      const demoOrders = demoStore.orders;
+      this.orders = demoOrders;
+      this.errorMessage = null;
+      if (this.selectedOrder) {
+        const updated = demoOrders.find((o) => o.id === this.selectedOrder?.id);
+        if (updated) this.selectedOrder = updated;
+      }
+      this.loading = false;
+      return;
+    }
+
     if (!silent) {
       this.loading = true;
     }
@@ -219,6 +234,20 @@ class OrdersStore {
 
     this.updatingId = orderId;
 
+    // Mode demo: mutasi langsung ke sandbox lokal.
+    if (isDemoMode()) {
+      demoStore.updateOrderStatus(orderId, nextStatus);
+      targetOrder.status = nextStatus;
+      targetOrder.updated_at = new Date().toISOString();
+      if (this.selectedOrder && this.selectedOrder.id === orderId) {
+        this.selectedOrder.status = nextStatus;
+        this.selectedOrder.updated_at = targetOrder.updated_at;
+      }
+      this.updatingId = null;
+      this.notifyStatusChange(targetOrder);
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('orders')
@@ -243,14 +272,7 @@ class OrdersStore {
         this.selectedOrder.updated_at = targetOrder.updated_at;
       }
 
-      const displayCode = targetOrder.order_code.startsWith('#')
-        ? targetOrder.order_code
-        : `#${targetOrder.order_code}`;
-
-      toastState.push(
-        `Pesanan ${displayCode} diubah menjadi "${getOrderStatusLabel(nextStatus)}".`,
-        'success'
-      );
+      this.notifyStatusChange(targetOrder);
       return true;
     } catch (err: any) {
       console.error('[ordersStore] Exception in updateStatus:', err);
@@ -268,6 +290,17 @@ class OrdersStore {
     this.selectedOrder = order;
   }
 
+  /** Toast sukses setelah transisi status, dipakai jalur daring maupun demo. */
+  private notifyStatusChange(order: OrderWithItems): void {
+    const displayCode = order.order_code.startsWith('#')
+      ? order.order_code
+      : `#${order.order_code}`;
+    toastState.push(
+      `Pesanan ${displayCode} diubah menjadi "${getOrderStatusLabel(order.status)}".`,
+      'success'
+    );
+  }
+
   /**
    * Menyetel tab filter status pesanan.
    */
@@ -281,6 +314,9 @@ class OrdersStore {
   startPolling(tenantId: string, intervalMs = 15000): void {
     this.stopPolling();
     this.activeTenantId = tenantId;
+
+    // Mode demo tidak perlu polling: tidak ada server yang berubah.
+    if (isDemoMode()) return;
 
     this.#pollTimer = setInterval(() => {
       if (this.activeTenantId) {

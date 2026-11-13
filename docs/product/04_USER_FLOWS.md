@@ -109,7 +109,20 @@ Catatan pembacaan: angka pada kedua tab sengaja tidak identik. Tab Pendapatan me
 
 ---
 
-## 8. Checklist UAT (diturunkan dari metrik keberhasilan di `01_PRD.md` bag. 9)
+## 8. Alur Mencoba Mode Demo (Juri / Penguji)
+
+1. Buka `/masuk` atau `/daftar`, tekan tombol **Coba Mode Demo** (atau buka `/masuk?demo=1`).
+2. Dashboard pemilik terbuka dengan data contoh: 14 menu, 6 kategori, dan pesanan 30 hari terakhir. Banner kuning menandai mode demo aktif.
+3. Jelajahi halaman: Ringkasan, Kategori & Menu, Antrean Pesanan, Laporan & Analitik, Profil Usaha, Langganan.
+4. Untuk melihat website pelanggan, buka tautan "Lihat Toko" (`/?tenant=demo`), tambahkan menu, lalu pesan sebagai tamu. Pesanan langsung muncul di Antrean Pesanan.
+5. Tekan **Perpanjang / Bayar Sekarang** pada halaman Langganan; pembayaran dinyatakan berhasil tanpa membuka Midtrans.
+6. Tekan **Reset Data Demo** untuk mengembalikan seluruh data contoh ke kondisi awal, atau **Keluar Demo** untuk keluar tanpa menghapus data.
+
+Catatan: mode demo hanya mencakup web pemilik dan website tenant. Panel admin memerlukan akun sungguhan.
+
+---
+
+## 9. Checklist UAT (diturunkan dari metrik keberhasilan di `01_PRD.md` bag. 9)
 
 Gunakan sebagai skenario uji sebelum demo lomba:
 
@@ -123,10 +136,14 @@ Gunakan sebagai skenario uji sebelum demo lomba:
 - [ ] Laporan Pendapatan hanya menjumlahkan pesanan `selesai`; pesanan `dibatalkan` tidak menambah omzet.
 - [ ] Laporan Aktivitas menghitung seluruh pesanan pada rentang dan menampilkan tingkat pembatalan yang konsisten dengan distribusi status.
 - [ ] Ekspor CSV menghasilkan satu berkas berisi baris dari kedua laporan.
+- [ ] Mode demo bisa dibuka tanpa akun dan tidak memanggil Supabase/Midtrans.
+- [ ] Tombol bayar mode demo menyatakan pembayaran berhasil dan status langganan bertahan setelah muat ulang.
+- [ ] Reset Data Demo mengembalikan fixture awal.
+- [ ] Onboarding tampil sekali per akun, dan tidak tampil di mode demo.
 
 ---
 
-## 9. Dokumen Terkait
+## 10. Dokumen Terkait
 
 - Requirement sumber alur ini → `01_PRD.md`
 - Detail keamanan resolusi subdomain & webhook → `02_ARCHITECTURE.md`

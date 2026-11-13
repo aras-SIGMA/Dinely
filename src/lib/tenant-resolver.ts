@@ -1,4 +1,4 @@
-import { APP_DOMAIN, isValidSubdomain } from './config';
+import { APP_DOMAIN, DEMO_SUBDOMAIN, isValidSubdomain } from './config';
 
 export type HostInfo = {
   slug: string | null;
@@ -14,6 +14,8 @@ function stripPort(hostname: string): string {
 
 export function sanitizeSlug(value: string): string | null {
   const slug = value.trim().toLowerCase();
+  // Subdomain demo sengaja dikecualikan dari larangan reserved agar mode demo bisa dibuka.
+  if (slug === DEMO_SUBDOMAIN) return slug;
   return isValidSubdomain(slug) ? slug : null;
 }
 

@@ -1,5 +1,8 @@
 ﻿import { supabase } from '@/lib/supabase';
 import { checkSubdomainAvailability } from '@/lib/subdomain-validator';
+import { OTP_LOGIN_ENABLED } from '@/lib/config';
+import { isDemoMode } from '@/lib/demo/mode';
+import { DEMO_IDS, demoStore } from '@/lib/demo/store';
 import type { Profile, Tenant, UserRole } from '@/types';
 
 export interface SignUpParams {
@@ -71,6 +74,23 @@ class AuthStore {
     this.#initialized = true;
 
     this.loading = true;
+
+    // Mode demo: hidrasi profil & tenant dari fixture, tanpa menyentuh Supabase Auth.
+    if (isDemoMode()) {
+      this.profile = DEMO_IDS.profile;
+      this.tenant = { ...DEMO_IDS.tenant };
+
+      // Pertahankan status langganan yang sudah dibayar pada sesi demo sebelumnya.
+      if (demoStore.getState().subscriptionStatus === 'active') {
+        this.tenant.subscription_ends_at = new Date(Date.now() + 31 * 86_400_000).toISOString();
+        this.tenant.trial_ends_at = null;
+      }
+
+      this.loading = false;
+      this.#resolveReady();
+      return;
+    }
+
     try {
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
@@ -173,6 +193,19 @@ class AuthStore {
   }
 
   async refreshTenant(): Promise<void> {
+    // Mode demo: tanggal langganan dihitung ulang dari sandbox lokal, tanpa Supabase.
+    if (isDemoMode() && this.tenant) {
+      const active = demoStore.getState().subscriptionStatus === 'active';
+      this.tenant = {
+        ...this.tenant,
+        subscription_ends_at: active
+          ? new Date(Date.now() + 31 * 86_400_000).toISOString()
+          : null,
+        trial_ends_at: active ? null : new Date(Date.now() + 7 * 86_400_000).toISOString()
+      };
+      return;
+    }
+
     if (this.profile?.id) {
       await this.loadTenant(this.profile.id);
     }
@@ -347,6 +380,7 @@ class AuthStore {
     otpRequired?: boolean;
     otpType?: 'email' | 'signup';
     message?: string;
+    role?: UserRole;
   }> {
     const { email, password } = params;
     const cleanEmail = email.trim();
@@ -392,6 +426,27 @@ class AuthStore {
       return {
         success: false,
         error: 'Data pengguna tidak ditemukan.'
+      };
+    }
+
+    // Gerbang sementara: OTP login dinonaktifkan selama pengujian pra-rilis.
+    // Aktifkan kembali lewat `OTP_LOGIN_ENABLED` di `src/lib/config.ts`.
+    if (!OTP_LOGIN_ENABLED) {
+      await Promise.all([
+        this.loadProfile(data.user.id),
+        this.loadTenant(data.user.id)
+      ]);
+
+      if (!this.tenant) {
+        await this.ensureTenantExists(data.user);
+      }
+
+      this.pending2FAEmail = null;
+
+      return {
+        success: true,
+        otpRequired: false,
+        role: this.role ?? undefined
       };
     }
 

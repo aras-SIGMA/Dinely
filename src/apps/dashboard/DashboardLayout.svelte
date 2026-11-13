@@ -3,8 +3,11 @@
   import { authStore } from '@/stores/auth.svelte';
   import { LOGIN_PATH } from '@/lib/guards';
   import { router } from '@/lib/router';
+  import { isDemoMode, exitDemo } from '@/lib/demo/mode';
+  import { demoStore } from '@/lib/demo/store';
   import Logo from '@/components/ui/Logo.svelte';
   import Badge from '@/components/ui/Badge.svelte';
+  import OnboardingTour from '@/components/ui/OnboardingTour.svelte';
 
   type Props = {
     children: Snippet;
@@ -14,6 +17,12 @@
 
   let mobileMenuOpen = $state(false);
   let copiedLink = $state(false);
+  const demoMode = isDemoMode();
+
+  function resetDemoData() {
+    demoStore.reset();
+    window.location.reload();
+  }
 
   const nav = [
     {
@@ -276,8 +285,39 @@
 
   <!-- Main Content Area -->
   <div class="lg:pl-64">
+    {#if demoMode}
+      <div class="border-b border-amber-200 bg-amber-50">
+        <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p class="flex items-center gap-2 text-xs font-semibold text-amber-900">
+            <svg class="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Mode Demo — data contoh, tidak tersimpan ke server.</span>
+          </p>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              onclick={resetDemoData}
+              class="inline-flex min-h-[36px] items-center rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
+            >
+              Reset Data Demo
+            </button>
+            <button
+              type="button"
+              onclick={exitDemo}
+              class="inline-flex min-h-[36px] items-center rounded-lg bg-amber-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-amber-800"
+            >
+              Keluar Demo
+            </button>
+          </div>
+        </div>
+      </div>
+    {/if}
+
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {@render children()}
     </main>
   </div>
+
+  <OnboardingTour />
 </div>

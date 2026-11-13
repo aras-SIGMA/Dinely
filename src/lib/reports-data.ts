@@ -10,6 +10,8 @@
 import { supabase } from '@/lib/supabase';
 import type { OrderWithItems } from '@/types';
 import type { ReportRange } from '@/lib/reports';
+import { isDemoMode } from '@/lib/demo/mode';
+import { demoStore } from '@/lib/demo/store';
 
 /**
  * Mengambil pesanan beserta rincian item dalam satu rentang tanggal.
@@ -21,6 +23,16 @@ export async function fetchReportOrders(
   limit = 2000
 ): Promise<OrderWithItems[]> {
   if (!tenantId) return [];
+
+  // Mode demo: saring sandbox lokal, tanpa query Supabase.
+  if (isDemoMode()) {
+    const start = new Date(range.startISO).getTime();
+    const end = new Date(range.endISO).getTime();
+    return demoStore.orders.filter((order) => {
+      const created = new Date(order.created_at).getTime();
+      return created >= start && created <= end;
+    });
+  }
 
   const { data, error } = await supabase
     .from('orders')

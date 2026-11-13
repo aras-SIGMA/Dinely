@@ -10,6 +10,8 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo/mode';
+import { demoStore } from '@/lib/demo/store';
 import type {
   CreateGuestOrderResult,
   GetGuestOrderStatusResult,
@@ -103,6 +105,55 @@ export async function submitGuestOrder(
     throw new Error(validation.error || 'Data pesanan tidak valid.');
   }
 
+  // Mode demo: pesanan dibuat di sandbox lokal dan langsung tampil di dashboard.
+  if (isDemoMode()) {
+    const items = input.items.map((payload, index) => {
+      const menu = demoStore.menuItems.find((m) => m.id === payload.menu_item_id);
+      if (!menu) throw new Error('Menu tidak ditemukan pada katalog demo.');
+      if (!menu.is_available) throw new Error(`Menu "${menu.name}" sedang habis.`);
+      return {
+        id: `oi-demo-${Date.now()}-${index}`,
+        order_id: '',
+        menu_item_id: menu.id,
+        menu_item_name_snapshot: menu.name,
+        price_snapshot: menu.price,
+        quantity: payload.quantity,
+        subtotal: menu.price * payload.quantity
+      };
+    });
+
+    const orderId = `o-demo-${Date.now()}`;
+    const orderCode = `DN-${String(2000 + demoStore.orders.length)}`;
+    const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+
+    for (const item of items) item.order_id = orderId;
+
+    demoStore.addOrder({
+      id: orderId,
+      tenant_id: input.tenantId,
+      order_code: orderCode,
+      buyer_name: input.buyerName.trim(),
+      buyer_contact: input.buyerContact?.trim() || null,
+      note: input.note?.trim() || null,
+      status: 'baru',
+      total_amount: total,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      order_items: items
+    });
+
+    saveLastOrderCode(input.tenantId, orderCode, null);
+
+    return {
+      success: true,
+      order_id: orderId,
+      order_code: orderCode,
+      tracking_token: undefined,
+      total_amount: total,
+      status: 'baru'
+    };
+  }
+
   const { data, error } = await supabase.rpc('create_guest_order', {
     p_tenant_id: input.tenantId,
     p_buyer_name: input.buyerName.trim(),
@@ -146,6 +197,32 @@ export async function fetchGuestOrderStatus(
   }
 
   const cleanCode = orderCode.trim().toUpperCase();
+
+  // Mode demo: baca status dari sandbox lokal.
+  if (isDemoMode()) {
+    const order = demoStore.orders.find((o) => o.order_code.toUpperCase() === cleanCode);
+    if (!order) {
+      return { success: false, message: 'Kode pesanan tidak ditemukan pada data demo.' };
+    }
+    return {
+      success: true,
+      order_id: order.id,
+      order_code: order.order_code,
+      buyer_name: order.buyer_name,
+      buyer_contact_masked: order.buyer_contact ? `${order.buyer_contact.slice(0, 4)}****` : null,
+      status: order.status,
+      total_amount: order.total_amount,
+      note: order.note,
+      created_at: order.created_at,
+      items: (order.order_items ?? []).map((item) => ({
+        name: item.menu_item_name_snapshot,
+        price: item.price_snapshot,
+        quantity: item.quantity,
+        subtotal: item.subtotal
+      })),
+      is_masked_view: false
+    };
+  }
 
   const { data, error } = await supabase.rpc('get_guest_order_status', {
     p_tenant_id: tenantId,

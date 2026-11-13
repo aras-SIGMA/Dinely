@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { authStore } from '@/stores/auth.svelte';
 import { toastState } from '@/stores/toast.svelte';
+import { isDemoMode } from '@/lib/demo/mode';
+import { demoStore } from '@/lib/demo/store';
 import {
   createSubscriptionTransaction,
   openSnapPayment,
@@ -28,6 +30,13 @@ class SubscriptionStore {
    * Mengambil daftar paket langganan aktif dari tabel packages Supabase.
    */
   async fetchPackages(): Promise<void> {
+    // Mode demo: paket berasal dari fixture.
+    if (isDemoMode()) {
+      this.packages = demoStore.packages;
+      this.loadingPackages = false;
+      return;
+    }
+
     this.loadingPackages = true;
     try {
       const { data, error } = await supabase
@@ -55,6 +64,25 @@ class SubscriptionStore {
       this.errorMessage = 'Data resto tidak ditemukan. Silakan lengkapi pendaftaran.';
       toastState.push(this.errorMessage, 'error');
       return false;
+    }
+
+    // Mode demo: bayar selalu berhasil, tanpa membuka Snap maupun webhook.
+    if (isDemoMode()) {
+      this.checkoutLoading = true;
+      this.paymentStatus = 'creating_transaction';
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      this.lastOrderId = `DEMO-${Date.now()}`;
+      this.paymentStatus = 'active';
+      this.checkoutLoading = false;
+      demoStore.markSubscriptionActive();
+      if (authStore.tenant) {
+        authStore.tenant.subscription_ends_at = new Date(
+          Date.now() + 31 * 86_400_000
+        ).toISOString();
+        authStore.tenant.trial_ends_at = null;
+      }
+      toastState.push('Pembayaran berhasil. Paket langganan Anda sudah aktif.', 'success');
+      return true;
     }
 
     this.checkoutLoading = true;

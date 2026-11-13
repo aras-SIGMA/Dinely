@@ -9,6 +9,7 @@
   import { router } from '@/lib/router';
   import Logo from '@/components/ui/Logo.svelte';
   import RegisterMotionIllustration from '@/components/illustrations/RegisterMotionIllustration.svelte';
+  import DemoEntryButton from '@/components/ui/DemoEntryButton.svelte';
 
   // Form Fields
   let businessName = $state('');
@@ -665,6 +666,9 @@
             </div>
           </div>
         {/if}
+
+        <!-- Demo Entry (selalu tersedia di semua langkah) -->
+        <DemoEntryButton class="mt-4" />
       </div>
     </div>
   </div>

@@ -3,6 +3,8 @@
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
   import { toastState } from '@/stores/toast.svelte';
+  import { isDemoMode } from '@/lib/demo/mode';
+  import { demoStore } from '@/lib/demo/store';
   import { formatRupiah, formatDate } from '@/lib/format';
   import Badge from '@/components/ui/Badge.svelte';
   import type { Transaction } from '@/types';
@@ -30,6 +32,30 @@
 
   async function fetchTransactions(tenantId: string) {
     loadingTransactions = true;
+
+    // Mode demo: riwayat transaksi dibuat dari status sandbox lokal.
+    if (isDemoMode()) {
+      const active = demoStore.getState().subscriptionStatus === 'active';
+      transactions = [
+        {
+          id: 'demo-trx-1',
+          tenant_id: tenantId,
+          package_id: 'p-mikro',
+          billing_cycle: active ? 'monthly' : 'trial',
+          amount: active ? 49000 : 0,
+          midtrans_order_id: active ? 'DEMO-PAID' : 'DEMO-TRIAL',
+          midtrans_transaction_id: null,
+          status: 'settlement',
+          raw_notification: null,
+          settled_at: new Date().toISOString(),
+          created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+          package: { name: 'Mikro', tier: 'mikro' }
+        }
+      ];
+      loadingTransactions = false;
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('transactions')
@@ -53,7 +79,12 @@
       if (tenant?.id) {
         await fetchTransactions(tenant.id);
       }
-      toastState.push('Status langganan berhasil diperbarui dari server', 'success');
+      toastState.push(
+        isDemoMode()
+          ? 'Status langganan demo berhasil diperbarui.'
+          : 'Status langganan berhasil diperbarui dari server',
+        'success'
+      );
     } catch {
       toastState.push('Gagal memperbarui status', 'error');
     } finally {

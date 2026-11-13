@@ -1,6 +1,8 @@
 <script lang="ts">
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
+  import { isDemoMode } from '@/lib/demo/mode';
+  import { demoStore } from '@/lib/demo/store';
   import { formatRupiah, formatDate } from '@/lib/format';
   import { ordersStore, getOrderStatusLabel, getOrderStatusTone } from '@/stores/orders.svelte';
   import Badge from '@/components/ui/Badge.svelte';
@@ -38,6 +40,14 @@
   async function fetchMenuMetrics(tenantId: string) {
     loadingMetrics = true;
     try {
+      if (isDemoMode()) {
+        const items = demoStore.menuItems;
+        totalMenuItems = items.length;
+        availableMenuItems = items.filter((m) => m.is_available).length;
+        totalCategories = demoStore.categories.length;
+        return;
+      }
+
       const [menuRes, catRes] = await Promise.all([
         supabase.from('menu_items').select('id, is_available').eq('tenant_id', tenantId),
         supabase.from('categories').select('id').eq('tenant_id', tenantId)

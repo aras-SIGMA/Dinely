@@ -19,6 +19,7 @@ Dokumen ini adalah panduan kerja teknis seluruh tim Dinely untuk menyelesaikan M
 | **M8** | Dashboard Admin Platform & Landing Page | H12–H13 | `feature/admin-and-landing` | ⏹️ Antrean |
 | **M9** | UAT, Audit Keamanan RLS, & Demo Polish | H13–H14 | `feature/uat-and-hardening` | ⏹️ Antrean |
 | **M10** | Laporan & Analitik Omzet *(pasca-lomba)* | — | `feature/reports-and-analytics` | ✅ **Selesai** |
+| **M11** | Mode Demo, Onboarding, & OTP Sementara *(pasca-lomba)* | — | `feature/demo-mode-and-onboarding` | ✅ **Selesai** |
 
 ---
 
@@ -196,6 +197,30 @@ Dokumen ini adalah panduan kerja teknis seluruh tim Dinely untuk menyelesaikan M
   * Pengelompokan tanggal/jam konsisten memakai `Asia/Jakarta`.
   * Satu berkas CSV memuat kedua laporan dengan kolom `laporan, kelompok, label, nilai, satuan`.
   * `npm run check` dan `npm run build` bersih.
+
+---
+
+### Milestone 11: Mode Demo, Onboarding Pemilik, & Penonaktifan OTP Sementara *(pasca-lomba)*
+* **Branch**: `feature/demo-mode-and-onboarding` (bertumpuk di atas `feature/reports-and-analytics`)
+* **Dependensi**: M7, M10
+* **Tujuan**: Memungkinkan juri mencoba seluruh alur pemilik tanpa akun, memberi panduan singkat kepada pemilik baru, dan mempercepat pengujian internal dengan menonaktifkan OTP sementara.
+* **Langkah Konkret**:
+  1. `src/lib/demo/fixtures.ts`: tenant demo, 6 kategori, 14 menu, generator pesanan deterministik 30 hari (termasuk pesanan `dibatalkan`).
+  2. `src/lib/demo/store.ts`: state mutable + persist `restolink_demo_state_v1`, fungsi reset manual.
+  3. `src/lib/demo/mode.ts`: `isDemoMode`, `enterDemo`, `exitDemo`; `?demo=1` dipersist, `?tenant=demo` tidak.
+  4. Intersepsi demo pada `auth`, `orders`, `tenant`, `subscription`, `reports-data`, `tenant-menu`, `guest-order`, `cloudinary-upload`, serta halaman `Overview`, `MenuManagement`, `Profile`, `Subscription`.
+  5. `DashboardLayout.svelte`: banner demo, tombol reset dan keluar, pemasangan `OnboardingTour`.
+  6. `OnboardingTour.svelte`: lima langkah, flag per akun, dilewati di mode demo.
+  7. `DemoEntryButton.svelte`: tombol "Coba Mode Demo" di halaman masuk dan daftar.
+  8. `src/lib/config.ts`: `DEMO_SUBDOMAIN`, `demo` pada `RESERVED_SUBDOMAINS`, dan `OTP_LOGIN_ENABLED = false`.
+  9. `src/lib/demo/demo.selftest.ts`: 10 pemeriksaan determinisme dan konsistensi fixture.
+* **Kriteria Selesai (AC)**:
+  * Mode demo berjalan penuh tanpa panggilan Supabase, Midtrans, atau Cloudinary.
+  * Tombol bayar demo menyatakan berhasil dan status langganan bertahan setelah muat ulang.
+  * Reset data hanya lewat tombol manual.
+  * Onboarding tampil sekali per akun dan tidak muncul di mode demo.
+  * `npm run check`, `npm run test:demo`, `npm run test:reports`, dan `npm run build` bersih.
+* **Catatan rilis**: `OTP_LOGIN_ENABLED` wajib dikembalikan ke `true` sebelum produksi.
 
 ---
 

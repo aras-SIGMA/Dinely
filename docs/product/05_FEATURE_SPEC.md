@@ -135,6 +135,41 @@ Rute: `/dashboard/laporan`. Dua laporan dipisahkan secara sengaja karena menjawa
 
 ---
 
+## F4. Mode Demo & Onboarding Pemilik `[Penambahan pasca-MVP lomba]`
+
+### F4.1 Sandbox Demo Lokal
+Rute masuk: `/masuk?demo=1` atau tombol "Coba Mode Demo" di halaman masuk/daftar. Website tenant demo: `/?tenant=demo`.
+- **AC**:
+  - [ ] Mode demo tidak memanggil Supabase, Midtrans, Cloudinary, maupun Gemini.
+  - [ ] Data demo (pesanan, menu, kategori, paket) berasal dari fixture deterministik dan dipersist di `localStorage` (`restolink_demo_state_v1`).
+  - [ ] Banner demo tampil di dashboard dengan tombol "Reset Data Demo" dan "Keluar Demo".
+  - [ ] Reset hanya terjadi saat tombol ditekan; keluar demo tidak menghapus data.
+  - [ ] Panel admin (`/admin/*`) tidak dapat diakses lewat mode demo.
+  - [ ] `demo` masuk daftar subdomain terpesan sehingga tidak bisa didaftarkan tenant sungguhan.
+
+### F4.2 Pembayaran Demo
+- **AC**:
+  - [ ] Menekan tombol bayar menampilkan pesan pembayaran berhasil, bukan pesan "tidak tersedia".
+  - [ ] Status langganan berubah menjadi aktif 31 hari dan tetap tersimpan setelah muat ulang.
+  - [ ] Riwayat pembayaran menampilkan satu baris `DEMO-PAID` senilai paket yang dipilih.
+  - [ ] Tidak ada permintaan jaringan ke Midtrans.
+
+### F4.3 Onboarding Pemilik Baru
+- **AC**:
+  - [ ] Tutorial lima langkah tampil otomatis pada kunjungan pertama pemilik.
+  - [ ] Status "sudah dilihat" disimpan per akun (`restolink_onboarding_seen_<profileId>`).
+  - [ ] Tombol "Lewati" dan "Kembali" berfungsi; langkah terakhir berlabel "Mulai Pakai".
+  - [ ] Tutorial dilewati pada mode demo agar tidak menghalangi presentasi.
+
+### F4.4 Penonaktifan OTP Sementara
+- **AC**:
+  - [ ] `OTP_LOGIN_ENABLED = false` di `src/lib/config.ts` membuat login langsung mengaktifkan sesi.
+  - [ ] Jalur OTP tetap utuh dan kembali aktif bila sakelar disetel `true`.
+  - [ ] Login setelah registrasi tidak memaksa verifikasi OTP selama sakelar mati.
+- **Catatan rilis**: sakelar **wajib** dikembalikan ke `true` sebelum produksi.
+
+---
+
 ## G. Dashboard Admin Platform `[MVP Lomba]`
 
 ### G1. Monitoring Pendaftaran & Pembayaran
