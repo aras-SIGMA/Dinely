@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo/mode';
+import { DEMO_IDS } from '@/lib/demo/store';
 import type { PublicTenant } from '@/types';
 
 class TenantStore {
@@ -37,6 +39,16 @@ class TenantStore {
     }
 
     const normalizedSlug = slug.trim().toLowerCase();
+
+    // Mode demo: website tenant dilayani dari fixture, tanpa query Supabase.
+    if (isDemoMode() && normalizedSlug === DEMO_IDS.tenant.subdomain) {
+      const { demoPublicTenant } = await import('@/lib/demo/fixtures');
+      this.slug = normalizedSlug;
+      this.tenant = demoPublicTenant;
+      this.loading = false;
+      this.#inFlight = null;
+      return this.tenant;
+    }
 
     // Hindari request duplikat jika tenant sudah dimuat atau request sedang berjalan (in-flight)
     if (!force && this.slug === normalizedSlug) {

@@ -2,12 +2,14 @@
   import { onMount, onDestroy } from 'svelte';
   import { authStore } from '@/stores/auth.svelte';
   import { homePathForRole } from '@/lib/guards';
+  import { OTP_LOGIN_ENABLED } from '@/lib/config';
   import { router } from '@/lib/router';
   import Button from '@/components/ui/Button.svelte';
   import Logo from '@/components/ui/Logo.svelte';
   import Modal from '@/components/ui/Modal.svelte';
   import OtpInput from '@/components/ui/OtpInput.svelte';
   import LoginMotionIllustration from '@/components/illustrations/LoginMotionIllustration.svelte';
+  import DemoEntryButton from '@/components/ui/DemoEntryButton.svelte';
 
   // Form Fields
   let email = $state('');
@@ -61,7 +63,7 @@
       const isFromRegistration = registeredNotice !== '' || params?.get('registered') === 'true';
 
       // Pas abis mencet tombol "Masuk", jika akun baru registrasi langsung tampilkan verifikasi OTP signup
-      if (isFromRegistration) {
+      if (isFromRegistration && OTP_LOGIN_ENABLED) {
         otpType = 'signup';
         step = 'otp';
         startCountdown(60);
@@ -87,6 +89,17 @@
         startCountdown(60);
         otpErrorMessage = '';
         otpSuccessNotice = result.message || 'Silakan masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+        return;
+      }
+
+      // Gerbang sementara: OTP login dimatikan, sesi langsung aktif.
+      if (result.success && authStore.isAuthenticated) {
+        if (rememberMe && typeof localStorage !== 'undefined') {
+          localStorage.setItem('restolink_remember_me', 'true');
+          localStorage.setItem('restolink_remembered_email', email.trim());
+        }
+        const targetPath = homePathForRole(authStore.role);
+        router.navigate(targetPath as `/${string}`);
         return;
       }
 
@@ -459,6 +472,9 @@
                   </a>
                 </p>
               </div>
+
+              <!-- 6. Demo Entry -->
+              <DemoEntryButton />
             </form>
           </div>
         {:else}

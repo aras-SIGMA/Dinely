@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test:reports": "npx tsx src/lib/reports.selftest.ts",
+    "test:demo": "npx tsx src/lib/demo/demo.selftest.ts",
     "test:api": "npx tsx api/_test_be01.ts && npx tsx api/_test_be02.ts && npx tsx api/_test_be03.ts && npx tsx api/_test_be04.ts && npx tsx api/_test_be05.ts"
   },
   "devDependencies": {

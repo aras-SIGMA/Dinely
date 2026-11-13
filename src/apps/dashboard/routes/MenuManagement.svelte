@@ -3,6 +3,8 @@
   import { supabase } from '@/lib/supabase';
   import { toastState } from '@/stores/toast.svelte';
   import { formatRupiah } from '@/lib/format';
+  import { isDemoMode } from '@/lib/demo/mode';
+  import { demoStore } from '@/lib/demo/store';
   import { uploadImage, type CompressionSummary } from '@/lib/cloudinary-upload';
   import Modal from '@/components/ui/Modal.svelte';
   import Badge from '@/components/ui/Badge.svelte';
@@ -63,6 +65,14 @@
   async function fetchAllData() {
     if (!tenant?.id) return;
     loading = true;
+
+    if (isDemoMode()) {
+      categories = [...demoStore.categories];
+      menuItems = [...demoStore.menuItems];
+      loading = false;
+      return;
+    }
+
     try {
       const [catRes, menuRes] = await Promise.all([
         supabase
@@ -134,6 +144,15 @@
 
     // Optimistic update
     menuItems = menuItems.map((m) => (m.id === item.id ? { ...m, is_available: nextState } : m));
+
+    if (isDemoMode()) {
+      demoStore.setMenuAvailability(item.id, nextState);
+      toastState.push(
+        nextState ? `Status "${item.name}" diubah: Tersedia` : `Status "${item.name}" diubah: Stok Habis`,
+        'success'
+      );
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -246,6 +265,41 @@
     menuFormSaving = true;
     menuFormError = null;
 
+    if (isDemoMode()) {
+      const now = new Date().toISOString();
+      const base = {
+        tenant_id: tenant.id,
+        category_id: formMenuCategoryId || null,
+        name: formMenuName.trim(),
+        description: formMenuDescription.trim() || null,
+        price: formMenuPrice,
+        image_url: formMenuImageUrl,
+        is_available: formMenuIsAvailable,
+        sort_order: formMenuSortOrder,
+        updated_at: now
+      };
+
+      if (editingMenu) {
+        const updated: MenuItem = { ...editingMenu, ...base } as MenuItem;
+        demoStore.upsertMenuItem(updated);
+        menuItems = menuItems.map((m) => (m.id === updated.id ? updated : m));
+        toastState.push('Menu berhasil diperbarui', 'success');
+      } else {
+        const created: MenuItem = {
+          ...base,
+          id: `m-demo-${Date.now()}`,
+          created_at: now
+        } as MenuItem;
+        demoStore.upsertMenuItem(created);
+        menuItems = [...menuItems, created];
+        toastState.push('Menu baru berhasil ditambahkan', 'success');
+      }
+
+      menuModalOpen = false;
+      menuFormSaving = false;
+      return;
+    }
+
     try {
       if (editingMenu) {
         // UPDATE
@@ -310,6 +364,15 @@
     if (!deleteMenuTarget || !tenant?.id) return;
     deletingMenu = true;
 
+    if (isDemoMode()) {
+      demoStore.deleteMenuItem(deleteMenuTarget.id);
+      menuItems = menuItems.filter((m) => m.id !== deleteMenuTarget!.id);
+      toastState.push(`Menu "${deleteMenuTarget.name}" berhasil dihapus`, 'success');
+      deleteMenuTarget = null;
+      deletingMenu = false;
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('menu_items')
@@ -334,6 +397,22 @@
     if (!tenant?.id || !newCategoryName.trim()) return;
     categorySaving = true;
     categoryError = null;
+
+    if (isDemoMode()) {
+      const created: Category = {
+        id: `c-demo-${Date.now()}`,
+        tenant_id: tenant.id,
+        name: newCategoryName.trim(),
+        sort_order: categories.length + 1,
+        created_at: new Date().toISOString()
+      };
+      demoStore.addCategory(created);
+      categories = [...categories, created];
+      newCategoryName = '';
+      toastState.push('Kategori berhasil ditambahkan', 'success');
+      categorySaving = false;
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -361,6 +440,15 @@
   async function handleUpdateCategory(cat: Category, newName: string) {
     if (!tenant?.id || !newName.trim()) return;
     categorySaving = true;
+
+    if (isDemoMode()) {
+      demoStore.updateCategory(cat.id, newName.trim());
+      categories = categories.map((c) => (c.id === cat.id ? { ...c, name: newName.trim() } : c));
+      editingCategory = null;
+      toastState.push('Kategori berhasil diperbarui', 'success');
+      categorySaving = false;
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -394,6 +482,15 @@
   async function executeDeleteCategory() {
     if (!deleteCategoryTarget || !tenant?.id) return;
     deletingCategory = true;
+
+    if (isDemoMode()) {
+      demoStore.deleteCategory(deleteCategoryTarget.id);
+      categories = categories.filter((c) => c.id !== deleteCategoryTarget!.id);
+      toastState.push(`Kategori "${deleteCategoryTarget.name}" berhasil dihapus`, 'success');
+      deleteCategoryTarget = null;
+      deletingCategory = false;
+      return;
+    }
 
     try {
       const { error } = await supabase

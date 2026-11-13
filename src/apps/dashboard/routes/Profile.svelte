@@ -2,6 +2,7 @@
   import { authStore } from '@/stores/auth.svelte';
   import { supabase } from '@/lib/supabase';
   import { toastState } from '@/stores/toast.svelte';
+  import { isDemoMode } from '@/lib/demo/mode';
   import { uploadImage, type CompressionSummary } from '@/lib/cloudinary-upload';
   import Badge from '@/components/ui/Badge.svelte';
 
@@ -141,6 +142,35 @@
 
     saving = true;
     errorMessage = null;
+
+    if (isDemoMode()) {
+      // ponytail: perubahan profil demo hanya bertahan selama sesi berjalan.
+      // Sambungkan ke demoStore bila perubahan profil perlu ikut ter-reset manual.
+      authStore.tenant = {
+        ...tenant,
+        business_name: businessName.trim(),
+        description: description.trim() || null,
+        address: address.trim() || null,
+        contact_whatsapp: contactWhatsapp.trim() || null,
+        contact_phone: contactPhone.trim() || null,
+        primary_color: primaryColor,
+        logo_url: logoUrl,
+        updated_at: new Date().toISOString()
+      };
+
+      if (authStore.profile) {
+        authStore.profile = {
+          ...authStore.profile,
+          full_name: fullName.trim(),
+          phone: ownerPhone.trim() || null
+        };
+      }
+
+      isDirty = false;
+      saving = false;
+      toastState.push('Profil usaha berhasil disimpan (mode demo)', 'success');
+      return;
+    }
 
     try {
       // 1. Update tenants table

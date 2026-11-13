@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo/mode';
+import { demoStore } from '@/lib/demo/store';
 import type { Category, MenuItem } from '@/types';
 
 export interface TenantMenuData {
@@ -15,6 +17,14 @@ export interface TenantMenuData {
 export async function fetchTenantMenu(tenantId: string): Promise<TenantMenuData> {
   if (!tenantId) {
     return { categories: [], items: [] };
+  }
+
+  // Mode demo: katalog publik dilayani dari sandbox lokal.
+  if (isDemoMode()) {
+    return {
+      categories: demoStore.categories,
+      items: demoStore.menuItems.filter((item) => item.is_available)
+    };
   }
 
   // 1. Coba fetch langsung via Supabase client (PostgREST)

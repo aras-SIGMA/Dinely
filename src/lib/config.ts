@@ -45,8 +45,21 @@ export const RESERVED_SUBDOMAINS = new Set([
   'static',
   'status',
   'assets',
-  'docs'
+  'docs',
+  'demo'
 ]);
+
+/**
+ * Subdomain khusus Mode Demo. Dicadangkan agar tidak dapat didaftarkan tenant
+ * sungguhan, namun tetap boleh dipakai sebagai target resolusi host.
+ */
+export const DEMO_SUBDOMAIN = 'demo';
+
+/**
+ * Sakelar sementara untuk verifikasi OTP saat login.
+ * Setel kembali ke `true` sebelum rilis produksi.
+ */
+export const OTP_LOGIN_ENABLED = false;
 
 /**
  * Memeriksa apakah suatu slug termasuk subdomain yang dilarang/dipesan.

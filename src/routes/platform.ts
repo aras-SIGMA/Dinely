@@ -30,6 +30,7 @@ export const platformRoutes: Routes = {
     '/': () => import('@/apps/dashboard/routes/Overview.svelte'),
     '/menu': () => import('@/apps/dashboard/routes/MenuManagement.svelte'),
     '/pesanan': () => import('@/apps/dashboard/routes/Orders.svelte'),
+    '/laporan': () => import('@/apps/dashboard/routes/Reports.svelte'),
     '/profil': () => import('@/apps/dashboard/routes/Profile.svelte'),
     '/langganan': () => import('@/apps/dashboard/routes/Subscription.svelte')
   },

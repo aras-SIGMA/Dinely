@@ -14,7 +14,15 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo/mode';
 import { compressImage, type CompressOptions, type CompressResult } from '@/lib/image-compressor';
+
+/** Placeholder SVG inline agar mode demo tidak bergantung pada jaringan. */
+const DEMO_IMAGE_PLACEHOLDER =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><rect width="800" height="800" fill="#f1f5f9"/><path d="M250 500l90-110 70 85 50-60 90 115z" fill="#cbd5e1"/><circle cx="300" cy="290" r="45" fill="#e2e8f0"/></svg>'
+  );
 
 export type UploadCategory = 'menu' | 'logo';
 
@@ -201,6 +209,20 @@ export async function uploadImage(
   input: File | Blob,
   options?: UploadImageOptions
 ): Promise<UploadImageResult> {
+  // Mode demo: tidak ada upload jaringan. Kembalikan gambar placeholder lokal.
+  // ponytail: foto asli tidak disimpan agar localStorage demo tidak cepat penuh.
+  if (isDemoMode()) {
+    options?.onProgress?.(100);
+    return {
+      url: DEMO_IMAGE_PLACEHOLDER,
+      publicId: `demo-${Date.now()}`,
+      width: 800,
+      height: 800,
+      format: 'svg',
+      bytes: 0
+    };
+  }
+
   let fileToUpload: File | Blob = input;
   let compressionMeta: CompressionSummary | undefined;
   let detectedWidth = 0;

@@ -39,26 +39,35 @@
       triggers.push(activeTrigger);
     }
 
+    // Arah masuk tiap kartu: bawah kiri, bawah kanan, bawah kiri, bawah kanan, bawah tengah.
+    const enterFrom = [
+      { xPercent: -35, yPercent: 45 },
+      { xPercent: 35, yPercent: 45 },
+      { xPercent: -35, yPercent: 45 },
+      { xPercent: 35, yPercent: 45 },
+      { xPercent: 0, yPercent: 45 }
+    ];
+
     sections.forEach((section, i) => {
       gsap.set(section, { zIndex: i + 1 });
 
       const inner = section.querySelector<HTMLElement>('.flow-art-container');
       if (!inner) return;
 
-      if (i > 0) {
-        gsap.set(inner, { rotation: 30, transformOrigin: 'bottom left' });
-        const tween = gsap.to(inner, {
-          rotation: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'top 25%',
-            scrub: true,
-          },
-        });
-        if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
-      }
+      const start = enterFrom[i % enterFrom.length];
+      gsap.set(inner, { xPercent: start.xPercent, yPercent: start.yPercent });
+      const tween = gsap.to(inner, {
+        xPercent: 0,
+        yPercent: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top bottom',
+          end: 'top 25%',
+          scrub: true,
+        },
+      });
+      if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
 
       if (i < sections.length - 1) {
         triggers.push(
