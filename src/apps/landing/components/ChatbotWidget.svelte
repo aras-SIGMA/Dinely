@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { uiStore } from '@/stores/ui.svelte';
   import { chatbotStore, QUICK_PROMPTS, type UiChatMessage } from '@/stores/chatbot.svelte';
   import LinkaMascot from '@/components/ui/LinkaMascot.svelte';
   import Markdown from '@/components/ui/Markdown.svelte';
@@ -65,6 +66,7 @@
 
 <svelte:window onkeydown={handleKeyDown} />
 
+{#if uiStore.isAppReady}
 <!-- Floating Action Button (FAB): pill label + circular mascot button -->
 <div class="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 sm:bottom-6 sm:right-6">
   <!-- Pill Label -->
@@ -359,4 +361,5 @@
       </p>
     </footer>
   </div>
+{/if}
 {/if}
