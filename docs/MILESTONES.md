@@ -18,6 +18,7 @@ Dokumen ini adalah panduan kerja teknis seluruh tim Dinely untuk menyelesaikan M
 | **M7** | Dashboard Pesanan (Owner Order Tracking) | H11 | `feature/order-management` | ⏹️ Antrean |
 | **M8** | Dashboard Admin Platform & Landing Page | H12–H13 | `feature/admin-and-landing` | ⏹️ Antrean |
 | **M9** | UAT, Audit Keamanan RLS, & Demo Polish | H13–H14 | `feature/uat-and-hardening` | ⏹️ Antrean |
+| **M10** | Laporan & Analitik Omzet *(pasca-lomba)* | — | `feature/reports-and-analytics` | ✅ **Selesai** |
 
 ---
 
@@ -176,6 +177,25 @@ Dokumen ini adalah panduan kerja teknis seluruh tim Dinely untuk menyelesaikan M
   4. Penyiapan data demo (seed 1 tenant contoh lengkap menu foto menarik untuk presentasi juri).
 * **Kriteria Selesai (AC)**:
   * Seluruh alur utama berjalan mulus dari awal hingga akhir tanpa kendala teknis saat presentasi.
+
+---
+
+### Milestone 10: Laporan & Analitik Omzet *(pasca-lomba)*
+* **Branch**: `feature/reports-and-analytics`
+* **Dependensi**: M7
+* **Tujuan**: Memberi pemilik usaha visibilitas angka nyata atas pendapatan dan aktivitas operasional, sebagai bekal pembukuan dan pengambilan keputusan.
+* **Langkah Konkret**:
+  1. `src/lib/reports.ts`: agregasi murni — `resolveRange`, `toDateKey`, `toJakartaHour`, `computeRevenueReport`, `computeActivityReport`, `buildCombinedCsv`.
+  2. `src/lib/reports-data.ts`: satu query rentang pesanan beserta `order_items` (limit 2000 baris).
+  3. `src/apps/dashboard/routes/Reports.svelte`: rute `/dashboard/laporan` dengan tab Pendapatan dan Aktivitas Pesanan.
+  4. `src/stores/../DashboardLayout.svelte`: item navigasi "Laporan & Analitik".
+  5. Pemilih rentang 7/30/90 hari plus kustom, ekspor CSV gabungan.
+  6. `src/lib/reports.selftest.ts`: 20 pemeriksaan mandiri atas perhitungan dan format.
+* **Kriteria Selesai (AC)**:
+  * Laporan Pendapatan hanya menjumlahkan pesanan `selesai`; laporan Aktivitas menghitung seluruh pesanan termasuk batal.
+  * Pengelompokan tanggal/jam konsisten memakai `Asia/Jakarta`.
+  * Satu berkas CSV memuat kedua laporan dengan kolom `laporan, kelompok, label, nilai, satuan`.
+  * `npm run check` dan `npm run build` bersih.
 
 ---
 

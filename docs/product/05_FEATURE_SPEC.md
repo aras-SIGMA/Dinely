@@ -101,6 +101,40 @@
 
 ---
 
+## F3. Laporan & Analitik `[Penambahan pasca-MVP lomba]`
+
+Rute: `/dashboard/laporan`. Dua laporan dipisahkan secara sengaja karena menjawab pertanyaan berbeda dan **angkanya memang tidak akan sama** — selisihnya adalah nilai diagnostik.
+
+### F3.1 Laporan Pendapatan
+- **Basis data**: hanya pesanan berstatus `selesai`.
+- **AC**:
+  - [ ] Menampilkan total omzet, jumlah pesanan selesai, dan rata-rata nilai pesanan pada rentang terpilih.
+  - [ ] Menampilkan tren omzet harian dalam bentuk batang, dengan nilai tertinggi sebagai skala.
+  - [ ] Menampilkan 5 menu terlaris berdasarkan kontribusi omzet beserta kuantitas terjual.
+  - [ ] Pesanan `dibatalkan` dan pesanan yang masih berjalan **tidak** dihitung sebagai omzet.
+
+### F3.2 Laporan Aktivitas Pesanan
+- **Basis data**: seluruh pesanan pada rentang, termasuk yang `dibatalkan`.
+- **AC**:
+  - [ ] Menampilkan total pesanan masuk, pesanan aktif (non-batal), dan tingkat pembatalan dalam persen.
+  - [ ] Menampilkan distribusi jumlah pesanan per status (`baru`, `diproses`, `selesai`, `dibatalkan`).
+  - [ ] Menampilkan volume pesanan harian dan distribusi jam sibuk (0–23).
+  - [ ] Menampilkan rata-rata durasi penyelesaian pesanan (`selesai`) beserta jumlah sampel yang diukur.
+  - [ ] Menandai jam tersibuk bila ada pesanan pada rentang tersebut.
+
+### F3.3 Kontrol dan Ekspor
+- **AC**:
+  - [ ] Pemilih rentang: 7 hari, 30 hari, 90 hari, dan rentang kustom (tanggal mulai–akhir).
+  - [ ] Pengelompokan tanggal dan jam memakai zona `Asia/Jakarta`, bukan zona perangkat pengguna.
+  - [ ] Ekspor CSV menghasilkan **satu berkas gabungan** berisi kedua laporan dengan kolom `laporan, kelompok, label, nilai, satuan`.
+  - [ ] Kondisi kosong menampilkan pesan informatif, bukan tabel kosong atau halaman gagal.
+
+### F3.4 Batasan Implementasi
+- Agregasi dilakukan di klien setelah satu query rentang (maksimal 2000 baris pesanan). Cukup untuk volume UMKM.
+- `updated_at` dipakai sebagai proksi waktu selesai. Tambahkan kolom `completed_at` bila butuh akurasi durasi yang lebih ketat.
+
+---
+
 ## G. Dashboard Admin Platform `[MVP Lomba]`
 
 ### G1. Monitoring Pendaftaran & Pembayaran

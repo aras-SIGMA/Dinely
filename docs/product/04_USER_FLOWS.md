@@ -97,7 +97,19 @@ Status yang wajib ditangani di UI pemilik: **sukses**, **pending/menunggu**, **g
 
 ---
 
-## 7. Checklist UAT (diturunkan dari metrik keberhasilan di `01_PRD.md` bag. 9)
+## 7. Alur Melihat Laporan & Analitik (Pemilik)
+
+1. Pemilik buka Dashboard → menu "Laporan & Analitik".
+2. Pilih rentang waktu: 7 hari, 30 hari, 90 hari, atau kustom (tanggal mulai s.d. akhir).
+3. Pilih tab **Pendapatan** untuk melihat omzet nyata dari pesanan selesai.
+4. Pilih tab **Aktivitas Pesanan** untuk melihat volume pesanan, tingkat pembatalan, jam sibuk, dan rata-rata durasi penyelesaian.
+5. Unduh CSV untuk pembukuan; berkas berisi kedua laporan dengan penanda kolom `laporan`.
+
+Catatan pembacaan: angka pada kedua tab sengaja tidak identik. Tab Pendapatan menghitung uang yang sudah benar-benar masuk, sedangkan tab Aktivitas menghitung seluruh pesanan masuk. Selisihnya menunjukkan pesanan yang belum tuntas atau batal.
+
+---
+
+## 8. Checklist UAT (diturunkan dari metrik keberhasilan di `01_PRD.md` bag. 9)
 
 Gunakan sebagai skenario uji sebelum demo lomba:
 
@@ -108,10 +120,13 @@ Gunakan sebagai skenario uji sebelum demo lomba:
 - [ ] Mencoba mengakses data tenant A memakai sesi/akun tenant B **harus gagal** (verifikasi RLS).
 - [ ] Simulasi pembayaran gagal/pending di sandbox Midtrans tidak mengaktifkan tenant.
 - [ ] Mengakses subdomain yang tidak terdaftar menampilkan halaman "usaha tidak ditemukan", bukan error mentah atau data tenant lain.
+- [ ] Laporan Pendapatan hanya menjumlahkan pesanan `selesai`; pesanan `dibatalkan` tidak menambah omzet.
+- [ ] Laporan Aktivitas menghitung seluruh pesanan pada rentang dan menampilkan tingkat pembatalan yang konsisten dengan distribusi status.
+- [ ] Ekspor CSV menghasilkan satu berkas berisi baris dari kedua laporan.
 
 ---
 
-## 8. Dokumen Terkait
+## 9. Dokumen Terkait
 
 - Requirement sumber alur ini → `01_PRD.md`
 - Detail keamanan resolusi subdomain & webhook → `02_ARCHITECTURE.md`
