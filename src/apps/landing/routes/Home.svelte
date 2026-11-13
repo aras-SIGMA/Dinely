@@ -18,21 +18,15 @@
   let windowHeight = $state(800);
   let prefersReducedMotion = $state(false);
 
-  function updateScrollMetrics() {
-    if (typeof window !== 'undefined') {
-      scrollY = window.scrollY;
-      windowHeight = window.innerHeight;
-    }
-  }
-
   onMount(() => {
-    prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    updateScrollMetrics();
-    window.addEventListener('scroll', updateScrollMetrics, { passive: true });
-    window.addEventListener('resize', updateScrollMetrics, { passive: true });
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    prefersReducedMotion = mediaQuery?.matches ?? false;
+    const handleChange = (e: MediaQueryListEvent) => {
+      prefersReducedMotion = e.matches;
+    };
+    mediaQuery?.addEventListener?.('change', handleChange);
     return () => {
-      window.removeEventListener('scroll', updateScrollMetrics);
-      window.removeEventListener('resize', updateScrollMetrics);
+      mediaQuery?.removeEventListener?.('change', handleChange);
     };
   });
 
@@ -255,7 +249,7 @@
                   <div class="p-3.5 flex-1 flex flex-col justify-between">
                     <div class="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-mono text-slate-600 flex items-center gap-1 border border-slate-200">
                       <span class="text-emerald-600">●</span>
-                      <span class="truncate">dapur-nia.restolink.site</span>
+                      <span class="truncate">dapur-nia.dinely.site</span>
                     </div>
                     <div class="my-auto rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/40 p-3 text-center flex flex-col items-center justify-center">
                       <div class="size-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 mb-1.5">
@@ -790,7 +784,7 @@
               KLAIM<br />SUBDOMAIN<br />MANDIRI
             </h3>
             <p class="mt-4 sm:mt-6 max-w-xl xl:max-w-2xl text-[clamp(1rem,1.35vw,1.25rem)] font-normal leading-relaxed text-white/95">
-              Miliki alamat website toko sendiri seperti <strong class="underline underline-offset-4 decoration-white/40 font-semibold">usaha-anda.restolink.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
+              Miliki alamat website toko sendiri seperti <strong class="underline underline-offset-4 decoration-white/40 font-semibold">usaha-anda.dinely.site</strong> yang langsung aktif seketika tanpa sewa hosting teknis atau instalasi rumit.
             </p>
           </div>
 
@@ -837,7 +831,7 @@
         <!-- Bottom Bar -->
         <div class="pt-3 sm:pt-4 border-t border-white/20 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-white/70 shrink-0">
           <span>LANGKAH 01 — 5 LANGKAH DIGITALISASI</span>
-          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">DINELY PLATFORM</span>
         </div>
       </FlowSection>
 
@@ -913,7 +907,7 @@
         <!-- Bottom Bar -->
         <div class="pt-3 sm:pt-4 border-t border-white/15 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-slate-400 shrink-0">
           <span>LANGKAH 02 — 5 LANGKAH DIGITALISASI</span>
-          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">DINELY PLATFORM</span>
         </div>
       </FlowSection>
 
@@ -989,7 +983,7 @@
         <!-- Bottom Bar -->
         <div class="pt-3 sm:pt-4 border-t border-amber-900/15 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-slate-500 shrink-0">
           <span>LANGKAH 03 — 5 LANGKAH DIGITALISASI</span>
-          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">DINELY PLATFORM</span>
         </div>
       </FlowSection>
 
@@ -1065,7 +1059,7 @@
         <!-- Bottom Bar -->
         <div class="pt-3 sm:pt-4 border-t border-white/20 flex items-center justify-between text-[11px] sm:text-xs font-mono tracking-wider text-white/70 shrink-0">
           <span>LANGKAH 04 — 5 LANGKAH DIGITALISASI</span>
-          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">RESTOLINK PLATFORM</span>
+          <span class="opacity-60 pr-16 sm:pr-24 lg:pr-32">DINELY PLATFORM</span>
         </div>
       </FlowSection>
 

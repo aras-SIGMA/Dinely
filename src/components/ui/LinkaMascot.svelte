@@ -18,6 +18,8 @@
     title = 'Linka — Maskot Resmi Dinely'
   }: Props = $props();
 
+  const uid = Math.random().toString(36).slice(2, 8);
+
   const sizeClasses: Record<MascotSize, string> = {
     xs: 'size-6',     // 24px
     sm: 'size-8',     // 32px
@@ -42,33 +44,33 @@
   >
     <defs>
       <!-- Gradient Tubuh Utama Linka -->
-      <linearGradient id="linkaShellGrad" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <linearGradient id="linkaShellGrad-{uid}" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#FB923C" />
         <stop offset="45%" stop-color="#F97316" />
         <stop offset="100%" stop-color="#EA580C" />
       </linearGradient>
 
       <!-- Gradient Highlight Perut / Celemek -->
-      <linearGradient id="linkaBellyGrad" x1="60" y1="65" x2="60" y2="95" gradientUnits="userSpaceOnUse">
+      <linearGradient id="linkaBellyGrad-{uid}" x1="60" y1="65" x2="60" y2="95" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#FFFBEB" />
         <stop offset="100%" stop-color="#FEF3C7" />
       </linearGradient>
 
       <!-- Gradient Topi Koki -->
-      <linearGradient id="linkaHatGrad" x1="60" y1="10" x2="60" y2="45" gradientUnits="userSpaceOnUse">
+      <linearGradient id="linkaHatGrad-{uid}" x1="60" y1="10" x2="60" y2="45" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#FFFFFF" />
         <stop offset="100%" stop-color="#F1F5F9" />
       </linearGradient>
 
       <!-- Shadow Halus -->
-      <radialGradient id="linkaShadow" cx="50%" cy="50%" r="50%">
+      <radialGradient id="linkaShadow-{uid}" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="#0F172A" stop-opacity="0.25" />
         <stop offset="100%" stop-color="#0F172A" stop-opacity="0" />
       </radialGradient>
     </defs>
 
     <!-- Bayangan Dasar (Ground Shadow) -->
-    <ellipse cx="60" cy="112" rx="36" ry="6" fill="url(#linkaShadow)" />
+    <ellipse cx="60" cy="112" rx="36" ry="6" fill="url(#linkaShadow-{uid})" />
 
     <!-- ==================== KAKI-KAKI KEPITING (LEGS) ==================== -->
     <g class="crab-legs" stroke="#C2410C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
@@ -87,13 +89,13 @@
     {#if variant === 'waving'}
       <!-- Capit Kiri (Istirahat Santai) -->
       <g class="claw-left">
-        <path d="M34 70 Q16 68 18 50 Q22 38 32 44 Q28 56 38 62 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M34 70 Q16 68 18 50 Q22 38 32 44 Q28 56 38 62 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M22 46 Q12 44 14 34 Q24 34 26 42 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
       </g>
 
       <!-- Capit Kanan (Melambai Tinggi Ceria) -->
       <g class="claw-right {animated ? 'animate-wave-claw origin-[86px_68px]' : ''}">
-        <path d="M86 68 Q104 60 102 40 Q98 28 88 34 Q92 46 82 54 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M86 68 Q104 60 102 40 Q98 28 88 34 Q92 46 82 54 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <!-- Pincer Thumb -->
         <path d="M96 34 Q106 28 104 18 Q94 20 92 28 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
         <!-- Motion lines melambai -->
@@ -103,13 +105,13 @@
     {:else if variant === 'thinking'}
       <!-- Capit Kiri (Pegang Pipi/Dagu Berpikir) -->
       <g class="claw-left">
-        <path d="M36 74 Q24 74 24 58 Q28 48 38 52 Q34 62 42 66 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M36 74 Q24 74 24 58 Q28 48 38 52 Q34 62 42 66 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M28 50 Q20 46 24 38 Q32 40 32 48 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
       </g>
 
       <!-- Capit Kanan (Mengetuk Dagu) -->
       <g class="claw-right">
-        <path d="M84 72 Q96 70 94 56 Q88 46 78 52 Q82 60 74 65 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M84 72 Q96 70 94 56 Q88 46 78 52 Q82 60 74 65 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M88 48 Q94 40 88 34 Q82 38 82 46 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
         <!-- Balon Pikiran Mini -->
         <circle cx="102" cy="34" r="3" fill="#E2E8F0" />
@@ -120,7 +122,7 @@
     {:else if variant === 'happy'}
       <!-- Capit Kiri (Mengangkat Sukses) -->
       <g class="claw-left {animated ? 'animate-bounce-subtle' : ''}">
-        <path d="M34 66 Q16 54 22 36 Q30 26 38 34 Q32 46 42 54 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M34 66 Q16 54 22 36 Q30 26 38 34 Q32 46 42 54 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M24 32 Q16 24 24 16 Q32 20 30 28 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
         <!-- Bintang Sparkle Kiri -->
         <path d="M12 22 L14 26 L18 28 L14 30 L12 34 L10 30 L6 28 L10 26 Z" fill="#FBBF24" />
@@ -128,7 +130,7 @@
 
       <!-- Capit Kanan (Mengangkat Sukses) -->
       <g class="claw-right {animated ? 'animate-bounce-subtle' : ''}">
-        <path d="M86 66 Q104 54 98 36 Q90 26 82 34 Q88 46 78 54 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M86 66 Q104 54 98 36 Q90 26 82 34 Q88 46 78 54 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M96 32 Q104 24 96 16 Q88 20 90 28 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
         <!-- Bintang Sparkle Kanan -->
         <path d="M108 22 L110 26 L114 28 L110 30 L108 34 L106 30 L102 28 L106 26 Z" fill="#FBBF24" />
@@ -136,17 +138,17 @@
     {:else}
       <!-- AVATAR / DEFAULT: Capit Imut Merangkul di Sisi Badan -->
       <g class="claw-left">
-        <path d="M32 70 Q16 66 18 52 Q22 42 30 46 Q26 56 36 62 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M32 70 Q16 66 18 52 Q22 42 30 46 Q26 56 36 62 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M22 48 Q14 44 16 36 Q24 38 24 44 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
       </g>
       <g class="claw-right">
-        <path d="M88 70 Q104 66 102 52 Q98 42 90 46 Q94 56 84 62 Z" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+        <path d="M88 70 Q104 66 102 52 Q98 42 90 46 Q94 56 84 62 Z" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
         <path d="M98 48 Q106 44 104 36 Q96 38 96 44 Z" fill="#F97316" stroke="#C2410C" stroke-width="2" />
       </g>
     {/if}
 
     <!-- ==================== BADAN KEPITING (CARAPACE) ==================== -->
-    <ellipse cx="60" cy="74" rx="34" ry="26" fill="url(#linkaShellGrad)" stroke="#C2410C" stroke-width="2.5" />
+    <ellipse cx="60" cy="74" rx="34" ry="26" fill="url(#linkaShellGrad-{uid})" stroke="#C2410C" stroke-width="2.5" />
 
     <!-- Sorotan Cahaya Halus di Tempurung Atas -->
     <path d="M38 60 Q60 52 82 60" stroke="#FDBA74" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8" />
@@ -158,7 +160,7 @@
       <!-- Badan Celemek -->
       <path
         d="M48 66 L72 66 Q76 80 70 94 Q60 97 50 94 Q44 80 48 66 Z"
-        fill="url(#linkaBellyGrad)"
+        fill="url(#linkaBellyGrad-{uid})"
         stroke="#E2E8F0"
         stroke-width="1.5"
       />
@@ -223,7 +225,7 @@
       <!-- Bayangan Lipatan Topi -->
       <path
         d="M40 46 C36 34 46 22 54 26 C57 18 68 18 72 25 C80 20 88 32 84 46 Z"
-        fill="url(#linkaHatGrad)"
+        fill="url(#linkaHatGrad-{uid})"
         stroke="#CBD5E1"
         stroke-width="2"
         stroke-linejoin="round"
@@ -296,5 +298,12 @@
 
   .animate-bounce-subtle {
     animation: bounceSubtle 1.8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-wave-claw,
+    .animate-bounce-subtle {
+      animation: none !important;
+    }
   }
 </style>
